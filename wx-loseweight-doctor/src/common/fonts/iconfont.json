@@ -1,0 +1,128 @@
+{
+  "id": "1754204",
+  "name": "减重患者",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "363117",
+      "name": "忘记密码",
+      "font_class": "icon12",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "1228395",
+      "name": "筛选",
+      "font_class": "shaixuan",
+      "unicode": "ea0d",
+      "unicode_decimal": 59917
+    },
+    {
+      "icon_id": "6033797",
+      "name": "撤回",
+      "font_class": "chehui",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "7738694",
+      "name": "二维码",
+      "font_class": "qrcode",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "12488782",
+      "name": "复制",
+      "font_class": "fuzhi",
+      "unicode": "e72a",
+      "unicode_decimal": 59178
+    },
+    {
+      "icon_id": "14127791",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "9727354",
+      "name": "不可见",
+      "font_class": "bukejian",
+      "unicode": "e699",
+      "unicode_decimal": 59033
+    },
+    {
+      "icon_id": "14230542",
+      "name": "可见",
+      "font_class": "kejian",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "6895836",
+      "name": "警告",
+      "font_class": "wuuiconsuotanhao",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "606303",
+      "name": "更多",
+      "font_class": "gengduomore10",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "11056521",
+      "name": "编辑",
+      "font_class": "bianji1",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "5651474",
+      "name": "三角箭头上",
+      "font_class": "sanjiaojiantoushang",
+      "unicode": "e66b",
+      "unicode_decimal": 58987
+    },
+    {
+      "icon_id": "77403",
+      "name": "链接",
+      "font_class": "lianjie",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "703461",
+      "name": "radiobox-blank",
+      "font_class": "radioboxblank",
+      "unicode": "ea2a",
+      "unicode_decimal": 59946
+    },
+    {
+      "icon_id": "1026835",
+      "name": "radio-fill",
+      "font_class": "radiofill",
+      "unicode": "e632",
+      "unicode_decimal": 58930
+    },
+    {
+      "icon_id": "6500419",
+      "name": "close",
+      "font_class": "close1",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
+      "icon_id": "12433252",
+      "name": "三角_fill-02",
+      "font_class": "sanjiao_fill-",
+      "unicode": "e6a0",
+      "unicode_decimal": 59040
+    }
+  ]
+}
