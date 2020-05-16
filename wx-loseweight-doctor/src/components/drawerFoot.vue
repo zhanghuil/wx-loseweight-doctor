@@ -5,11 +5,17 @@
             <div class="drawer-head">
                 <span>{{ title }}</span>
                 <span v-show="closable" class="close-btn" @click="closeByButton"
-                    ><i class="cubeic-close"></i></span
-                >
+                    ><i class="iconfont icon-searchclose"></i
+                ></span>
             </div>
             <div class="drawer-body" :style="bodyStyle">
                 <slot />
+            </div>
+            <div class="footerEdit">
+                <button class="yk-btn yk-btn-def" @click="cancelTap">
+                    取消
+                </button>
+                <button class="yk-btn" @click="submitTap">确定</button>
             </div>
         </div>
     </div>
@@ -99,6 +105,12 @@ export default {
         },
         closeByButton() {
             this.$emit('update:display', false)
+        },
+        cancelTap() {
+            this.$emit('cancle', event.target)
+        },
+        submitTap() {
+            this.$emit('confirm', event.target)
         }
     }
 }
@@ -127,7 +139,7 @@ export default {
         height: 100%;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
-        background: #f7f7f7;
+        background: #ffffff;
         transition: all 0.5s;
     }
     .main-show {
@@ -140,33 +152,41 @@ export default {
         position: absolute;
     }
     .drawer-head {
+        font-family: PingFangSC-Medium;
         display: flex;
         justify-content: space-between;
         align-items: center;
         height: 50px;
         padding: 20px;
         box-sizing: border-box;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
         font-size: 16px;
+        color: #3a3a3a;
         font-weight: bold;
         background: #fff;
         position: relative;
-        border-bottom: 1px solid #eee;
         .close-btn {
-            font-size: 24px;
+            font-size: 20px;
+            font-weight: bold;
             position: absolute;
             right: 20px;
             top: 50%;
             transform: translateY(-50%);
             display: inline-block;
-            cursor: pointer;
+						cursor: pointer;
+						.iconfont{
+							font-size: 20px;
+						}
         }
     }
     .drawer-body {
         // padding: 20px;
         font-size: 14px;
         overflow: auto;
-    }
+		}
+		.footerEdit{
+			position: absolute;
+		}
 }
 </style>

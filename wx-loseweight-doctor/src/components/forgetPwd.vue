@@ -141,7 +141,15 @@ export default {
         loginSubmit() {
             alert('tijiaola')
         }
+		},
+    mounted() {
+        document
+            .querySelector('body')
+            .setAttribute('style', 'background-color:#ffffff')
     },
+    beforeDestroy() {
+        document.querySelector('body').setAttribute('style', '')
+    }
 }
 </script>
 

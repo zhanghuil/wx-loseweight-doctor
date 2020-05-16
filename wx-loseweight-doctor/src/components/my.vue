@@ -8,7 +8,7 @@
                     <p class="name">李伟<i class="icon cubeic-arrow"></i></p>
                     <p class="hos">上海第十人民医院</p>
                 </div>
-                <div class="qCodeimg"><i class="icon icon-qrcode"></i></div>
+                <div class="qCodeimg"><i class="icon iconfont icon-qrcode"></i></div>
             </div>
         </div>
         <div class="myList">
@@ -41,6 +41,7 @@
                     </div>
                     <div><i class="icon cubeic-arrow"></i></div>
                 </li>
+								<router-link to="/groupMag">
                 <li>
                     <div class="L">
                         <div>
@@ -54,6 +55,7 @@
                     </div>
                     <div><i class="icon cubeic-arrow"></i></div>
                 </li>
+								</router-link>
                 <li>
                     <div class="L">
                         <div>
@@ -115,14 +117,6 @@ export default {
             }).show()
         }
     },
-    mounted() {
-        document
-            .querySelector('body')
-            .setAttribute('style', 'background-color:#f7f7f7')
-    },
-    beforeDestroy() {
-        document.querySelector('body').setAttribute('style', '')
-    }
 }
 </script>
 
@@ -169,7 +163,7 @@ export default {
         }
         .qCodeimg {
             position: absolute;
-            top: 4px;
+            top: 15px;
             right: 15px;
             .icon {
                 color: #ffffff;

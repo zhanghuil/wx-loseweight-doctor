@@ -14,14 +14,6 @@
 <script>
 export default {
     name: 'doctorCard',
-    mounted() {
-        document
-            .querySelector('body')
-            .setAttribute('style', 'background-color:#f7f7f7')
-    },
-    beforeDestroy() {
-        document.querySelector('body').setAttribute('style', '')
-    }
 }
 </script>
 

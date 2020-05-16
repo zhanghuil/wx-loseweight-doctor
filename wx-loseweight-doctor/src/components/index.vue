@@ -2,12 +2,12 @@
     <div>
         <div class="header">
             <div class="wrapper">
-                <i class="icon icon-shaixuan" @click="display = true"></i>
+                <i class="icon iconfont icon-shaixuan" @click="display = true"></i>
                 <div class="searchBox" @click="searchTap">
-                    <i class="icon icon-sousuo"></i>
+                    <i class="icon iconfont icon-sousuo"></i>
                     <span class="c-a f14 ml10">输入患者称呼或手机号搜索</span>
                 </div>
-                <i class="icon icon-qrcode" @click="lookDoctorCard"></i>
+                <i class="icon iconfont icon-qrcode" @click="lookDoctorCard"></i>
             </div>
         </div>
         <div class="contenter">
@@ -100,27 +100,37 @@
                 ></Options>
             </div>
         </drawer>
-        <!-- 底部弹窗 -->
-        <!-- <div @click="display2 = true">底部弹窗</div>
-        <drawerFoot
-            title="底部菜单"
-            :display.sync="display2"
-            :width="drawerWidth2"
-            :height="drawerHeight2"
-        ></drawerFoot> -->
         <!-- 筛选end -->
+        <!-- 左滑删除使用 -->
+        <!-- <div v-for="(item,index) in leftList" :key="index">
+            <leftSlider :index="1" @deleteItem="deleteItem">
+                <div style="height: 1.16rem;width: 100%;border:1px solid #ccc;background:#fff">
+                    {{ item.text }}
+                </div>
+            </leftSlider>
+        </div> -->
     </div>
 </template>
 
 <script>
+import leftSlider from '@/components/leftSlider.vue'
 import Options from '@/components/options'
 import drawer from '@/components/drawer'
-import drawerFoot from '@/components/drawerFoot'
 export default {
     name: 'index',
-    components: { drawer, Options, drawerFoot },
+    components: { drawer, Options, leftSlider },
     data() {
         return {
+            leftList: [
+                {
+                    text: '苹果',
+                    id: 1
+                },
+                {
+                    text: '香蕉',
+                    id: 2
+                }
+            ],
             radioVal: [],
             checkedVal: [],
             checkedList: [
@@ -182,9 +192,6 @@ export default {
             display: false, //筛选弹窗
             drawerWidth: '280px',
             drawerHeight: '100%',
-            display2: true,
-            drawerWidth2: '100%',
-            drawerHeight2: '245px',
             timeIndex: 0
         }
     },
@@ -203,7 +210,12 @@ export default {
         tabTimeClick(index) {
             this.timeIndex = index
         },
-        lookDetails() {},
+        lookDetails() {
+            this.$router.push({
+                path: '/patientList',
+                query: { userId: 123, userName: '李梅丽' }
+            })
+        },
         //查看医生名片
         lookDoctorCard() {
             this.$router.push({
@@ -229,14 +241,6 @@ export default {
             })
         }
     },
-    mounted() {
-        document
-            .querySelector('body')
-            .setAttribute('style', 'background-color:#f7f7f7')
-    },
-    beforeDestroy() {
-        document.querySelector('body').setAttribute('style', '')
-    }
 }
 </script>
 

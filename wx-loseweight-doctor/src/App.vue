@@ -17,8 +17,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
+@import 'common/less/mixin.less';
 body{
-	background-color: #ffffff;
+	background-color: #f7f7f7;
 }
 </style>

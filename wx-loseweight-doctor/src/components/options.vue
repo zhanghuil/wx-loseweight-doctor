@@ -7,13 +7,33 @@
                 :key="index"
                 @click="optionsClick(item)"
             >
-                <div v-if="checkActive(item)">
-                    <i class="icon cubeic-square-right"></i>
+                <!-- 右侧选择文本框 -->
+                <div v-show="isRight" class="flex-bet w-100">
+                    <div class="flex-bet">
+                        <div>{{ item.label }}</div>
+                        <div v-show="item.num" class="num">
+                            （{{ item.num }}）
+                        </div>
+                    </div>
+                    <div>
+                        <div v-if="checkActive(item)">
+                            <i class="icon cubeic-square-right"></i>
+                        </div>
+                        <div v-else>
+                            <i class="icon cubeic-square-border"></i>
+                        </div>
+                    </div>
                 </div>
-                <div v-else>
-                    <i class="icon cubeic-square-border"></i>
+                <div v-show="!isRight" class="flex-bet">
+                    <div v-if="checkActive(item)">
+                        <i class="icon cubeic-square-right"></i>
+                    </div>
+                    <div v-else>
+                        <i class="icon cubeic-square-border"></i>
+                    </div>
+                    <div>{{ item.label }}</div>
+                    <div v-show="item.num" class="num">（{{ item.num }}）</div>
                 </div>
-                <div>{{ item.label }}</div>
             </li>
         </ul>
     </div>
@@ -29,6 +49,11 @@ export default {
         options: Array, //传入的数组
         isMultiply: {
             //是否是多选。默认为false：单选；true：多选
+            type: Boolean,
+            default: false
+        },
+        isRight: {
+            //是否右侧选择框。默认为false：左侧；    true：右侧
             type: Boolean,
             default: false
         },
@@ -66,6 +91,11 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+.flex-bet {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
 ul,
 li {
     margin: 0;

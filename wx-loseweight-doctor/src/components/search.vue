@@ -62,14 +62,6 @@ export default {
             this.$router.go(-1) //返回上一层
         }
     },
-    mounted() {
-        document
-            .querySelector('body')
-            .setAttribute('style', 'background-color:#f7f7f7')
-    },
-    beforeDestroy() {
-        document.querySelector('body').setAttribute('style', '')
-    }
 }
 </script>
 

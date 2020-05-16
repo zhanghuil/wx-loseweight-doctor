@@ -6,6 +6,76 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "14692400",
+      "name": "复制",
+      "font_class": "fuzhi2",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "9520735",
+      "name": "必填",
+      "font_class": "bitian-",
+      "unicode": "e6cf",
+      "unicode_decimal": 59087
+    },
+    {
+      "icon_id": "7030138",
+      "name": "插入",
+      "font_class": "charu",
+      "unicode": "eb06",
+      "unicode_decimal": 60166
+    },
+    {
+      "icon_id": "7235610",
+      "name": "meals",
+      "font_class": "meals",
+      "unicode": "e827",
+      "unicode_decimal": 59431
+    },
+    {
+      "icon_id": "8747339",
+      "name": "引号",
+      "font_class": "yinhao",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "13609806",
+      "name": "保存",
+      "font_class": "baocun",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "14026801",
+      "name": "引号",
+      "font_class": "quote-right",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "14154337",
+      "name": "消息",
+      "font_class": "xiaoxi-01",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "14595923",
+      "name": "meal",
+      "font_class": "meal",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "11713014",
+      "name": "search close",
+      "font_class": "searchclose",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
       "icon_id": "363117",
       "name": "忘记密码",
       "font_class": "icon12",
@@ -32,13 +102,6 @@
       "font_class": "qrcode",
       "unicode": "e603",
       "unicode_decimal": 58883
-    },
-    {
-      "icon_id": "12488782",
-      "name": "复制",
-      "font_class": "fuzhi",
-      "unicode": "e72a",
-      "unicode_decimal": 59178
     },
     {
       "icon_id": "14127791",

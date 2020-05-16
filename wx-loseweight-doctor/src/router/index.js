@@ -22,6 +22,35 @@ export default new Router({
 			}
 		},
 		{
+			path: '/patientList',
+			name: 'patientList',
+			component: resolve => require(['@/components/patientList'], resolve),
+			meta: {
+				title: '患者'
+			}
+		},
+		{
+			path: '/patientGroup',
+			name: 'patientGroup',
+			component: resolve => require(['@/components/patientGroup'], resolve),
+			meta: {
+				title: '患者组'
+			}
+		},
+		{
+			path: '/lookInfo',
+			name: 'lookInfo',
+			component: resolve => require(['@/components/lookInfo'], resolve),
+		},
+		{
+			path: '/lookPlan',
+			name: 'lookPlan',
+			component: resolve => require(['@/components/lookPlan'], resolve),
+			meta: {
+				title: '减重方案'
+			}
+		},
+		{
 			path: '/doctorCard',
 			name: 'doctorCard',
 			component: resolve => require(['@/components/doctorCard'], resolve),
@@ -59,6 +88,27 @@ export default new Router({
 			component: resolve => require(['@/components/myInfo'], resolve),
 			meta: {
 				title: '我的信息'
+			}
+		},
+		{
+			path: '/groupMag',
+			name: 'groupMag',
+			component: resolve => require(['@/components/groupMag'], resolve),
+			meta: {
+				title: '患者组管理'
+			}
+		},
+		{
+			path: '/editGroup',
+			name: 'editGroup',
+			component: resolve => require(['@/components/editGroup'], resolve)
+		},
+		{
+			path: '/draftPlan',
+			name: 'draftPlan',
+			component: resolve => require(['@/components/draftPlan'], resolve),
+			meta: {
+				title: '制定减重方案'
 			}
 		},
 	]

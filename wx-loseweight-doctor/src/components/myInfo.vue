@@ -51,25 +51,10 @@ export default {
         return {}
     },
     methods: {},
-    mounted() {
-        document
-            .querySelector('body')
-            .setAttribute('style', 'background-color:#f7f7f7')
-    },
-    //销毁前清除
-    beforeDestroy() {
-        document.querySelector('body').removeAttribute('style')
-    }
 }
 </script>
 
 <style lang="less" scoped>
-// .contenter {
-//     height: 100%;
-//     position: fixed;
-//     width: 100%;
-//     background: #f7f7f7;
-// }
 .wx_cell {
     padding: 16px;
     position: relative;
