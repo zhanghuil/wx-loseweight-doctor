@@ -1,13 +1,19 @@
 <template>
     <div>
         <div class="header">
-            <div class="wrapper">
-                <i class="icon iconfont icon-shaixuan" @click="display = true"></i>
+            <div class="wrapperH">
+                <i
+                    class="icon iconfont icon-shaixuan"
+                    @click="display = true"
+                ></i>
                 <div class="searchBox" @click="searchTap">
                     <i class="icon iconfont icon-sousuo"></i>
                     <span class="c-a f14 ml10">输入患者称呼或手机号搜索</span>
                 </div>
-                <i class="icon iconfont icon-qrcode" @click="lookDoctorCard"></i>
+                <i
+                    class="icon iconfont icon-qrcode"
+                    @click="lookDoctorCard"
+                ></i>
             </div>
         </div>
         <div class="contenter">
@@ -19,23 +25,43 @@
                         class="navBarItem"
                         :class="activeIndex == index ? 'on' : ''"
                     >
-                        <div class="item" @click="tabClick(index)">
+                        <div class="item" @click="tabClick(index, item.id)">
                             {{ item.name }}
                         </div>
                     </div>
                 </div>
             </div>
             <div class="listPanel" v-show="activeIndex === 0">
-                <div class="item" @click="lookDetails">
+                <div
+                    class="item"
+                    @click="lookDetails(item.PatientID, item.Name)"
+                    v-for="(item, index) in patientsList"
+                    :key="index"
+                >
                     <div>
-                        <img class="txImg" src="../assets/tx1.png" alt="" />
+                        <img
+                            class="txImg"
+                            :src="item.AvatarUrl"
+                            @error="imgError()"
+                        />
                     </div>
                     <div>
                         <p>
-                            <strong>李芳</strong>
-                            <span>120kg，女，23岁</span>
+                            <strong>{{ item.Name }}</strong>
+                            <span
+                                >{{ item.Weight }}kg，{{
+                                    item.Sex == 1 ? '男' : '女'
+                                }}，{{ item.Age }}岁</span
+                            >
                         </p>
-                        <p class="time">首诊：2020-03-01</p>
+                        <p class="time">
+                            首诊：{{ item.DiagnoseDate | formatDateStr }}
+                        </p>
+                        <p class="time">
+                            计划下次复诊：{{
+                                item.ReVisitingDate | formatDateStr
+                            }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -116,11 +142,17 @@
 import leftSlider from '@/components/leftSlider.vue'
 import Options from '@/components/options'
 import drawer from '@/components/drawer'
+import { yktoast } from '../common/js/util'
+import storage from '../common/js/storage'
+import { formatDate } from '../common/js/date'
 export default {
     name: 'index',
     components: { drawer, Options, leftSlider },
     data() {
         return {
+            errorImg: require('@/assets/tx1.png'),
+            patientsList: [], //患者列表
+            accountId: '',
             leftList: [
                 {
                     text: '苹果',
@@ -174,20 +206,18 @@ export default {
             navList: [
                 {
                     id: '1',
-                    name: '今日患者',
-                    type: 'LastModifyTime'
+                    name: '今日患者'
                 },
                 {
                     id: '2',
-                    name: '明日患者',
-                    type: 'ShowPalyPT'
+                    name: '明日患者'
                 },
                 {
-                    id: '2',
-                    name: '全部患者',
-                    type: 'ShowPalyPT'
+                    id: '0',
+                    name: '全部患者'
                 }
             ],
+            queryType: 0, //查询类型 0 全部 1今日患者 2明日患者
             activeIndex: 0,
             display: false, //筛选弹窗
             drawerWidth: '280px',
@@ -195,7 +225,51 @@ export default {
             timeIndex: 0
         }
     },
+    filters: {
+        formatDateStr: function(time) {
+            if (time != null && time != '') {
+                var date = new Date(time)
+                return formatDate(date, 'yyyy-MM-dd')
+            } else {
+                return ''
+            }
+        }
+    },
+    created() {
+        let AccountId = storage.getItem('AccountId')
+        if (AccountId) this.accountId = AccountId
+        console.log(`AccountId：${AccountId}`)
+
+        this.getJZMZPatients() //获取减重病人
+    },
     methods: {
+        imgError() {
+            let img = event.srcElement
+            img.src = this.errorImg
+            img.onerror = null //防止闪图
+        },
+        //获取减重病人
+        getJZMZPatients() {
+            var _this = this
+            let url = this.api.userApi.GetJZMZPatients
+            let data = {
+                PageIndex: 0,
+                PageSize: 10,
+                Keyword: '', //搜索关键词
+                DoctorId: this.accountId,
+                UpdateTimeDay: 0, //更新时间天数 7,15,30
+                GroupId: '', // 分组
+                QueryType: this.queryType //查询类型 0 全部 1今日患者 2明日患者
+            }
+            this.$fetchPost(url, data, 4111).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.Data) {
+                    _this.patientsList = result.Data
+                }
+                // yktoast()
+            })
+        },
+
         close() {
             this.isshow = false
         },
@@ -203,17 +277,18 @@ export default {
             this.isshow = true
         },
         //切换tab项
-        tabClick(index) {
+        tabClick(index, id) {
             this.activeIndex = index
+            this.queryType = id
         },
         // 更新时间
         tabTimeClick(index) {
             this.timeIndex = index
         },
-        lookDetails() {
+        lookDetails(id, name) {
             this.$router.push({
                 path: '/patientList',
-                query: { userId: 123, userName: '李梅丽' }
+                query: { userId: id, userName: name }
             })
         },
         //查看医生名片
@@ -240,7 +315,7 @@ export default {
                 path: '/search'
             })
         }
-    },
+    }
 }
 </script>
 
@@ -252,7 +327,7 @@ export default {
     top: 0;
     left: 0;
     width: 100%;
-    .wrapper {
+    .wrapperH {
         display: flex;
         align-items: center;
         padding: 15px 20px;

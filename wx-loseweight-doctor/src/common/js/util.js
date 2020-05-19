@@ -1,105 +1,38 @@
 import md5 from 'js-md5';
 import storage from './storage'
-import axios from '../../request/http'
-import qs from 'qs'
+import Cube from 'cube-ui'
 
-import cryptoJs from 'crypto-js'
+import Vue from 'vue';  //1.引入vue
+let v = new Vue();  //2.新创建一个vue实例
 
-// DES加密
-//CBC模式
-export const encryptDes = (message) => {
-	var key = 'YkBrWXCz'
-	var keyHex = cryptoJs.enc.Utf8.parse(key)
-	var ivHex = cryptoJs.enc.Utf8.parse(key)
-	var option = { iv: ivHex, mode: cryptoJs.mode.CBC, padding: cryptoJs.pad.Pkcs7 }
-	var encrypted = cryptoJs.DES.encrypt(message, keyHex, option)
-	return encrypted.ciphertext.toString()
-}
 
-// DES解密
-export const decryptDes = (message) => {
-	var key = 'YkBrWXCz'
-	var keyHex = cryptoJs.enc.Utf8.parse(key)
-	var ivHex = cryptoJs.enc.Utf8.parse(key)
-	var decrypted = cryptoJs.DES.decrypt(
-		{
-			ciphertext: cryptoJs.enc.Hex.parse(message)
-		},
-		keyHex,
-		{
-			iv: ivHex,
-			mode: cryptoJs.mode.CBC,
-			padding: cryptoJs.pad.Pkcs7
-		}
-	)
-	return decrypted.toString(cryptoJs.enc.Utf8)
-}
 /**
- * @param 默认参数
- * @param {String} WechatNo [请求时openid] 
- * @param {Number} number [请求的接口编号]
+ * 提示框toast
+ * @param {*} number 
+ * @param {*} currentDate 
  */
-export function defaultParam(WechatNo, number) {
-	if (!WechatNo)
-		var WechatNo = storage.getItem('openId');
-	let currentDate = formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
-	let defaultParams = {
-		authCode: encryption(WechatNo, number, currentDate),
-		terminalNo: WechatNo,
-		callFrom: 'yk_wx_brc',
-		callTime: currentDate
-	}
-	return defaultParams
+export function yktoast(txt) {
+	//3.在新的实例上使用组件
+	v.$createToast({
+		time: 1000,
+		txt: txt,
+		type: 'txt'
+	}).show()
 }
-/**
- * 首页未登录
- * @param {*} WechatNo [openid]
- * @param {*} number [接口编号]
- */
-export function defaultParam2(WechatNo, number) {
-	let defaultParams = {
-		wexinNo: WechatNo,
-		authCode: encryption(WechatNo, number)
-	}
-	return defaultParams
-}
-/** 
- * post方法，对应post请求 封装请求方法
- * @param {String} url [请求的url地址] 
- * @param {Object} params [请求时携带的参数] 
- */
-export function postRequest(url, params) {
-	return new Promise((resolve, reject) => {
-		axios.post(url, qs.stringify(params))
-			.then(res => {
-				resolve(res.data);
-			}).catch(err => {
-				reject(err.data)
-			})
-	});
-}
+
 /**
  * API接口参数加密
- * @example authCode内容为：微信号+当前日期+接口编号
+ * @example authCode内容为：接口编号+当前日期
  * @return 64196cb63ebf712f750ede4c0584222d
  */
-export function encryption(WechatNo, number, currentDate) {
+export function encryption(number, currentDate) {
 	let authCode = ''
-	var str = [WechatNo, currentDate, number].map(authCodeStr).join('+');
+	var str = [currentDate, number].map(authCodeStr).join('+');
 	authCode = md5(str)
 	// console.log(str)
 	return authCode
 }
-//预支付authCode加密
-export function encryptionPay(WechatNo, number, price) {
-	let authCode = ''
-	let date = new Date();
-	let currentDate = formatDate(date, 'yyyyMMddhhmmss');
-	var str = [WechatNo, currentDate, number, price].map(authCodeStr).join('+');
-	authCode = md5(str)
-	// console.log(str)
-	return authCode
-}
+
 function authCodeStr(n) {
 	n = n.toString()
 	return n
@@ -128,70 +61,3 @@ export function formatDate(date, fmt) {
 	}
 	return fmt;
 };
-
-function padLeftZero(str) {
-	return ('00' + str).substr(str.length);
-}
-/**
- * 
- * @param {*} url 
- */
-export function extractQueryParams(url) {
-	let queryParams = {}
-	if (url.includes('?')) {
-		let queryString = url.substr(url.indexOf('?') + 1)
-		let pairs = queryString.split('&')
-		for (let pair of pairs) {
-			let splitArray = pair.split('=')
-			let key = splitArray[0]
-			let value = splitArray[1]
-			if (value.indexOf('#') > -1) {
-				value = value.substring(0, value.indexOf('#'))
-			}
-
-			queryParams[key] = value
-		}
-	}
-	return queryParams
-}
-
-/**
- * 解析url参数
- * @example ?id=12345&a=b
- * @return Object {id:12345,a:b}
- */
-export function urlParse() {
-	let url = window.location.search;
-	let obj = {};
-	let reg = /[?&][^?&]+=[^?&]+/g;
-	let arr = url.match(reg);
-	// ['?id=12345', '&a=b']
-	if (arr) {
-		arr.forEach((item) => {
-			let tempArr = item.substring(1).split('=');
-			let key = decodeURIComponent(tempArr[0]);
-			let val = decodeURIComponent(tempArr[1]);
-			obj[key] = val;
-		});
-	}
-	return obj;
-};
-
-/**
- * 分组
- * list:原始数据。
- * fn:分组条件判断函数，之后会根据该函数返回的结果进行分组，其有一个参数表示数组的某一项数据。
- */
-export const groupBy = (list, fn) => {
-	const groups = {};
-	list.forEach(function (o) {
-		const group = JSON.stringify(fn(o));
-		groups[group] = groups[group] || [];
-		groups[group].push(o);
-	});
-	// return Object.keys(groups).map(function (group) {
-	//     return groups[group];
-	// });
-	return groups;
-}
-

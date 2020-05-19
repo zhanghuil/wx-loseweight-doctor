@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapperPa">
         <div class="patientPanel">
             <div class="item">
                 <div>
@@ -7,36 +7,46 @@
                 </div>
                 <div>
                     <p class="pb8">
-                        <strong>李芳</strong>
-                        <span>120kg，女，23岁</span>
+                        <strong>{{ patientInfo.Name }}</strong>
+                        <span
+                            >{{ patientInfo.Weight }}kg，{{
+                                patientInfo.Sex == 1 ? '男' : '女'
+                            }}，{{ patientInfo.Age }}岁</span
+                        >
                     </p>
-                    <p class="time">首诊：2020-03-01</p>
-                    <p class="time">计划复诊：2020-04-02</p>
+                    <p class="time" v-show="patientInfo.DiagnoseDate">
+                        首诊：{{ patientInfo.DiagnoseDate | formatDateStr2 }}
+                    </p>
+                    <p class="time" v-show="patientInfo.ReVisitingDate">
+                        计划复诊：{{
+                            patientInfo.ReVisitingDate | formatDateStr2
+                        }}
+                    </p>
                 </div>
             </div>
             <div class="infoPanel">
-                <div class="item currentPanel">
+                <div class="item currentPanel" v-show="patientInfo.Weight">
                     <div class="tip">当前</div>
                     <div class="flex-between">
                         <div>
-                            <p class="num">68</p>
+                            <p class="num">{{ patientInfo.Weight }}</p>
                             <p>体重（kg）</p>
                         </div>
                         <div>
-                            <p class="num">42</p>
+                            <p class="num">{{ patientInfo.BMI }}</p>
                             <p>BMI指标</p>
                         </div>
                     </div>
                 </div>
-                <div class="item">
+                <div class="item" v-show="patientInfo.DiagnoseWeight">
                     <div class="tip">首诊</div>
                     <div class="flex-between">
                         <div>
-                            <p class="num">68</p>
+                            <p class="num">{{ patientInfo.DiagnoseWeight }}</p>
                             <p>体重（kg）</p>
                         </div>
                         <div>
-                            <p class="num">42</p>
+                            <p class="num">{{ patientInfo.DiagnoseBMI }}</p>
                             <p>BMI指标</p>
                         </div>
                     </div>
@@ -91,7 +101,7 @@
                             </div>
                             <div
                                 class="img"
-                                :style="{ height: item.CurrentWeight + 'px' }"
+                                :style="{ height: item.heightClass + 'px' }"
                             ></div>
                             <div class="txt">
                                 {{ item.RecordDate | formatDateStr }}
@@ -105,8 +115,8 @@
                             class="item"
                             v-for="(item, index) in tagTab"
                             :key="index"
-                            :class="index == tagTabIndex ? 'on' : ''"
-                            @click="tagTabTap(index)"
+                            :class="item.id == tagTabId ? 'on' : ''"
+                            @click="tagTabTap(item.id)"
                         >
                             {{ item.name }}
                         </li>
@@ -132,10 +142,28 @@
                 <img src="../assets/icon0@2x.png" alt="" />
                 医生评估表
             </div>
-            <div class="info" @click="lookInfo('follow', 1)">
-                03/20 随访登记(患者)
+            <div v-for="(item, index) in infoList" :key="index">
+                <div v-if="item.TypeCode == 'SFDJ'">
+                    <!-- 随访登记 -->
+                    <div
+                        class="info"
+                        @click="lookInfo('follow', item.FollowUpVisit.ID)"
+                    >
+                        {{ item.RecordDate | formatDateStr }} 随访登记(患者)
+                    </div>
+                </div>
+                <!-- 首诊登记 -->
+                <div v-if="item.TypeCode == 'SZDJ'">
+                    <div
+                        class="info"
+                        @click="lookInfo('first', item.Diagnose.ID)"
+                    >
+                        {{ item.RecordDate | formatDateStr }} 首诊登记(患者)
+                    </div>
+                </div>
             </div>
-            <div class="rel">
+            <!-- 医生评估表 -->
+            <div class="rel dn">
                 <div class="info">
                     <span>03/20 评估表(医生)</span>
                     <i class="icon iconfont icon-gengduomore10"></i>
@@ -157,9 +185,6 @@
                     </div>
                 </div>
             </div>
-            <div class="info" @click="lookInfo('first', 2)">
-                03/20 首诊登记(患者)
-            </div>
         </div>
         <!-- 减重方案 -->
         <div v-show="activeIndex == 1" class="listBox">
@@ -167,25 +192,73 @@
                 <img src="../assets/icon0@2x.png" alt="" />
                 制定新的减重方案
             </div>
-            <div class="wrapper2">
+            <div
+                class="wrapper2"
+                v-for="(item, index) in planList"
+                :key="index"
+            >
                 <div class="title">
-                    <span class="plan">03/22 减重方案</span>
+                    <span class="plan"
+                        >{{ item.RecordDate | formatDateStr }} 减重方案</span
+                    >
+                    <span class="state" v-if="item.WeightLossPlan.State == 6"
+                        >已撤回</span
+                    >
+                    <i
+                        class="icon iconfont icon-gengduomore10"
+                        @click="editBtn(item.WeightLossPlan.ID)"
+                    ></i>
                 </div>
-                <div class="planTxt" @click="lookPlan(1)">
-                    <img src="../assets/icon0.png" alt="" />
-                    <div class="">#高蛋白饮食方案#</div>
+                <div
+                    class="editBoxwrap"
+                    v-show="planId == item.WeightLossPlan.ID"
+                >
+                    <div class="editBox">
+                        <div class="arrow">
+                            <i></i>
+                            <span></span>
+                        </div>
+                        <ul class="w-100">
+                            <li
+                                class="editImg"
+                                v-if="item.IsModifiable == true"
+                                @click="withdrawTap(item.WeightLossPlan.ID)"
+                            >
+                                <img src="../assets/edit2@2x.png" alt="" /> 撤回
+                            </li>
+                            <li
+                                class="editImg"
+                                @click="copyTap(item.WeightLossPlan.ID)"
+                            >
+                                <img src="../assets/edit3@2x.png" alt="" /> 复制
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="planTxt" @click="lookPlan(item.WeightLossPlan.ID)">
+                    <template
+                        v-if="item.WeightLossPlan.TypeCode == 'HighProtein'"
+                    >
+                        <img src="../assets/icon0.png" alt="" />
+                    </template>
+                    <template
+                        v-else-if="item.WeightLossPlan.TypeCode == 'FastDiet'"
+                    >
+                        <img src="../assets/icon2.png" alt="" />
+                    </template>
+                    <template
+                        v-else-if="
+                            item.WeightLossPlan.TypeCode == 'LimitEnergy'
+                        "
+                    >
+                        <img src="../assets/icon3.png" alt="" />
+                    </template>
+
+                    <div class="">#{{ item.WeightLossPlan.Name }}#</div>
                 </div>
             </div>
-            <div class="wrapper2">
-                <div class="title">
-                    <span class="plan">03/22 减重方案</span>
-                </div>
-                <div class="planTxt">
-                    <img src="../assets/icon2.png" alt="" />
-                    <div class="">#轻断食方案#</div>
-                </div>
-            </div>
-            <div class="wrapper2">
+
+            <div class="wrapper2 dn">
                 <div class="title">
                     <span class="plan">03/22 减重方案</span>
                     <span class="state">已撤回</span>
@@ -218,11 +291,14 @@
 </template>
 
 <script>
+import { yktoast } from '../common/js/util'
+import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
 export default {
     name: 'patientList',
     data() {
         return {
+            patientInfo: {}, //患者信息
             formId: '',
             empty: true,
             tabs: ['评估表', '减重方案'],
@@ -242,70 +318,12 @@ export default {
                     id: 3
                 }
             ],
-            tagTabIndex: 0,
+            tagTabId: 1, //默认体重类型  日
             showTipIndex: 0,
-            weightData: [
-                {
-                    CurrentWeight: 100,
-                    RecordDate: '2020-05-04T00:00:00'
-                },
-                {
-                    CurrentWeight: 105,
-                    RecordDate: '2020-05-05T00:00:00'
-                },
-                {
-                    CurrentWeight: 131,
-                    RecordDate: '2020-05-06T00:00:00'
-                },
-                {
-                    CurrentWeight: 121.9,
-                    RecordDate: '2020-05-07T00:00:00'
-                },
-                {
-                    CurrentWeight: 121.9,
-                    RecordDate: '2020-05-08T00:00:00'
-                },
-                {
-                    CurrentWeight: 100,
-                    RecordDate: '2020-05-04T00:00:00'
-                },
-                {
-                    CurrentWeight: 105,
-                    RecordDate: '2020-05-05T00:00:00'
-                },
-                {
-                    CurrentWeight: 131,
-                    RecordDate: '2020-05-06T00:00:00'
-                },
-                {
-                    CurrentWeight: 121.9,
-                    RecordDate: '2020-05-07T00:00:00'
-                },
-                {
-                    CurrentWeight: 121.9,
-                    RecordDate: '2020-05-08T00:00:00'
-                },
-                {
-                    CurrentWeight: 100,
-                    RecordDate: '2020-05-04T00:00:00'
-                },
-                {
-                    CurrentWeight: 105,
-                    RecordDate: '2020-05-05T00:00:00'
-                },
-                {
-                    CurrentWeight: 131,
-                    RecordDate: '2020-05-06T00:00:00'
-                },
-                {
-                    CurrentWeight: 121.9,
-                    RecordDate: '2020-05-07T00:00:00'
-                },
-                {
-                    CurrentWeight: 121.9,
-                    RecordDate: '2020-05-08T00:00:00'
-                }
-            ]
+            weightData: [], //体重记录
+            infoList: [], //评估表
+            planList: [], //减重方案
+            planId: ''
         }
     },
     filters: {
@@ -316,23 +334,109 @@ export default {
             } else {
                 return ''
             }
+        },
+        formatDateStr2: function(time) {
+            if (time != null && time != '') {
+                var date = new Date(time)
+                return formatDate(date, 'yyyy-MM-dd')
+            } else {
+                return ''
+            }
         }
     },
     created() {
-        // this.$refs.scroll.refresh()
         document.title = this.$route.query.userName
-
-        // this.getParams()
+        this.getParams()
+        this.getJZMZPatient()
+        this.getWeightRecordByType()
+        this.getRecordedRegistrations()
+        this.getWeightLossPlans()
     },
     methods: {
+        //操作按钮
+        editBtn(id) {
+            this.planId = id
+        },
+        //复制减重方案
+        copyTap(id) {},
+        //撤回减重方案
+        withdrawTap(id) {},
         getParams() {
             this.userName = this.$route.query.userName
             this.userId = this.$route.query.userId
         },
+        //获取患者详情
+        getJZMZPatient() {
+            var _this = this
+            let url = this.api.userApi.GetJZMZPatient
+            let data = {
+                patientId: this.$route.query.userId
+            }
+            this.$fetchGet(url, data, 4112).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                _this.patientInfo = result
+            })
+        },
+        //获取患者体重记录
+        getWeightRecordByType() {
+            var _this = this
+            let url = this.api.userApi.GetWeightRecordByType
+            let data = {
+                patientId: this.$route.query.userId,
+                showType: this.tagTabId
+            }
+            this.$fetchGet(url, data, 4201).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                result.forEach(element => {
+                    element.heightClass = element.CurrentWeight / 2
+                })
+                _this.weightData = result
+            })
+        },
+        // 获取病人完成的评估表
+        getRecordedRegistrations() {
+            var _this = this
+            let url = this.api.userApi.GetRecordedRegistrations
+            let data = {
+                patientId: this.$route.query.userId
+            }
+            this.$fetchGet(url, data, 4105).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                _this.infoList = result
+            })
+        },
+        //获取减重方案
+        getWeightLossPlans() {
+            var _this = this
+            let url = this.api.userApi.GetWeightLossPlans
+            let data = {
+                patientId: this.$route.query.userId
+            }
+            this.$fetchGet(url, data, 4106).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                _this.planList = result
+            })
+        },
         lookPaGroup() {
             this.$router.push({
                 path: '/patientGroup',
-                query: { userName: '李梅丽' }
+                query: { userName: this.userName }
             })
         },
         showTap(e) {
@@ -340,7 +444,8 @@ export default {
         },
         //体重切换标签
         tagTabTap(e) {
-            this.tagTabIndex = e
+            this.tagTabId = e
+            this.getWeightRecordByType()
         },
         tabClick(e) {
             this.activeIndex = e
@@ -349,14 +454,14 @@ export default {
         lookInfo(type, id) {
             this.$router.push({
                 path: '/lookInfo',
-                query: { type: type }
+                query: { type: type, id: id }
             })
         },
         //查看减重方案
-        lookPlan(e) {
+        lookPlan(id) {
             this.$router.push({
                 path: '/lookPlan',
-                query: { id: e }
+                query: { id: id }
             })
         },
         //制定减重方案
@@ -371,7 +476,7 @@ export default {
 </script>
 
 <style lang="less">
-.wrapper {
+.wrapperPa {
     padding: 15px;
     .patientPanel {
         background: #ffffff;
@@ -657,6 +762,7 @@ export default {
     }
     .listBox {
         margin-top: 30px;
+        padding-bottom: 20px;
         .add {
             display: flex;
             align-items: center;

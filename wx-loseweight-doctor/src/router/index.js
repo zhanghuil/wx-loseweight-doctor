@@ -10,7 +10,8 @@ export default new Router({
 			name: 'index',
 			component: resolve => require(['@/components/index'], resolve),
 			meta: {
-				title: '患者'
+				title: '患者',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -75,6 +76,14 @@ export default new Router({
 			}
 		},
 		{
+			path: '/editPwd',
+			name: 'editPwd',
+			component: resolve => require(['@/components/editPwd'], resolve),
+			meta: {
+				title: '修改密码'
+			}
+		},
+		{
 			path: '/my',
 			name: 'my',
 			component: resolve => require(['@/components/my'], resolve),
@@ -86,6 +95,14 @@ export default new Router({
 			path: '/myInfo',
 			name: 'myInfo',
 			component: resolve => require(['@/components/myInfo'], resolve),
+			meta: {
+				title: '我的信息'
+			}
+		},
+		{
+			path: '/mailBox',
+			name: 'mailBox',
+			component: resolve => require(['@/components/mailBox'], resolve),
 			meta: {
 				title: '我的信息'
 			}
@@ -109,6 +126,14 @@ export default new Router({
 			component: resolve => require(['@/components/draftPlan'], resolve),
 			meta: {
 				title: '制定减重方案'
+			}
+		},
+		{
+			path: '/InsertTemplate',
+			name: 'InsertTemplate',
+			component: resolve => require(['@/components/InsertTemplate'], resolve),
+			meta: {
+				title: '插入模板'
 			}
 		},
 	]

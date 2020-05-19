@@ -32,7 +32,7 @@
                                         }}</span>
                                         <i
                                             :style="{ color: colorStyle }"
-                                            class="icon icon-sanjiaojiantoushang"
+                                            class="icon iconfont icon-sanjiaojiantoushang"
                                         >
                                         </i>
                                     </div>

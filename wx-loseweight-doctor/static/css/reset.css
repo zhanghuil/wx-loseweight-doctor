@@ -215,6 +215,10 @@ button {
   color: #FB805E;
 }
 
+.c-73 {
+  color: #7362F5;
+}
+
 .df {
   display: flex;
 }
@@ -240,4 +244,8 @@ textarea {
 
 .tc {
   text-align: center;
+}
+
+.dn {
+  display: none;
 }

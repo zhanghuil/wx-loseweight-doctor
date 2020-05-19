@@ -10,53 +10,29 @@
                     <div class="rel">
                         <input
                             class="input"
-                            type="tel"
-                            v-model.trim="loginModel.phone"
-                            placeholder="手机号"
-                            @focus="focusShow"
-                            maxlength="11"
-                        />
-                        <i
-                            v-show="blurHidden"
-                            class="clear cubeic-wrong"
-                            @click="clearInput"
-                        ></i>
-                    </div>
-                    <div class="rel">
-                        <input
-                            class="input"
-                            type="tel"
-                            v-model="loginModel.messageCode"
-                            placeholder="验证码"
-                            maxlength="4"
-                        />
-                        <button
-                            :disabled="disabled"
-                            :class="
-                                !loginModel.phone ||
-                                loginModel.phone.length < 11
-                                    ? 'codeFnDe'
-                                    : 'codeFnCl'
-                            "
-                            class="codeFn"
-                            @click="codeFn"
-                        >
-                            {{ codeText }}
-                        </button>
-                    </div>
-                    <div class="rel">
-                        <input
-                            class="input"
                             :type="showPass ? 'text' : 'password'"
                             v-model.trim="loginModel.password"
-                            placeholder="密码"
-                            @focus="focusShow"
-                            maxlength="11"
+                            placeholder="原密码"
+                            maxlength="6"
                         />
                         <i
                             class="clear iconfont"
                             :class="showPass ? 'icon-kejian' : 'icon-bukejian'"
                             @click="showPass = !showPass"
+                        ></i>
+                    </div>
+                    <div class="rel">
+                        <input
+                            class="input"
+                            :type="showPassN ? 'text' : 'password'"
+                            v-model.trim="loginModel.newPasswoed"
+                            placeholder="新密码"
+                            maxlength="6"
+                        />
+                        <i
+                            class="clear iconfont"
+                            :class="showPassN ? 'icon-kejian' : 'icon-bukejian'"
+                            @click="showPassN = !showPassN"
                         ></i>
                     </div>
                 </div>
@@ -66,7 +42,7 @@
                     :class="isLogin ? 'loginSubmit' : 'loginDefault'"
                     @click.self="loginSubmit"
                 >
-                    登 录
+                    确 定
                 </button>
             </div>
         </div>
@@ -75,100 +51,54 @@
 
 <script>
 import { yktoast } from '../common/js/util'
+import storage from '../common/js/storage'
+import cellInput from '@/components/cellInput'
 export default {
-    name: 'forgetPwd',
-    components: {},
+    name: 'editPwd',
+    components: { cellInput },
     data() {
         return {
-            countDown: '60',
             loginModel: {
-                phone: '',
-                messageCode: '',
-                password: ''
+                password: '',
+                newPasswoed: ''
             },
-            blurHidden: false,
-            blurHiddenPwd: false,
-            showPass: false
+            showPass: false,
+            showPassN: false
         }
     },
     computed: {
-        //登录按钮
+        //按钮
         isLogin() {
-            return (
-                !!this.loginModel.phone &&
-                !!this.loginModel.messageCode &&
-                !!this.loginModel.password
-            )
-        },
-        codeText() {
-            if (this.countDown < 60) {
-                return `${this.countDown}秒`
-            } else {
-                return '获取验证码'
-            }
+            return !!this.loginModel.password && !!this.loginModel.newPasswoed
         },
         disabled() {
-            return this.countDown != 60 || this.loginModel.phone.length < 11
+            return (
+                this.loginModel.password.length < 6 ||
+                this.loginModel.newPasswoed.length < 6
+            )
         }
     },
     methods: {
-        focusShow() {
-            this.blurHidden = true
-        },
-        clearInput(i) {
-            if (this.loginModel.phone) {
-                this.loginModel.phone = ''
-                this.loginModel.messageCode = ''
-            }
-        },
-        codeFn() {
-            var _this = this
-            //校验手机号格式
-            if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.loginModel.phone)) {
-                yktoast('手机号格式不正确')
+        loginSubmit() {
+            if (this.loginModel.password == this.loginModel.newPasswoed) {
+                yktoast('密码不能相同')
                 return
             }
-
-            let url = this.api.userApi.GetCodeNew
+            var _this = this
+            let url = this.api.userApi.ModifyPwd
             let data = {
-                VerifyMedia: this.loginModel.phone,
-                VerifySource: 'LoseWeightDoctorAuth'
+                Phone: this.$route.query.phone,
+                OldPwd: this.loginModel.password,
+                NewPwd: this.loginModel.newPasswoed
             }
-            this.$fetchPost(url, data, 103).then(response => {
+            this.$fetchPost(url, data, 153).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.status == 0) {
                     yktoast(result.data)
-                    let t = window.setInterval(() => {
-                        if (_this.countDown == 0) {
-                            window.clearInterval(t)
-                            _this.countDown = 60
-                        } else {
-                            _this.countDown--
-                        }
-                    }, 1000)
+                    _this.$router.go(-1)
                 } else {
                     yktoast(result.data)
                 }
-            })
-        },
-        loginSubmit() {
-            var _this = this
-            let url = this.api.userApi.SubmitPwd
-            let data = {
-                Phone: this.loginModel.phone,
-                code: this.loginModel.messageCode,
-                Pwd: this.loginModel.password
-            }
-            this.$fetchPost(url, data, 152).then(response => {
-                let result = response.data.data //请求返回数据
-                if (result.status == 1) {
-                    yktoast(result.data)
-                    return
-                }
-                yktoast(result.data)
-                _this.$router.replace({
-                    path: '/'
-                })
             })
         }
     },

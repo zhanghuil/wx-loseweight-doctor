@@ -93,13 +93,13 @@
                             maxlength="11"
                         />
                         <i
-                            class="clear"
+                            class="clear iconfont"
                             :class="showPass ? 'icon-kejian' : 'icon-bukejian'"
                             @click="showPass = !showPass"
                         ></i>
                     </div>
                     <div class="forgetPwd" @click="forgetPwdTap">
-                        <i class="icon-icon12 icon"></i>
+                        <i class="iconfont icon-icon12 icon"></i>
                         <span>忘记密码</span>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
                     :disabled="!isLoginPwd"
                     class="loginBtn"
                     :class="isLoginPwd ? 'loginSubmit' : 'loginDefault'"
-                    @click.self="loginSubmit"
+                    @click.self="loginPwdSubmit"
                 >
                     登 录
                 </button>
@@ -117,6 +117,8 @@
 </template>
 
 <script>
+import { yktoast } from '../common/js/util'
+import storage from '../common/js/storage'
 export default {
     name: 'login',
     components: {},
@@ -136,6 +138,7 @@ export default {
             showPass: false
         }
     },
+    created() {},
     computed: {
         //登录按钮
         isLogin() {
@@ -156,6 +159,7 @@ export default {
         }
     },
     methods: {
+        codeLogin() {},
         // 忘记密码
         forgetPwdTap() {
             this.$router.push({
@@ -178,26 +182,79 @@ export default {
                 }
             if (i == 2) this.loginModel.phonePwd = ''
         },
+        //获取验证码
         codeFn() {
-            alert('1')
-            if (!this.loginModel.phone) {
-                this.$createToast({
-                    txt: '手机号不能为空',
-                    type: 'txt'
-                }).show()
-                // this.$myToast.error('手机号不能为空')
-                return
-            }
+            var _this = this
             //校验手机号格式
             if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.loginModel.phone)) {
-                // this.$myToast.error('手机号格式不正确')
+                yktoast('手机号格式不正确')
                 return
             }
+
+            let url = this.api.userApi.GetCodeNew
+            let data = {
+                VerifyMedia: this.loginModel.phone,
+                VerifySource: 'LoseWeightDoctorAuth'
+            }
+            this.$fetchPost(url, data, 103).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.status == 0) {
+                    yktoast(result.data)
+                    let t = window.setInterval(() => {
+                        if (_this.countDown == 0) {
+                            window.clearInterval(t)
+                            _this.countDown = 60
+                        } else {
+                            _this.countDown--
+                        }
+                    }, 1000)
+                } else {
+                    yktoast(result.data)
+                }
+            })
         },
+        // 验证码登录
         loginSubmit() {
-            alert('tijiaola')
+            var _this = this
+            let url = this.api.userApi.JZDoctorPhoneLogin
+            let data = {
+                Phone: this.loginModel.phone,
+                AuthCode: this.loginModel.messageCode
+            }
+            this.$fetchPost(url, data, 404).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.State == 1) {
+                    yktoast(result.Msg)
+                    return
+                }
+                yktoast('登录成功')
+                storage.setItem('AccountId', result.Data.AccountId)
+                storage.setItem('Token', result.Data.Token)
+                _this.$router.replace({
+                    path: '/'
+                })
+            })
+        },
+        // 密码登录
+        loginPwdSubmit() {
+            let url = this.api.userApi.JZDoctorPhonePasswordLogin
+            let data = {
+                Phone: this.loginModel.phonePwd,
+                Password: this.loginModel.password
+            }
+            this.$fetchPost(url, data, 405).then(response => {
+                debugger
+                let result = response.data.data //请求返回数据
+                if (result.State == 1) {
+                    yktoast(result.Msg)
+                    return
+                }
+                yktoast('登录成功')
+                storage.setItem('AccountId', result.Data.AccountId)
+                storage.setItem('Token', result.Data.Token)
+            })
         }
-		},
+    },
     mounted() {
         document
             .querySelector('body')

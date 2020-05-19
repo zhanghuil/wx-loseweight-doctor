@@ -5,10 +5,12 @@
             <div class="myTopCon">
                 <img src="../assets/tx1.png" class="img" alt="" />
                 <div class="con">
-                    <p class="name">李伟<i class="icon cubeic-arrow"></i></p>
-                    <p class="hos">上海第十人民医院</p>
+                    <p class="name">{{doctorInfo.Name}}<i class="icon cubeic-arrow"></i></p>
+                    <p class="hos">{{doctorInfo.HosName}}</p>
                 </div>
-                <div class="qCodeimg"><i class="icon iconfont icon-qrcode"></i></div>
+                <div class="qCodeimg">
+                    <i class="icon iconfont icon-qrcode"></i>
+                </div>
             </div>
         </div>
         <div class="myList">
@@ -28,34 +30,36 @@
                         <div><i class="icon cubeic-arrow"></i></div>
                     </li>
                 </router-link>
-                <li>
-                    <div class="L">
-                        <div>
-                            <img
-                                class="cell_icon"
-                                src="../assets/personal_2@2x.png"
-                                alt=""
-                            />
+                <router-link to="/doctorCard">
+                    <li>
+                        <div class="L">
+                            <div>
+                                <img
+                                    class="cell_icon"
+                                    src="../assets/personal_2@2x.png"
+                                    alt=""
+                                />
+                            </div>
+                            <div>我的名片</div>
                         </div>
-                        <div>我的名片</div>
-                    </div>
-                    <div><i class="icon cubeic-arrow"></i></div>
-                </li>
-								<router-link to="/groupMag">
-                <li>
-                    <div class="L">
-                        <div>
-                            <img
-                                class="cell_icon"
-                                src="../assets/personal_4@2x.png"
-                                alt=""
-                            />
+                        <div><i class="icon cubeic-arrow"></i></div>
+                    </li>
+                </router-link>
+                <router-link to="/groupMag">
+                    <li>
+                        <div class="L">
+                            <div>
+                                <img
+                                    class="cell_icon"
+                                    src="../assets/personal_4@2x.png"
+                                    alt=""
+                                />
+                            </div>
+                            <div>患者组管理</div>
                         </div>
-                        <div>患者组管理</div>
-                    </div>
-                    <div><i class="icon cubeic-arrow"></i></div>
-                </li>
-								</router-link>
+                        <div><i class="icon cubeic-arrow"></i></div>
+                    </li>
+                </router-link>
                 <li>
                     <div class="L">
                         <div>
@@ -102,21 +106,45 @@
 </template>
 
 <script>
-// import footer from './footer'
+import { yktoast } from '../common/js/util'
+import storage from '../common/js/storage'
 export default {
     name: 'my',
     components: {},
     data() {
-        return {}
+        return {
+            doctorInfo: {}
+        }
+    },
+    created() {
+        this.getDoctorInfoNew()
     },
     methods: {
+        //获取医生信息
+        getDoctorInfoNew() {
+            let AccountId = storage.getItem('AccountId')
+            var _this = this
+            let url = this.api.userApi.GetDoctorInfoNew
+            let data = {
+                AccountId: AccountId
+            }
+            this.$fetchPost(url, data, 150).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.status == 0) {
+                    console.log(result.data)
+                    _this.doctorInfo = result.data
+                } else {
+                    yktoast(result)
+                }
+            })
+        },
         showToast() {
             this.$createToast({
                 txt: '我是弹窗',
                 type: 'txt'
             }).show()
         }
-    },
+    }
 }
 </script>
 
