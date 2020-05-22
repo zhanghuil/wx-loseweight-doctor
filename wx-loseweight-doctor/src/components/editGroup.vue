@@ -21,17 +21,20 @@
             ></textarea>
         </div>
         <div class="footerEdit" v-show="type == 'add'">
-            <button class="yk-btn">确定</button>
+            <button class="yk-btn" @click="addGroup">确定</button>
         </div>
 
         <div class="footerEdit" v-show="type == 'edit'">
             <button class="yk-btn-del" @click="delTap">删除</button>
-            <button class="yk-btn">确定</button>
+            <button class="yk-btn" @click="editTap">确定</button>
         </div>
     </div>
 </template>
 
 <script>
+import qs from 'qs'
+import { yktoast } from '../common/js/util'
+import storage from '../common/js/storage'
 export default {
     name: 'editGroup',
     data() {
@@ -40,11 +43,96 @@ export default {
             desc: ''
         }
     },
-
     methods: {
         getParams() {
             this.type = this.$route.query.type
             this.id = this.$route.query.id
+        },
+        //获取患者组信息
+        getPatientGroup() {
+            if (this.$route.query.id == 0) return
+            var _this = this
+            let url = this.api.userApi.GetPatientGroup
+            let data = {
+                groupId: this.$route.query.id
+            }
+            this.$fetchGet(url, data, 4122).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                _this.name = result.Name
+                _this.desc = result.Description
+            })
+        },
+        //添加组
+        addGroup() {
+            if (this.name == '') {
+                yktoast('请填写组名')
+                return
+            }
+            let AccountId = storage.getItem('AccountId')
+            var _this = this
+            let url = this.api.userApi.AddPatientGroup
+            let data = {
+                Name: this.name,
+                Description: this.desc,
+                DoctorID: AccountId
+            }
+            this.$fetchPost(url, data, 4123).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result) {
+                    yktoast('添加成功')
+                    _this.$router.go(-1)
+                }
+            })
+        },
+        //编辑组
+        editTap() {
+            if (this.name == '') {
+                yktoast('请填写组名')
+                return
+            }
+            var _this = this
+            let url = this.api.userApi.EditPatientGroup
+            let groupId = this.$route.query.id
+            let data = {
+                Name: this.name,
+                Description: this.desc
+            }
+            this.$fetchPut(`${url}?groupId=${groupId}`, qs.stringify(data), 4124).then(
+                response => {
+                    let result = response.data.data //请求返回数据
+                    if (!result) {
+                        yktoast(result)
+                        return
+										}
+										yktoast('修改成功')
+                    _this.$router.go(-1)
+                }
+            )
+        },
+        //删除组
+        delGroup() {
+            var _this = this
+            let url = this.api.userApi.DeletePatientGroup
+            let data = {
+                groupId: this.$route.query.id
+            }
+            this.$fetchDelete(url, data, 4125).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                this.$createToast({
+                    type: 'Timeout',
+                    time: 1000,
+                    txt: '删除成功'
+                }).show()
+                _this.$router.go(-1)
+            })
         },
         delTap() {
             this.$createDialog({
@@ -63,11 +151,7 @@ export default {
                     href: 'javascript:;'
                 },
                 onConfirm: () => {
-                    this.$createToast({
-                        type: 'Timeout',
-                        time: 1000,
-                        txt: '删除成功'
-                    }).show()
+                    this.delGroup()
                 },
                 onCancel: () => {
                     console.log('点击取消按钮')
@@ -77,6 +161,7 @@ export default {
     },
     created() {
         this.getParams()
+        this.getPatientGroup()
         if (this.$route.query.type == 'add') document.title = '添加组'
         else document.title = '编辑组'
     }

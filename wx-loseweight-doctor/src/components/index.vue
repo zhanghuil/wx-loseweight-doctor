@@ -23,46 +23,19 @@
                         v-for="(item, index) in navList"
                         :key="index"
                         class="navBarItem"
-                        :class="activeIndex == index ? 'on' : ''"
+                        :class="queryType == item.id ? 'on' : ''"
                     >
-                        <div class="item" @click="tabClick(index, item.id)">
+                        <div class="item" @click="tabClick(item.id)">
                             {{ item.name }}
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="listPanel" v-show="activeIndex === 0">
-                <div
-                    class="item"
-                    @click="lookDetails(item.PatientID, item.Name)"
-                    v-for="(item, index) in patientsList"
-                    :key="index"
-                >
-                    <div>
-                        <img
-                            class="txImg"
-                            :src="item.AvatarUrl"
-                            @error="imgError()"
-                        />
-                    </div>
-                    <div>
-                        <p>
-                            <strong>{{ item.Name }}</strong>
-                            <span
-                                >{{ item.Weight }}kg，{{
-                                    item.Sex == 1 ? '男' : '女'
-                                }}，{{ item.Age }}岁</span
-                            >
-                        </p>
-                        <p class="time">
-                            首诊：{{ item.DiagnoseDate | formatDateStr }}
-                        </p>
-                        <p class="time">
-                            计划下次复诊：{{
-                                item.ReVisitingDate | formatDateStr
-                            }}
-                        </p>
-                    </div>
+            <div class="listPanel">
+                <div v-for="(item, index) in patientsList" :key="index">
+                    <leftSlider :index="index" @deleteItem="deleteItem">
+                        <paItem :item="item" @lookTap="lookDetails"></paItem>
+                    </leftSlider>
                 </div>
             </div>
         </div>
@@ -97,15 +70,18 @@
             :display.sync="display"
             :width="drawerWidth"
             :height="drawerHeight"
+            @resetTap="resetTap"
+            @confirmTap="confirmTap"
+            ref="drawerFilter"
         >
             <div class="drawerPanel">
                 <div class="f14 c-7a mb15">更新时间</div>
                 <ul class="chooseTime">
                     <li v-for="(item, index) in timeList" :key="index">
                         <div
-                            @click="tabTimeClick(index)"
+                            @click="tabTimeClick(item.id)"
                             class="item"
-                            :class="timeIndex == index ? 'on' : ''"
+                            :class="timeIndex == item.id ? 'on' : ''"
                         >
                             {{ item.name }}
                         </div>
@@ -115,94 +91,74 @@
                 <!-- 多选 -->
                 <Options
                     :options="checkedList"
+                    :selectPatientGroup="selectPatientGroup"
                     :isMultiply="true"
                     @toparents="childByValueGroup"
                 ></Options>
-                <div class="f14 c-7a mb15 mt30">医生</div>
-                <!-- 单选 -->
-                <Options
-                    :options="doctorList"
-                    @toparents="childByValueDoc"
-                ></Options>
+                <template v-if="doctorList && doctorList.length > 0">
+                    <div class="f14 c-7a mb15 mt30">医生</div>
+                    <!-- 多选 -->
+                    <Options
+                        :options="doctorList"
+                        :selectPatientGroup="selectDoctorGroup"
+                        :isMultiply="true"
+                        @toparents="childByValueDoc"
+                    ></Options>
+                </template>
             </div>
         </drawer>
         <!-- 筛选end -->
-        <!-- 左滑删除使用 -->
-        <!-- <div v-for="(item,index) in leftList" :key="index">
-            <leftSlider :index="1" @deleteItem="deleteItem">
-                <div style="height: 1.16rem;width: 100%;border:1px solid #ccc;background:#fff">
-                    {{ item.text }}
-                </div>
-            </leftSlider>
-        </div> -->
+        <!-- 搜索 -->
+        <search
+            ref="search"
+            :patientsListSearch="patientsListSearch"
+            @searchVal="childSearchVal"
+            @cancelBtn="cancelSearchTap"
+        ></search>
     </div>
 </template>
 
 <script>
-import leftSlider from '@/components/leftSlider.vue'
-import Options from '@/components/options'
-import drawer from '@/components/drawer'
-import { yktoast } from '../common/js/util'
+import leftSlider from '@/components/public/leftSlider'
+import Options from '@/components/public/options'
+import drawer from '@/components/public/drawer'
+import paItem from '@/components/public/paItem'
+import search from '@/components/search'
+import { yktoast, convertKey } from '../common/js/util'
 import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
 export default {
     name: 'index',
-    components: { drawer, Options, leftSlider },
+    components: { drawer, Options, leftSlider, paItem, search },
     data() {
         return {
-            errorImg: require('@/assets/tx1.png'),
+            errorImg0: require('@/assets/tx1.png'),
+            errorImg1: require('@/assets/tx2.png'),
             patientsList: [], //患者列表
-            accountId: '',
-            leftList: [
-                {
-                    text: '苹果',
-                    id: 1
-                },
-                {
-                    text: '香蕉',
-                    id: 2
-                }
-            ],
-            radioVal: [],
-            checkedVal: [],
-            checkedList: [
-                {
-                    label: '高蛋白组',
-                    value: 1,
-                    checked: true
-                },
-                {
-                    label: '轻断食组',
-                    value: 2,
-                    checked: false
-                }
-            ],
-            doctorList: [
-                {
-                    label: '陈威',
-                    id: '1',
-                    checked: true
-                },
-                {
-                    label: '林明鑫',
-                    id: '2',
-                    checked: false
-                }
-            ],
+            patientsListSearch: [], //搜索患者列表
+            accountId: '', //默认登录医生id
+            doctorId: '', //医生id 多个 科室负责人
+            checkedVal: '', //选中的患者组值
+            checkedList: [], //患者组
+            selectPatientGroup: [], //重置选中的值
+            selectDoctorGroup: [], //重置医生选中
+            searchValue: '', //关键词
+            doctorList: [], //下属医生
             timeList: [
                 {
-                    id: 1,
+                    id: 7,
                     name: '7天'
                 },
                 {
-                    id: 2,
+                    id: 15,
                     name: '15天'
                 },
                 {
-                    id: 3,
+                    id: 30,
                     name: '30天'
                 }
             ],
+            timeIndex: '', //更新时间默认值
             navList: [
                 {
                     id: '1',
@@ -221,8 +177,7 @@ export default {
             activeIndex: 0,
             display: false, //筛选弹窗
             drawerWidth: '280px',
-            drawerHeight: '100%',
-            timeIndex: 0
+            drawerHeight: '100%'
         }
     },
     filters: {
@@ -236,29 +191,148 @@ export default {
         }
     },
     created() {
+        if (!storage.getItem('Token') || !storage.getItem('AccountId')) {
+            this.$router.replace({
+                path: '/login'
+            })
+            return
+        }
         let AccountId = storage.getItem('AccountId')
-        if (AccountId) this.accountId = AccountId
+        this.accountId = AccountId
+        this.doctorId = AccountId
         console.log(`AccountId：${AccountId}`)
 
         this.getJZMZPatients() //获取减重病人
+        this.getSubDoctor() //获取下属医生
+        this.getPatientGroups() //患者组
     },
     methods: {
+        //删除患者
+        deleteItem: function(index) {
+            //todo
+            console.log('删除这个患者')
+        },
+        //筛选重置操作
+        resetTap() {
+            this.timeIndex = ''
+            this.checkedVal = ''
+            this.doctorId = ''
+            this.selectPatientGroup = []
+            this.selectDoctorGroup = []
+        },
+        //获取当前筛选器中的信息
+        currfilterInfo() {
+            return {
+                timeIndex: this.timeIndex,
+                checkedVal: this.checkedVal,
+                doctorId: this.doctorId
+            }
+        },
+        //筛选确定操作
+        confirmTap() {
+            //如果是科室负责人  医生选项不能为空
+            if (this.doctorList) {
+                if (!this.doctorId) {
+                    yktoast('请至少选择一个医生')
+                    return
+                }
+            }
+            this.$refs.drawerFilter.closeByButton()
+            this.getJZMZPatients()
+            //缓存筛选器中的选中值
+            storage.setObjItem('filterResultsGroup', this.currfilterInfo())
+        },
         imgError() {
             let img = event.srcElement
-            img.src = this.errorImg
+            img.src = this.errorImg0
             img.onerror = null //防止闪图
         },
-        //获取减重病人
+        //获取患者组
+        getPatientGroups() {
+            var _this = this
+            let url = this.api.userApi.GetPatientGroups
+            let data = {
+                doctorId: this.accountId
+            }
+            this.$fetchGet(url, data, 4121).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                _this.checkedList = result
+
+                // 获取筛选器的缓存信息
+                let filterInfo = storage.getObjItem('filterResultsGroup')
+                if (filterInfo) {
+                    //给筛选器赋值
+                    _this.timeIndex = filterInfo.timeIndex
+                    let checkedValArray = filterInfo.checkedVal.split(',')
+                    checkedValArray.forEach(n => {
+                        let group = result.find(e => e.GroupID == n)
+                        if (group) _this.selectPatientGroup.push(group)
+                    })
+                    console.log(_this.selectPatientGroup)
+                }
+                //end
+            })
+        },
+        // 获取下级医生
+        getSubDoctor() {
+            var _this = this
+            let url = this.api.userApi.GetSubDoctor
+            let data = {
+                doctorId: this.accountId
+            }
+            this.$fetchGet(url, data, 177).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                //重新组装数组符合组件
+                let listNew = result.map(item => {
+                    let { ID, Name } = item
+                    return { ID, Name }
+                })
+                let newDoctorList = convertKey(listNew, [
+                    'GroupID',
+                    'GroupName'
+                ])
+                _this.doctorList = newDoctorList
+                //赋默认值
+                let defaultDoctor = newDoctorList.filter(
+                    n => n.GroupID == _this.accountId
+                )
+
+                _this.selectDoctorGroup = defaultDoctor
+                _this.doctorId = defaultDoctor[0].GroupID
+                console.log(_this.selectDoctorGroup)
+                // debugger
+                // 获取筛选器的缓存信息
+                let filterInfo = storage.getObjItem('filterResultsGroup')
+                if (filterInfo) {
+                    //给筛选器赋值  todo  有问题
+                    let checkedValArray = filterInfo.doctorId.split(',')
+                    checkedValArray.forEach(n => {
+                        let group = newDoctorList.find(e => e.GroupID == n)
+                        if (group) _this.selectDoctorGroup.push(group)
+                    })
+                }
+                //end
+            })
+        },
+        //获取减重患者病人
         getJZMZPatients() {
             var _this = this
             let url = this.api.userApi.GetJZMZPatients
             let data = {
                 PageIndex: 0,
                 PageSize: 10,
-                Keyword: '', //搜索关键词
-                DoctorId: this.accountId,
-                UpdateTimeDay: 0, //更新时间天数 7,15,30
-                GroupId: '', // 分组
+                Keyword: this.searchValue, //搜索关键词
+                DoctorId: this.doctorId,
+                UpdateTimeDay: this.timeIndex, //更新时间天数 7,15,30
+                GroupId: this.checkedVal, // 分组
                 QueryType: this.queryType //查询类型 0 全部 1今日患者 2明日患者
             }
             this.$fetchPost(url, data, 4111).then(response => {
@@ -269,26 +343,46 @@ export default {
                 // yktoast()
             })
         },
-
-        close() {
-            this.isshow = false
+        //搜索患者
+        getJZMZPatientsSearch() {
+            var _this = this
+            let url = this.api.userApi.GetJZMZPatients
+            let data = {
+                PageIndex: 0,
+                PageSize: 10,
+                Keyword: this.searchValue, //搜索关键词
+                DoctorId: this.doctorId,
+                UpdateTimeDay: this.timeIndex, //更新时间天数 7,15,30
+                GroupId: this.checkedVal, // 分组
+                QueryType: 0 //查询类型 0 全部 1今日患者 2明日患者
+            }
+            this.$fetchPost(url, data, 4111).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.Data) {
+                    _this.patientsListSearch = result.Data
+                }
+                // yktoast()
+            })
         },
-        open() {
-            this.isshow = true
-        },
-        //切换tab项
-        tabClick(index, id) {
-            this.activeIndex = index
+        // close() {
+        //     this.isshow = false
+        // },
+        // open() {
+        //     this.isshow = true
+        // },
+        //切换头部患者列表tab项
+        tabClick(id) {
             this.queryType = id
+            this.getJZMZPatients()
         },
         // 更新时间
-        tabTimeClick(index) {
-            this.timeIndex = index
+        tabTimeClick(id) {
+            this.timeIndex = id
         },
-        lookDetails(id, name) {
+        lookDetails(val) {
             this.$router.push({
                 path: '/patientList',
-                query: { userId: id, userName: name }
+                query: { userId: val.id, userName: val.name }
             })
         },
         //查看医生名片
@@ -301,19 +395,31 @@ export default {
         childByValueGroup(childValue) {
             // childValue就是子组件传过来的值
             console.log(childValue)
-            // debugger  checkedVal
-            let val = childValue
+            let selMap = childValue.map(item => item.GroupID)
+            this.checkedVal = selMap.join(',')
         },
         //医生
         childByValueDoc(childValue) {
-            // childValue就是子组件传过来的值 radioVal
+            debugger
+            // childValue就是子组件传过来的值
             console.log(childValue)
-            let val = childValue
+            let selMap = childValue.map(item => item.GroupID)
+            this.doctorId = selMap.join(',')
         },
         searchTap() {
-            this.$router.push({
-                path: '/search'
-            })
+            this.$refs.search.show()
+            // this.$router.push({
+            //     path: '/search'
+            // })
+        },
+        //搜索框值
+        childSearchVal(childValue) {
+            this.searchValue = childValue
+            this.getJZMZPatientsSearch()
+        },
+        //取消搜索 清空关键词
+        cancelSearchTap() {
+            this.searchValue = ''
         }
     }
 }
@@ -395,7 +501,7 @@ export default {
             box-shadow: 0 2px 10px 0 rgba(120, 121, 164, 0.1);
             border-radius: 4px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             font-size: 14px;
             color: #6d6d6d;
             .txImg {
@@ -431,6 +537,9 @@ export default {
             box-sizing: border-box;
             text-align: center;
             margin-right: 15px;
+            &:last-child {
+                margin-right: 0;
+            }
             &.on {
                 background: #7362f5;
                 color: #ffffff;

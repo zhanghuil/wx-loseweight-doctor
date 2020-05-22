@@ -24,7 +24,7 @@
 <script>
 import { yktoast } from '../common/js/util'
 import storage from '../common/js/storage'
-import cellInput from '@/components/cellInput'
+import cellInput from '@/components/public/cellInput'
 export default {
     name: 'mailBox',
     components: { cellInput },

@@ -609,9 +609,9 @@
 <script>
 // /Resource/LoseWeigthPlan/dietexecexplain.png   饮食要求
 // /Resource/LoseWeigthPlan/dietrequire.png  食谱执行说明
-import ruler from '@/components/ruler'
-import drawerFoot from '@/components/drawerFoot'
-import checkbox from '@/components/checkbox'
+import ruler from '@/components/public/ruler'
+import drawerFoot from '@/components/public/drawerFoot'
+import checkbox from '@/components/public/checkbox'
 import { formatDate } from '../common/js/date'
 export default {
     name: 'draftPlan',

@@ -15,19 +15,12 @@ export default new Router({
 			}
 		},
 		{
-			path: '/search',
-			name: 'search',
-			component: resolve => require(['@/components/search'], resolve),
-			meta: {
-				title: '患者'
-			}
-		},
-		{
 			path: '/patientList',
 			name: 'patientList',
 			component: resolve => require(['@/components/patientList'], resolve),
 			meta: {
-				title: '患者'
+				title: '患者',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -35,20 +28,25 @@ export default new Router({
 			name: 'patientGroup',
 			component: resolve => require(['@/components/patientGroup'], resolve),
 			meta: {
-				title: '患者组'
+				title: '患者组',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
 			path: '/lookInfo',
 			name: 'lookInfo',
 			component: resolve => require(['@/components/lookInfo'], resolve),
+			meta: {
+				requiresAuth: true  // 添加表示需要验证
+			}
 		},
 		{
 			path: '/lookPlan',
 			name: 'lookPlan',
 			component: resolve => require(['@/components/lookPlan'], resolve),
 			meta: {
-				title: '减重方案'
+				title: '减重方案',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -56,7 +54,8 @@ export default new Router({
 			name: 'doctorCard',
 			component: resolve => require(['@/components/doctorCard'], resolve),
 			meta: {
-				title: '医师名片'
+				title: '医师名片',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -88,7 +87,8 @@ export default new Router({
 			name: 'my',
 			component: resolve => require(['@/components/my'], resolve),
 			meta: {
-				title: '我的'
+				title: '我的',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -96,7 +96,8 @@ export default new Router({
 			name: 'myInfo',
 			component: resolve => require(['@/components/myInfo'], resolve),
 			meta: {
-				title: '我的信息'
+				title: '我的信息',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -104,7 +105,8 @@ export default new Router({
 			name: 'mailBox',
 			component: resolve => require(['@/components/mailBox'], resolve),
 			meta: {
-				title: '我的信息'
+				title: '我的信息',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -112,7 +114,8 @@ export default new Router({
 			name: 'groupMag',
 			component: resolve => require(['@/components/groupMag'], resolve),
 			meta: {
-				title: '患者组管理'
+				title: '患者组管理',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{
@@ -125,7 +128,8 @@ export default new Router({
 			name: 'draftPlan',
 			component: resolve => require(['@/components/draftPlan'], resolve),
 			meta: {
-				title: '制定减重方案'
+				title: '制定减重方案',
+				requiresAuth: true  // 添加表示需要验证
 			}
 		},
 		{

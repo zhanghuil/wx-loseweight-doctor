@@ -22,16 +22,49 @@ axios.interceptors.request.use((config) => {
 });
 
 //返回状态判断(添加响应拦截器)
-axios.interceptors.response.use((res) => {
-	//对响应数据做些事
-	if (!res.data.success) {
-		return Promise.resolve(res);
+// axios.interceptors.response.use((res) => {
+// 	//对响应数据做些事
+// 	if (!res.data.success) {
+// 		return Promise.resolve(res);
+// 	}
+// 	return res;
+// }, (error) => {
+// 	console.log('网络异常')
+// 	return Promise.reject(error);
+// });
+
+axios.interceptors.response.use(
+	response => {
+		if (response.data.code === 4003) {
+			Toast({
+				mes: '您没有权限操作！',
+				timeout: 1500,
+				callback: () => {
+					router.go(-1);
+				}
+			});
+
+			return false;
+		}
+		if (response.data.code === -1) {
+			localStorage.removeItem('Token')
+			router.push({
+				path: "/login",
+				querry: { redirect: router.currentRoute.fullPath }//从哪个页面跳转
+			})
+		}
+		return response
+	},
+	err => {
+		if (err.code === 'ECONNABORTED' && err.message.indexOf('timeout') !== -1) {
+			Toast({
+				mes: '网络异常，连接超时...',
+				timeout: 1500
+			});
+		}
+		return Promise.reject(err)
 	}
-	return res;
-}, (error) => {
-	console.log('网络异常')
-	return Promise.reject(error);
-});
+)
 
 //返回一个Promise(发送post请求)
 var tokenValue = storage.getItem('Token') || ''
@@ -67,7 +100,35 @@ export function fetchPost(url, params, authCode) {
 			})
 	})
 }
-
+//返回一个Promise(发送put请求)
+export function fetchPut(url, params, authCode) {
+	const toast = v.$createToast({
+		txt: 'Loading...',
+		mask: true
+	})
+	toast.show()
+	return new Promise((resolve, reject) => {
+		axios.put(url, params, {
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				token: tokenValue,
+				wincomeflag: encryption(authCode, timestamp),
+				wincometimestamp: timestamp
+			}
+		})
+			.then(response => {
+				resolve(response);
+				toast.hide()
+			}, err => {
+				reject(err);
+				toast.hide()
+			})
+			.catch((error) => {
+				reject(error)
+				toast.hide()
+			})
+	})
+}
 //返回一个Promise(发送get请求)
 export function fetchGet(url, param, authCode) {
 	const toast = v.$createToast({
@@ -98,20 +159,37 @@ export function fetchGet(url, param, authCode) {
 	})
 }
 //返回一个Promise(发送delete请求)
-export function fetchDelete(url, param) {
+export function fetchDelete(url, param, authCode) {
+	const toast = v.$createToast({
+		txt: 'Loading...',
+		mask: true
+	})
+	toast.show()
 	return new Promise((resolve, reject) => {
-		axios.delete(url, { params: param })
+		axios.delete(url, { params: param }, {
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				token: tokenValue,
+				wincomeflag: encryption(authCode, timestamp),
+				wincometimestamp: timestamp
+			}
+		})
 			.then(response => {
 				resolve(response)
+				toast.hide()
 			}, err => {
 				reject(err)
+				toast.hide()
 			})
 			.catch((error) => {
 				reject(error)
+				toast.hide()
 			})
 	})
 }
 export default {
 	fetchPost,
-	fetchGet
+	fetchPut,
+	fetchGet,
+	fetchDelete
 }

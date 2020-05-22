@@ -1,55 +1,115 @@
 <template>
-    <div>
-        <div class="searchTop">
-            <div class="searchBox">
-                <i class="icon icon-sousuo"></i>
-                <input
-                    class="input"
-                    type="text"
-                    v-model.trim="searchVal"
-                    placeholder="输入患者称呼或手机号搜索"
-                    @focus="focusShow"
-                />
-                <i
-                    v-show="blurHidden"
-                    class="clear cubeic-wrong"
-                    @click="clearInput"
-                ></i>
-            </div>
-            <div class="cancelBtn" @click="cancelBtn">取消</div>
-        </div>
-        <div class="searchList">
-            <div class="item">
+    <transition name="move">
+        <div v-show="showFlag" class="searchContent">
+            <cube-scroll ref="scrollSearch">
                 <div>
-                    <img class="txImg" src="../assets/tx1.png" alt="" />
+                    <div class="searchTop">
+                        <div class="searchBox">
+                            <i class="icon iconfont icon-sousuo"></i>
+                            <input
+                                class="input"
+                                type="text"
+                                v-model.trim="searchVal"
+                                placeholder="输入患者称呼或手机号搜索"
+                                @focus="focusShow"
+                                @keyup.enter="searchEnterFun"
+                            />
+                            <i
+                                v-show="blurHidden"
+                                class="clear cubeic-wrong"
+                                @click="clearInput"
+                            ></i>
+                        </div>
+                        <div class="cancelBtn" @click="cancelBtn">取消</div>
+                    </div>
+                    <div
+                        class="searchList"
+                        v-show="
+                            patientsListSearch && patientsListSearch.length > 0
+                        "
+                    >
+                        <div
+                            v-for="(item, index) in patientsListSearch"
+                            :key="index"
+                        >
+                            <paItem
+                                :item="item"
+                                @lookTap="lookDetails"
+                            ></paItem>
+                        </div>
+                    </div>
+                    <!-- 无内容 -->
+                    <div
+                        class="emptyBox"
+                        v-show="
+                            searchEmptyCon &&
+                                patientsListSearch &&
+                                patientsListSearch.length == 0
+                        "
+                    >
+                        <img
+                            class="emptyImg"
+                            src="../assets/empty@2x.png"
+                            alt=""
+                        />
+                        <p>无相关结果</p>
+                    </div>
                 </div>
-                <div>
-                    <p>
-                        <strong>李芳</strong>
-                        <span>120kg，女，23岁</span>
-                    </p>
-                    <p class="time">首诊：2020-03-01</p>
-                </div>
-            </div>
+            </cube-scroll>
         </div>
-        <!-- 无内容 -->
-        <div class="emptyBox">
-            <img class="emptyImg" src="../assets/empty@2x.png" alt="" />
-            <p>无相关结果</p>
-        </div>
-    </div>
+    </transition>
 </template>
 
 <script>
+import leftSlider from '@/components/public/leftSlider'
+import paItem from '@/components/public/paItem'
 export default {
-    name: 'search',
-    data() {
-        return {
-            searchVal: '',
-            blurHidden: false
+    props: {
+        patientsListSearch: {
+            type: Array
         }
     },
+    components: { leftSlider, paItem },
+    data() {
+        return {
+            showFlag: false, //显示搜索页面
+            searchVal: '',
+            blurHidden: false,
+            searchEmptyCon: false //默认不显示搜索空图片
+        }
+    },
+    created() {},
     methods: {
+        refreshCard() {
+            this.$refs.scrollSearch.refresh()
+        },
+        show() {
+            this.showFlag = true
+            this.$nextTick(() => {
+                this.refreshCard()
+            })
+        },
+        hide() {
+            this.showFlag = false
+        },
+        //回车搜索
+        searchEnterFun: function(e) {
+            this.searchEmptyCon = true
+            // 使用 which 和 keyCode 属性来解决兼容问题
+            var keyCode = window.event ? e.keyCode : e.which
+            var val = e.target.value
+            console.log('回车搜索', keyCode, e)
+            if (keyCode == 13 && val) {
+                this.$emit('searchVal', val)
+            }
+        },
+        lookDetails(val) {
+            //患者详情页
+            this.$router.push({
+                path: '/patientList',
+                query: { userId: val.id, userName: val.name }
+            })
+        },
         focusShow(i) {
             this.blurHidden = true
         },
@@ -59,13 +119,35 @@ export default {
             }
         },
         cancelBtn() {
-            this.$router.go(-1) //返回上一层
+            this.hide()
+            this.searchVal = ''
+            this.searchEmptyCon = false
+            this.$emit('cancelBtn')
         }
-    },
+    }
 }
 </script>
 
 <style lang="less" scoped>
+.searchContent {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 48px;
+    z-index: 101;
+    width: 100%;
+    height: 100%;
+    background: #f7f7f7;
+    transform: translate3d(0, 0, 0);
+    &.move-enter-active,
+    &.move-leave-active {
+        transition: all 0.2s linear;
+    }
+    &.move-enter,
+    &.move-leave-active {
+        transform: translate3d(100%, 0, 0);
+    }
+}
 .searchTop {
     background: #ffffff;
     padding: 15px;

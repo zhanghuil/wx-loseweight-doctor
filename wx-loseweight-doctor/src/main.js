@@ -14,7 +14,7 @@ import storage from './common/js/storage'
 
 import md5 from 'js-md5';
 import api from './request/api'
-import { fetchPost, fetchGet } from './request/http'
+import { fetchPost, fetchPut, fetchGet, fetchDelete } from './request/http'
 import qs from 'qs'
 
 import vConsole from 'vconsole'
@@ -28,7 +28,9 @@ Vue.config.productionTip = false
 Vue.prototype.$md5 = md5
 Vue.prototype.api = api
 Vue.prototype.$fetchPost = fetchPost
+Vue.prototype.$fetchPut = fetchPut
 Vue.prototype.$fetchGet = fetchGet
+Vue.prototype.$fetchDelete = fetchDelete
 Vue.prototype.qs = qs
 
 /* eslint-disable no-new */

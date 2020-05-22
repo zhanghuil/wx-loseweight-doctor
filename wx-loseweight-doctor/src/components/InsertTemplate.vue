@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import Options from '@/components/options'
+import Options from '@/components/public/options'
 export default {
     name: 'InsertTemplate',
     components: { Options },

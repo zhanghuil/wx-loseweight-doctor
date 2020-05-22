@@ -54,7 +54,7 @@
             </div>
         </div>
         <!-- 患者组 -->
-        <div class="groupPanel" @click="lookPaGroup">
+        <div class="groupPanel" @click="lookPaGroup(patientInfo.PatientGroup)">
             <div class="L">
                 <div>
                     <img
@@ -63,7 +63,18 @@
                         alt=""
                     />
                 </div>
-                <div>暂无所属患者组</div>
+                <div v-if="patientGroup && patientGroup.length == 0">
+                    暂无所属患者组
+                </div>
+                <div v-else class="groupPanelTxt">
+                    <span
+                        v-for="(g, idx) in patientInfo.PatientGroup"
+                        :key="idx"
+                        >{{
+                            g.Name
+                        }}</span
+                    >
+                </div>
             </div>
             <div><i class="icon cubeic-arrow"></i></div>
         </div>
@@ -156,7 +167,7 @@
                 <div v-if="item.TypeCode == 'SZDJ'">
                     <div
                         class="info"
-                        @click="lookInfo('first', item.Diagnose.ID)"
+                        @click="lookInfo('first', $route.query.userId)"
                     >
                         {{ item.RecordDate | formatDateStr }} 首诊登记(患者)
                     </div>
@@ -299,6 +310,7 @@ export default {
     data() {
         return {
             patientInfo: {}, //患者信息
+            patientGroup: [], //患者所属组
             formId: '',
             empty: true,
             tabs: ['评估表', '减重方案'],
@@ -379,6 +391,7 @@ export default {
                     return
                 }
                 _this.patientInfo = result
+                _this.patientGroup = result.PatientGroup
             })
         },
         //获取患者体重记录
@@ -433,10 +446,14 @@ export default {
                 _this.planList = result
             })
         },
-        lookPaGroup() {
+        lookPaGroup(e) {
+            storage.setObjItem('patientGroup', e) //患者所属组
             this.$router.push({
                 path: '/patientGroup',
-                query: { userName: this.userName }
+                query: {
+                    userName: this.userName,
+                    userId: this.$route.query.userId
+                }
             })
         },
         showTap(e) {
@@ -904,6 +921,23 @@ export default {
             width: 30px;
             height: 30px;
             margin-right: 10px;
+        }
+    }
+}
+.groupPanelTxt {
+    flex: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+		overflow: hidden;
+    span {
+        position: relative;
+        &::after {
+            content: '/';
+            font-weight: bold;
+        }
+        &:last-child::after {
+            content: '';
         }
     }
 }

@@ -5,11 +5,15 @@
             <div class="myTopCon">
                 <img src="../assets/tx1.png" class="img" alt="" />
                 <div class="con">
-                    <p class="name">{{doctorInfo.Name}}<i class="icon cubeic-arrow"></i></p>
-                    <p class="hos">{{doctorInfo.HosName}}</p>
+                    <p class="name">
+                        {{ doctorInfo.Name }}<i class="icon cubeic-arrow"></i>
+                    </p>
+                    <p class="hos">{{ doctorInfo.HosName }}</p>
                 </div>
                 <div class="qCodeimg">
-                    <i class="icon iconfont icon-qrcode"></i>
+                    <router-link to="/doctorCard">
+                        <i class="icon iconfont icon-qrcode"></i
+                    ></router-link>
                 </div>
             </div>
         </div>
@@ -75,7 +79,7 @@
                 </li>
             </ul>
         </div>
-        <div class="exitBox">退出</div>
+        <div class="exitBox" @click="exitTap">退出</div>
         <div class="footer">
             <ul class="footerWrap">
                 <router-link to="/">
@@ -120,6 +124,16 @@ export default {
         this.getDoctorInfoNew()
     },
     methods: {
+        //退出  清除缓存
+        exitTap() {
+            yktoast('退出成功')
+            storage.removeItem('filterResultsGroup')
+            storage.removeItem('Token')
+            storage.removeItem('AccountId')
+            this.$router.replace({
+                path: '/login'
+            })
+        },
         //获取医生信息
         getDoctorInfoNew() {
             let AccountId = storage.getItem('AccountId')
@@ -131,7 +145,7 @@ export default {
             this.$fetchPost(url, data, 150).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.status == 0) {
-                    console.log(result.data)
+                    // console.log(result.data)
                     _this.doctorInfo = result.data
                 } else {
                     yktoast(result)

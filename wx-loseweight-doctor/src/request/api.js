@@ -2,7 +2,7 @@
  * api 接口
  */
 
-import { webApi } from '../common/env'
+import { webApi } from './env'
 
 const userApi = {
 	JZDoctorPhoneLogin: webApi + '/api/System/Auth/JZDoctorPhoneLogin', //验证码登录
@@ -17,19 +17,19 @@ const userApi = {
 	GetWeightLossPlans: webApi + '/api/System/MedicalRecord/GetWeightLossPlans', //获取病人减重方案列表
 	GetPatientWeightLossPlan: webApi + '/api/System/MedicalRecord/GetPatientWeightLossPlan', //获取减重方案
 	GetPatientMedical: webApi + '/api/System/Patient/GetPatientMedical',  //获取病人医生信息
+	GetJZMZDoctorQRCode: webApi + '/api/System/Doctor/GetJZMZDoctorQRCode', //获取减重门诊公众号医生二维码
 	GetDoctorInfoNew: webApi + '/api/System/Doctor/GetDoctorInfoNew',  //医生信息 
+	GetSubDoctor: webApi + '/api/System/Doctor/GetSubDoctor',  //获取下级医生
 	EditEmail: webApi + '/api/System/Doctor/EditEmail',  //修改邮箱地址
+	GetPatientGroups: webApi + '/api/System/PatientGroup/GetPatientGroups',  //查询医生下的患者组
+	GetPatientGroup: webApi + '/api/System/PatientGroup/GetPatientGroup',  //获取患者组信息
+	AddPatientGroup: webApi + '/api/System/PatientGroup/AddPatientGroup', //添加患者组 
+	EditPatientGroup: webApi + '/api/System/PatientGroup/EditPatientGroup', //编辑患者组
+	DeletePatientGroup: webApi + '/api/System/PatientGroup/DeletePatientGroup',  //删除患者组 
+	SetJZMZPatientGroup: webApi + '/api/System/JZMZPatient/SetJZMZPatientGroup',  //设置患者的分组
 
-
-
-
-
-
-
-
-
-
-
+	GetPatientFollowUpVisit: webApi + '/api/System/MedicalRecord/GetPatientFollowUpVisit',  //获取患者随访信息
+	GetPatientDiagnose: webApi + '/api/System/MedicalRecord/GetPatientDiagnose',  //获取患者首诊信息
 }
 export default {
 	userApi

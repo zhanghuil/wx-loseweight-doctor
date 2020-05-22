@@ -48,7 +48,7 @@ const getObjItem = function (key) {
 	}
 	let value = localStorage.getItem(key)
 	if (!value || value == 'undefined')
-		return [];
+		return '';
 	// console.log(key)
 	return JSON.parse(value)
 }

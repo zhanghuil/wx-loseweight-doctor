@@ -5,6 +5,18 @@ import Cube from 'cube-ui'
 import Vue from 'vue';  //1.引入vue
 let v = new Vue();  //2.新创建一个vue实例
 
+export function convertKey(arr, key) {
+	let newArr = [];
+	arr.forEach((item, index) => {
+		let newObj = {};
+		for (var i = 0; i < key.length; i++) {
+			newObj[key[i]] = item[Object.keys(item)[i]]
+		}
+		newArr.push(newObj);
+	})
+	// console.log(newArr)
+	return newArr;
+}
 
 /**
  * 提示框toast
