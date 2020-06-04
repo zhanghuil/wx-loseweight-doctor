@@ -174,19 +174,19 @@ export default {
             top: 50%;
             transform: translateY(-50%);
             display: inline-block;
-						cursor: pointer;
-						.iconfont{
-							font-size: 20px;
-						}
+            cursor: pointer;
+            .iconfont {
+                font-size: 20px;
+            }
         }
     }
     .drawer-body {
         // padding: 20px;
         font-size: 14px;
         overflow: auto;
-		}
-		.footerEdit{
-			position: absolute;
-		}
+    }
+    .footerEdit {
+        position: absolute;
+    }
 }
 </style>

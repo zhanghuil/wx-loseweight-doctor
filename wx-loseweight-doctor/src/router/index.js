@@ -132,13 +132,5 @@ export default new Router({
 				requiresAuth: true  // 添加表示需要验证
 			}
 		},
-		{
-			path: '/InsertTemplate',
-			name: 'InsertTemplate',
-			component: resolve => require(['@/components/InsertTemplate'], resolve),
-			meta: {
-				title: '插入模板'
-			}
-		},
 	]
 })

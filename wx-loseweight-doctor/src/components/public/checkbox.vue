@@ -14,7 +14,7 @@
                     <div v-else>
                         <i class="icon iconfont icon-radioboxblank "></i>
                     </div>
-                    <div>{{ item.label }}</div>
+                    <div>{{ item.Name }}</div>
                 </div>
             </li>
         </ul>

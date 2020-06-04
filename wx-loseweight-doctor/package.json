@@ -23,6 +23,7 @@
     "js-md5": "^0.7.3",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
+    "mathjs": "^7.0.1",
     "postcss-px2rem": "^0.3.0",
     "qs": "^6.7.0",
     "vconsole": "^3.3.4",

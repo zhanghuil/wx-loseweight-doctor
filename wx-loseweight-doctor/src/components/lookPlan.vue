@@ -542,7 +542,7 @@ export default {
             const id = e
             if (id == 1) this.ellState = !this.ellState
             if (id == 2) this.ellState2 = !this.ellState2
-				}
+        }
     }
 }
 </script>

@@ -58,6 +58,11 @@ export default {
             type: Boolean,
             default: false
         },
+        isRemoveSelf: {
+            //单选是否移除自己  默认不可移除
+            type: Boolean,
+            default: false
+        },
         cssStyle: Object //可以自定义单选或者多选的样式
     },
     data() {
@@ -88,7 +93,17 @@ export default {
         optionsClick(item) {
             if (this.isMultiply === false) {
                 //单选
-                this.$set(this.currValArr, 0, item) // 将该值设为当前数组的第一项
+                if (this.isRemoveSelf == false) {
+                    //不可移除自己
+                    this.$set(this.currValArr, 0, item) // 将该值设为当前数组的第一项
+                } else {
+                    if (this.currValArr.indexOf(item) != -1) {
+                        //当前数组中有该值，找到该值下标并删除
+                        this.currValArr.splice(this.currValArr.indexOf(item), 1)
+                    } else {
+                        this.$set(this.currValArr, 0, item) // 将该值设为当前数组的第一项
+                    }
+                }
             } else {
                 //多选
                 if (this.currValArr.indexOf(item) === -1) {

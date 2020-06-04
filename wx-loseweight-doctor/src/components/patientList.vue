@@ -10,7 +10,7 @@
                         <strong>{{ patientInfo.Name }}</strong>
                         <span
                             >{{ patientInfo.Weight }}kg，{{
-                                patientInfo.Sex == 1 ? '男' : '女'
+                                patientInfo.Sex == 0 ? '男' : '女'
                             }}，{{ patientInfo.Age }}岁</span
                         >
                     </p>
@@ -70,9 +70,7 @@
                     <span
                         v-for="(g, idx) in patientInfo.PatientGroup"
                         :key="idx"
-                        >{{
-                            g.Name
-                        }}</span
+                        >{{ g.Name }}</span
                     >
                 </div>
             </div>
@@ -485,7 +483,7 @@ export default {
         draftPlan(e) {
             this.$router.push({
                 path: '/draftPlan',
-                query: { id: 1 }
+                query: { userId: this.$route.query.userId }
             })
         }
     }
@@ -929,7 +927,7 @@ export default {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
-		overflow: hidden;
+    overflow: hidden;
     span {
         position: relative;
         &::after {

@@ -26,6 +26,8 @@
                         type="number"
                         @input="oninput"
                         v-model="num"
+                        min="0.00"
+                        max="100"
                     />
                     <span class="f12 c-6d">kg</span>
                 </div>
@@ -36,14 +38,14 @@
                         v-for="(item, index) in tabs"
                         :key="index"
                         class="weui-navbar__item"
-                        :class="activeIndex == index ? 'on' : ''"
-                        @click="tabClick(index)"
+                        :class="activeVal == item.value ? 'on' : ''"
+                        @click="tabClick(item.value)"
                     >
-                        <div class="weui-navbar__title">{{ item }}</div>
+                        <div class="weui-navbar__title">{{ item.name }}</div>
                     </div>
                 </div>
                 <!-- 高蛋白 -->
-                <div v-show="activeIndex == 0" class="pb15">
+                <div v-show="activeVal == 'HighProtein'" class="pb15">
                     <div class="infoTit">
                         <div class="rel">
                             <div class="title b">供给量（日）</div>
@@ -57,7 +59,7 @@
                         <div class="PanelPlan2">
                             <div class="L">
                                 <div class="f24 lh24">
-                                    800
+                                    {{ planSupply.energy }}
                                 </div>
                                 <div class="f12">大卡</div>
                             </div>
@@ -66,7 +68,7 @@
                                     <div class="df">
                                         <div class="w90">蛋白质</div>
                                         <div class="f14 c-3a">
-                                            480g
+                                            {{ planSupply.protein }}g
                                         </div>
                                     </div>
                                 </div>
@@ -74,7 +76,7 @@
                                     <div class="df">
                                         <div class="w90">脂肪</div>
                                         <div class="f14 c-3a">
-                                            160g
+                                            {{ planSupply.fat }}g
                                         </div>
                                     </div>
                                 </div>
@@ -82,7 +84,7 @@
                                     <div class="df">
                                         <div class="w90">碳水化合物</div>
                                         <div class="f14 c-3a">
-                                            80g
+                                            {{ planSupply.CHO }}g
                                         </div>
                                     </div>
                                 </div>
@@ -91,26 +93,30 @@
                     </div>
                 </div>
                 <!-- 轻断食 -->
-                <div v-show="activeIndex == 1" class="pb15">
+                <div v-show="activeVal == 'FastDiet'" class="pb15">
                     <div class="infoTit">
                         <div class="rel">
                             <div class="title b">断食日供给量（日）</div>
                             <div class="bg_img"></div>
                         </div>
                     </div>
-                    <div class="f14 c-6d px15">800大卡</div>
+                    <div class="f14 c-6d px15">
+                        {{ planSupply.fastingSupply }}大卡
+                    </div>
                     <div class="infoTit mt10">
                         <div class="rel">
                             <div class="title b">非断食日供给量（日）</div>
                             <div class="bg_img"></div>
                         </div>
-                        <div class="weightScale">补充瘦体重</div>
+                        <div class="weightScale" @click="display = true">
+                            补充瘦体重
+                        </div>
                     </div>
                     <div class="wrapper4 p15">
                         <div class="PanelPlan2">
                             <div class="L">
                                 <div class="f24 lh24">
-                                    800
+                                    {{ planSupply.energy }}
                                 </div>
                                 <div class="f12">大卡</div>
                             </div>
@@ -119,7 +125,7 @@
                                     <div class="df">
                                         <div class="w90">蛋白质</div>
                                         <div class="f14 c-3a">
-                                            480g
+                                            {{ planSupply.protein }}g
                                         </div>
                                     </div>
                                 </div>
@@ -127,7 +133,7 @@
                                     <div class="df">
                                         <div class="w90">脂肪</div>
                                         <div class="f14 c-3a">
-                                            160g
+                                            {{ planSupply.fat }}g
                                         </div>
                                     </div>
                                 </div>
@@ -135,7 +141,7 @@
                                     <div class="df">
                                         <div class="w90">碳水化合物</div>
                                         <div class="f14 c-3a">
-                                            80g
+                                            {{ planSupply.CHO }}g
                                         </div>
                                     </div>
                                 </div>
@@ -144,19 +150,21 @@
                     </div>
                 </div>
                 <!-- 限能量 -->
-                <div v-show="activeIndex == 2" class="pb15">
+                <div v-show="activeVal == 'LimitEnergy'" class="pb15">
                     <div class="infoTit">
                         <div class="rel">
                             <div class="title b">供给量（日）</div>
                             <div class="bg_img"></div>
                         </div>
-                        <div class="weightScale">补充瘦体重</div>
+                        <div class="weightScale" @click="display = true">
+                            补充瘦体重
+                        </div>
                     </div>
                     <div class="wrapper4 p15">
                         <div class="PanelPlan2">
                             <div class="L">
                                 <div class="f24 lh24">
-                                    800
+                                    {{ planSupply.energy }}
                                 </div>
                                 <div class="f12">大卡</div>
                             </div>
@@ -165,7 +173,7 @@
                                     <div class="df">
                                         <div class="w90">蛋白质</div>
                                         <div class="f14 c-3a">
-                                            480g
+                                            {{ planSupply.protein }}g
                                         </div>
                                     </div>
                                 </div>
@@ -173,7 +181,7 @@
                                     <div class="df">
                                         <div class="w90">脂肪</div>
                                         <div class="f14 c-3a">
-                                            160g
+                                            {{ planSupply.fat }}g
                                         </div>
                                     </div>
                                 </div>
@@ -181,7 +189,7 @@
                                     <div class="df">
                                         <div class="w90">碳水化合物</div>
                                         <div class="f14 c-3a">
-                                            80g
+                                            {{ planSupply.CHO }}g
                                         </div>
                                     </div>
                                 </div>
@@ -193,7 +201,8 @@
         </div>
         <!-- 饮食要求 -->
         <div v-show="pageIndex == 2">
-            <ul class="requireBox">
+            <img class="mealDesImg" :src="dietrequireUrl" />
+            <ul class="requireBox dn">
                 <li class="px75 py20">
                     <div>
                         <span class="tag">1</span>
@@ -235,67 +244,127 @@
             </div>
             <!-- 饮食方案 start-->
             <div class="dietPlan">
-                <ul>
+                <!-- 高蛋白、限能量饮食方案 -->
+                <div
+                    class="con"
+                    v-show="
+                        activeVal == 'HighProtein' || activeVal == 'LimitEnergy'
+                    "
+                >
+                    <div
+                        class="panelCon"
+                        v-for="(item,
+                        index) in DietQuestionnaire.QuestionGroups"
+                        :key="index"
+                    >
+                        <div class="flex-between">
+                            <div class="f16 c-3a">
+                                {{ item.Name }}
+                                <i
+                                    v-show="item.IsRequired"
+                                    class="c-fb iconfont icon-bitian-"
+                                ></i>
+                            </div>
+                            <div class="f14 c-6d">{{ item.Description }}</div>
+                        </div>
+                        <ol class="mt15">
+                            <li v-for="(n, idx) in item.Questions" :key="idx">
+                                <div class="wrap">
+                                    <div class="f14 c-3a">{{ n.Name }}</div>
+                                    <div class="pr10">
+                                        <template v-if="n.Precision > 0">
+                                            <input
+                                                placeholder="请输入"
+                                                v-model="
+                                                    n.QuestionAnswerInfo
+                                                        .DecimalValue
+                                                "
+                                            />
+                                        </template>
+                                        <template v-else>
+                                            <input
+                                                placeholder="请输入"
+                                                v-model="
+                                                    n.QuestionAnswerInfo
+                                                        .IntValue
+                                                "
+                                            />
+                                        </template>
+                                        <span class="f14 c-6d">{{
+                                            n.Suffix
+                                        }}</span>
+                                    </div>
+                                </div>
+                                <p class="desc" v-show="n.Description">
+                                    {{ n.Description }}
+                                </p>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <!-- 轻断食饮食方案 -->
+                <ul v-show="activeVal == 'FastDiet'">
                     <li>
                         <div class="tag">
                             <span>非断食日</span>
                         </div>
                         <div class="con con2">
-                            <div class="panelCon">
+                            <div
+                                class="panelCon"
+                                v-for="(item,
+                                index) in DietQuestionnaire.QuestionGroups"
+                                :key="index"
+                            >
                                 <div class="flex-between">
                                     <div class="f16 c-3a">
-                                        早餐
+                                        {{ item.Name }}
                                         <i
+                                            v-show="item.IsRequired"
                                             class="c-fb iconfont icon-bitian-"
                                         ></i>
                                     </div>
-                                    <div class="f14 c-6d">7:00</div>
-                                </div>
-                                <ol class="mt15">
-                                    <li>
-                                        <div class="wrap">
-                                            <div class="f14 c-3a">
-                                                主食（粗细搭配）
-                                            </div>
-                                            <div class="pr10">
-                                                <input placeholder="请输入" />
-                                                <span class="f14 c-6d">克</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="wrap">
-                                            <div class="f14 c-3a">
-                                                蛋白质类食物
-                                            </div>
-                                            <div class="pr10">
-                                                <input placeholder="请输入" />
-                                                <span class="f14 c-6d">克</span>
-                                            </div>
-                                        </div>
-                                        <p class="desc">
-                                            1 个鸡蛋＋牛奶/豆浆 250ml
-                                        </p>
-                                    </li>
-                                </ol>
-                            </div>
-                            <div class="panelCon">
-                                <div class="flex-between">
-                                    <div class="f16 c-3a">
-                                        全天饮水量
+                                    <div class="f14 c-6d">
+                                        {{ item.Description }}
                                     </div>
                                 </div>
                                 <ol class="mt15">
-                                    <li>
+                                    <li
+                                        v-for="(n, idx) in item.Questions"
+                                        :key="idx"
+                                    >
                                         <div class="wrap">
                                             <div class="f14 c-3a">
-                                                全天饮水量
+                                                {{ n.Name }}
                                             </div>
                                             <div class="pr10">
-                                                <input placeholder="请输入" />
-                                                <span class="f14 c-6d">ml</span>
+                                                <template
+                                                    v-if="n.Precision > 0"
+                                                >
+                                                    <input
+                                                        placeholder="请输入"
+                                                        v-model="
+                                                            n.QuestionAnswerInfo
+                                                                .DecimalValue
+                                                        "
+                                                    />
+                                                </template>
+                                                <template v-else>
+                                                    <input
+                                                        placeholder="请输入"
+                                                        v-model="
+                                                            n.QuestionAnswerInfo
+                                                                .IntValue
+                                                        "
+                                                    />
+                                                </template>
+                                                <span class="f14 c-6d">{{
+                                                    n.Suffix
+                                                }}</span>
                                             </div>
                                         </div>
+                                        <p class="desc" v-show="n.Description">
+                                            {{ n.Description }}
+                                        </p>
                                     </li>
                                 </ol>
                             </div>
@@ -305,62 +374,63 @@
                         <div class="tag">
                             <span>断食日</span>
                         </div>
-                        <div class="con con2">
-                            <div class="panelCon">
+                        <div class="con con2" v-if="DietEkadeshQuestionnaire">
+                            <div
+                                class="panelCon"
+                                v-for="(item,
+                                index) in DietEkadeshQuestionnaire.QuestionGroups"
+                                :key="index"
+                            >
                                 <div class="flex-between">
                                     <div class="f16 c-3a">
-                                        早餐
+                                        {{ item.Name }}
                                         <i
+                                            v-show="item.IsRequired"
                                             class="c-fb iconfont icon-bitian-"
                                         ></i>
                                     </div>
-                                    <div class="f14 c-6d">7:00</div>
-                                </div>
-                                <ol class="mt15">
-                                    <li>
-                                        <div class="wrap">
-                                            <div class="f14 c-3a">
-                                                主食（粗细搭配）
-                                            </div>
-                                            <div class="pr10">
-                                                <input placeholder="请输入" />
-                                                <span class="f14 c-6d">克</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="wrap">
-                                            <div class="f14 c-3a">
-                                                蛋白质类食物
-                                            </div>
-                                            <div class="pr10">
-                                                <input placeholder="请输入" />
-                                                <span class="f14 c-6d">克</span>
-                                            </div>
-                                        </div>
-                                        <p class="desc">
-                                            1 个鸡蛋＋牛奶/豆浆 250ml
-                                        </p>
-                                    </li>
-                                </ol>
-                            </div>
-                            <div class="panelCon">
-                                <div class="flex-between">
-                                    <div class="f16 c-3a">
-                                        全天饮水量
+                                    <div class="f14 c-6d">
+                                        {{ item.Description }}
                                     </div>
                                 </div>
                                 <ol class="mt15">
-                                    <li>
+                                    <li
+                                        v-for="(n, idx) in item.Questions"
+                                        :key="idx"
+                                    >
                                         <div class="wrap">
                                             <div class="f14 c-3a">
-                                                全天饮水量
+                                                {{ n.Name }}
                                             </div>
                                             <div class="pr10">
-                                                <input placeholder="请输入" />
-                                                <span class="f14 c-6d">ml</span>
+                                                <template
+                                                    v-if="n.Precision > 0"
+                                                >
+                                                    <input
+                                                        placeholder="请输入"
+                                                        v-model="
+                                                            n.QuestionAnswerInfo
+                                                                .DecimalValue
+                                                        "
+                                                    />
+                                                </template>
+                                                <template v-else>
+                                                    <input
+                                                        placeholder="请输入"
+                                                        v-model="
+                                                            n.QuestionAnswerInfo
+                                                                .IntValue
+                                                        "
+                                                    />
+                                                </template>
+                                                <span class="f14 c-6d">{{
+                                                    n.Suffix
+                                                }}</span>
                                             </div>
                                         </div>
+                                        <p class="desc" v-show="n.Description">
+                                            {{ n.Description }}
+                                        </p>
                                     </li>
                                 </ol>
                             </div>
@@ -372,7 +442,8 @@
         </div>
         <!-- 食谱执行说明 -->
         <div v-show="pageIndex == 4">
-            <ul class="requireBox requireBox2">
+            <img class="mealDesImg" :src="dietexecexplainUrl" />
+            <ul class="requireBox requireBox2 dn">
                 <li class="py20">
                     <div>
                         <span class="tag">1</span>
@@ -412,8 +483,8 @@
                         <div class="p15">
                             <checkbox
                                 :isMultiply="true"
-                                :options="options"
-                                :name="name"
+                                :options="sportEvent"
+                                name="建议有氧运动项目"
                                 @toparents="childByValueCheck"
                             ></checkbox>
                         </div>
@@ -421,38 +492,36 @@
                         <div class="f16 c-3a px15 pt15">建议运动频率与时长</div>
                         <div class="panelCon">
                             <ol>
-                                <li>
+                                <li
+                                    v-for="(item, index) in adviseSports"
+                                    :key="index"
+                                >
                                     <div class="wrap">
                                         <div class="f14 c-3a">
-                                            每周运动
+                                            {{ item.Name }}
                                         </div>
                                         <div class="pr10">
-                                            <input placeholder="请输入" />
-                                            <span class="f14 c-6d">次</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="wrap">
-                                        <div class="f14 c-3a">
-                                            每次
-                                        </div>
-                                        <div class="pr10">
-                                            <input placeholder="请输入" />
-                                            <span class="f14 c-6d">分钟</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="wrap">
-                                        <div class="f14 c-3a">
-                                            心率达到
-                                        </div>
-                                        <div class="pr10">
-                                            <input placeholder="请输入" />
-                                            <span class="f14 c-6d"
-                                                >次/分钟</span
-                                            >
+                                            <template v-if="item.Precision > 0">
+                                                <input
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .DecimalValue
+                                                    "
+                                                />
+                                            </template>
+                                            <template v-else>
+                                                <input
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .IntValue
+                                                    "
+                                                />
+                                            </template>
+                                            <span class="f14 c-6d">{{
+                                                item.Suffix
+                                            }}</span>
                                         </div>
                                     </div>
                                 </li>
@@ -471,38 +540,36 @@
                         </div>
                         <div class="panelCon">
                             <ol>
-                                <li>
+                                <li
+                                    v-for="(item, index) in Zmotion"
+                                    :key="index"
+                                >
                                     <div class="wrap">
                                         <div class="f14 c-3a">
-                                            每周运动
+                                            {{ item.Name }}
                                         </div>
                                         <div class="pr10">
-                                            <input placeholder="请输入" />
-                                            <span class="f14 c-6d">次</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="wrap">
-                                        <div class="f14 c-3a">
-                                            每次
-                                        </div>
-                                        <div class="pr10">
-                                            <input placeholder="请输入" />
-                                            <span class="f14 c-6d">分钟</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="wrap">
-                                        <div class="f14 c-3a">
-                                            心率达到
-                                        </div>
-                                        <div class="pr10">
-                                            <input placeholder="请输入" />
-                                            <span class="f14 c-6d"
-                                                >次/分钟</span
-                                            >
+                                            <template v-if="item.Precision > 0">
+                                                <input
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .DecimalValue
+                                                    "
+                                                />
+                                            </template>
+                                            <template v-else>
+                                                <input
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .IntValue
+                                                    "
+                                                />
+                                            </template>
+                                            <span class="f14 c-6d">{{
+                                                item.Suffix
+                                            }}</span>
                                         </div>
                                     </div>
                                 </li>
@@ -516,14 +583,16 @@
         <div v-show="pageIndex == 6">
             <ul class="p15">
                 <li class="wrapper2">
-                    <div class="f16 c-3a">下次复诊</div>
                     <checkbox
-                        :isMultiply="true"
-                        :options="options"
-                        :name="name"
-                        @toparents="childByValueCheck"
+                        :options="isReVisitingOptions"
+                        name="下次复诊"
+                        @toparents="childByValueCheckR"
                     ></checkbox>
-                    <div class="yk_wx_cell yk-wx-cell2" @click="showDateFollow">
+                    <div
+                        v-show="reVisitTime"
+                        class="yk_wx_cell yk-wx-cell2"
+                        @click="showDateFollow"
+                    >
                         <div class="cell_bd flex-center">
                             <div>
                                 <img
@@ -541,11 +610,11 @@
                     </div>
                 </li>
                 <li class="wrapper2">
-                    <div class="f16 c-3a">随访计划</div>
+                    <!-- <div class="f16 c-3a">随访计划</div> -->
                     <checkbox
-                        :options="options"
-                        :name="name"
-                        @toparents="childByValueCheck"
+                        :options="followOptions"
+                        name="随访计划"
+                        @toparents="childByValueCheckF"
                     ></checkbox>
                 </li>
             </ul>
@@ -571,6 +640,7 @@
             :height="drawerHeight"
             @cancle="cancle"
             @confirm="confirm"
+            ref="drawerWeight"
         >
             <div>
                 <div class="weightRuler">
@@ -579,9 +649,10 @@
                 </div>
                 <ruler
                     @post-NumValue="rulerNum"
-                    :NowNum="NumValue"
-                    :maxNum="400"
-                    :minNum="10"
+                    :NowNum="1000"
+                    :maxNum="4000"
+                    :minNum="100"
+                    :ispoint="true"
                 ></ruler>
             </div>
         </drawerFoot>
@@ -591,11 +662,13 @@
             :display.sync="showTmp"
             :width="drawerWidth"
             :height="drawerHeight"
-            @cancle="cancle"
-            @confirm="confirm"
+            @cancle="cancleTmp"
+            @confirm="confirmTmp"
+            ref="drawertemplate"
         >
             <div class="mx15">
                 <textarea
+                    v-model="templateName"
                     class="tmpTxtArea"
                     rows="3"
                     maxlength="30"
@@ -603,21 +676,60 @@
                 ></textarea>
             </div>
         </drawerFoot>
+        <!-- 插入模板 start-->
+        <template v-if="templatesList && templatesList.length > 0">
+            <InsertTemplate
+                ref="insTmp"
+                :list="templatesList"
+                @selGroupTmp="selGroupTmp"
+                @cancle="cancleInsTmp"
+                @confirm="confirmInsTmp"
+            ></InsertTemplate>
+        </template>
+        <!-- 插入模板 end -->
     </div>
 </template>
 
 <script>
-// /Resource/LoseWeigthPlan/dietexecexplain.png   饮食要求
-// /Resource/LoseWeigthPlan/dietrequire.png  食谱执行说明
+import { webApi } from '../request/env'
 import ruler from '@/components/public/ruler'
 import drawerFoot from '@/components/public/drawerFoot'
 import checkbox from '@/components/public/checkbox'
+import { yktoast, convertKey } from '../common/js/util'
+import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
+import InsertTemplate from '@/components/InsertTemplate'
+const math = require('mathjs')
 export default {
     name: 'draftPlan',
-    components: { drawerFoot, ruler, checkbox },
+    components: { drawerFoot, ruler, checkbox, InsertTemplate },
     data() {
         return {
+            templateName: '', //模板名称
+            templatesList: [], //模板列表
+            selGroupTmpId: '', //选中模板id
+            dietexecexplainUrl:
+                webApi + '/Resource/LoseWeigthPlan/dietexecexplain.png', //食谱执行说明
+            dietrequireUrl: webApi + '/Resource/LoseWeigthPlan/dietrequire.png', //饮食要求
+            planSupply: {
+                energy: '', //能量
+                protein: '', //蛋白质
+                fat: '', //脂肪
+                CHO: '', //碳水化合物
+                fastingSupply: '' //断食日供给量
+            }, //方案供给量
+            patientInfo: {}, //患者信息
+            doctorInfo: {}, //医生信息
+            doctorId: '', //医生id
+
+            planInfo: {},
+            WeightLossPlan: {},
+            sportEvent: [], //运动项目
+            adviseSports: [], //建议运动
+            Zmotion: [], //阻抗运动
+            DietQuestionnaire: {}, //方案  非断食日
+            DietEkadeshQuestionnaire: {}, //轻断食断食日饮食方案
+
             pageIndex: 1,
             display: false, //体重弹窗
             showTmp: false, //保存模板弹窗
@@ -626,66 +738,232 @@ export default {
             planDate: '', //方案时间
             followDate: '请选择', //复诊时间
             num: 0.0, //减重目标
-            tabs: ['高蛋白', '轻断食', '限能量'],
-            activeIndex: 0,
-            NumValue: 100,
+            tabs: [
+                {
+                    name: '高蛋白',
+                    value: 'HighProtein'
+                },
+                {
+                    name: '轻断食',
+                    value: 'FastDiet'
+                },
+                {
+                    name: '限能量',
+                    value: 'LimitEnergy'
+                }
+            ], //方案类型
+            activeVal: 'HighProtein',
+            NumValue: 100, //瘦体重默认值
+            LBW: 0, //瘦体重
 
             imgUrl: '',
 
-            name: '建议有氧运动项目',
-            options: [
+            isReVisitingOptions: [
+                //下次复诊
                 {
-                    label: '快走',
-                    value: '1',
-                    checked: false
+                    Name: '不需要',
+                    value: 0
                 },
                 {
-                    label: '慢跑',
-                    value: '2',
-                    checked: false
-                },
-                {
-                    label: '游泳',
-                    value: '3',
-                    checked: false
-                },
-                {
-                    label: '跳绳',
-                    value: '4',
-                    checked: false
-                },
-                {
-                    label: '健身车',
-                    value: '5',
-                    checked: false
-                },
-                {
-                    label: '瑜伽',
-                    value: '6',
-                    checked: false
+                    Name: '需要',
+                    value: 1
                 }
-            ]
+            ],
+            isReVisiting: '',
+            reVisitTime: false, //复诊时间选择框默认隐藏
+            followOptions: [
+                //随访计划
+                {
+                    Name: '不需要',
+                    value: '-1'
+                },
+                {
+                    Name: '每周',
+                    value: '7'
+                },
+                {
+                    Name: '每月',
+                    value: '30'
+                }
+            ],
+            FollowUpVisitPlan: '' //随访周期计划 = ['0', '7', '14', '30', '90', '180', '360', '-1'],
         }
     },
     computed: {},
     filters: {},
     created() {
         this.planDate = formatDate(new Date(), 'yyyy-MM-dd')
+        this.getJZMZPatient()
+        this.getDoctorInfoNew()
+        let AccountId = storage.getItem('AccountId')
+        this.doctorId = AccountId
     },
     methods: {
         //子组件传递刻度表
         rulerNum(value) {
             this.NumValue = value
         },
-        tabClick(e) {
-            this.activeIndex = e
-        },
+        //刻度尺选择
         cancle() {
-            console.log('点击了取消')
+            console.log('点击了取消刻度尺选择')
+            this.$refs.drawerWeight.closeByButton()
         },
         confirm() {
-            console.log('点击了确定')
+            console.log(`点击了确定刻度尺选择--${this.NumValue}`)
+            this.$refs.drawerWeight.closeByButton()
+            this.LBW = this.NumValue
+            this.filtersPlanSupply(this.patientInfo)
         },
+
+        //获取饮食方案答案数据
+        getAnswerStr(typeCode) {
+            // typeCode //模板类型 todo
+            let questionInfoArr = []
+            let questionGroups = this.DietQuestionnaire.QuestionGroups
+            for (let i = 0; i < questionGroups.length; i++) {
+                let array = questionGroups[i].Questions
+                for (let j = 0; j < array.length; j++) {
+                    // debugger
+                    const element = array[j]
+
+                    if (element.Precision > 0) {
+                        //小数值
+                        var items = {
+                            DecimalValue: '',
+                            QuestionID: ''
+                        }
+                        items.DecimalValue =
+                            element.QuestionAnswerInfo.DecimalValue
+                    } else {
+                        //整数值
+                        var items = {
+                            IntValue: '',
+                            QuestionID: ''
+                        }
+                        items.IntValue = element.QuestionAnswerInfo.IntValue
+                    }
+
+                    items.QuestionID = element.QuestionAnswerInfo.QuestionID
+                    questionInfoArr.push(items)
+                }
+            }
+            return questionInfoArr
+            console.log(questionInfoArr)
+        },
+        // 获取运动方案答案-有氧运动项目
+        childByValueCheck(childValue) {
+            // childValue就是子组件传过来的值
+            console.log(childValue)
+            let val = childValue
+            let questionID = val[0].QuestionID //题目ID
+            let questionIDArr = val.map(n => n.ID)
+            this.SportsAnswerInfoStr = {
+                QuestionID: questionID,
+                StrValue: questionIDArr.join(',')
+            }
+            console.log(this.SportsAnswerInfoStr)
+        },
+        //获取运动方案答案-运动频率与时长
+        getSportsAnswerStr() {
+            let questionInfoArr = []
+            let questionGroups = this.adviseSports
+            for (let i = 0; i < questionGroups.length; i++) {
+                const element = questionGroups[i]
+
+                if (element.Precision > 0) {
+                    //小数值
+                    var items = {
+                        DecimalValue: '',
+                        QuestionID: ''
+                    }
+                    items.DecimalValue = element.QuestionAnswerInfo.DecimalValue
+                } else {
+                    //整数值
+                    var items = {
+                        IntValue: '',
+                        QuestionID: ''
+                    }
+                    items.IntValue = element.QuestionAnswerInfo.IntValue
+                }
+
+                items.QuestionID = element.QuestionAnswerInfo.QuestionID
+                questionInfoArr.push(items)
+            }
+            // debugger
+            return questionInfoArr
+            console.log(questionInfoArr)
+        },
+        //获取运动方案答案-阻抗运动项目
+        getZmotionAnswerStr() {
+            let questionInfoArr = []
+            let questionGroups = this.Zmotion
+            for (let i = 0; i < questionGroups.length; i++) {
+                const element = questionGroups[i]
+
+                if (element.Precision > 0) {
+                    //小数值
+                    var items = {
+                        DecimalValue: '',
+                        QuestionID: ''
+                    }
+                    items.DecimalValue = element.QuestionAnswerInfo.DecimalValue
+                } else {
+                    //整数值
+                    var items = {
+                        IntValue: '',
+                        QuestionID: ''
+                    }
+                    items.IntValue = element.QuestionAnswerInfo.IntValue
+                }
+
+                items.QuestionID = element.QuestionAnswerInfo.QuestionID
+                questionInfoArr.push(items)
+            }
+            // debugger
+            return questionInfoArr
+            console.log(questionInfoArr)
+        },
+        //取消保存模板操作
+        cancleTmp() {
+            console.log('点击了取消保存模板')
+            this.$refs.drawertemplate.closeByButton()
+        },
+        //保存模板
+        confirmTmp() {
+            console.log(`点击了确定保存模板`)
+            let templateName = this.templateName
+            if (!templateName) {
+                yktoast('请输入模板名称')
+                return
+            }
+
+            // 保存减重方案模板
+            var _this = this
+            let AccountId = storage.getItem('AccountId')
+            let url = this.api.userApi.SaveWeightLossPlanTemplate
+            let data = {
+                TemplateName: templateName, //模板名称
+                DoctorID: AccountId, //模板制定医生ID
+                HospID: this.doctorInfo.HosId, //医院ID
+                TypeCode: this.activeVal, //模板类型
+                DietAnswerInfoStr: JSON.stringify(
+                    this.getAnswerStr(this.activeVal)
+                ),
+                EkadeshDietAnswerInfoStr: ''
+            }
+            console.log(data)
+            this.$fetchPost(url, data, 4332).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.State == 0) {
+                    //保存成功
+                    yktoast(result.Msg)
+                    this.$refs.drawertemplate.closeByButton()
+                } else {
+                    yktoast(result.Msg)
+                }
+            })
+        },
+
         oninput(e) {
             // 通过正则过滤小数点后两位
             e.target.value =
@@ -693,13 +971,160 @@ export default {
 
             console.log('e', e.target.value)
         },
+        //获取医生信息
+        getDoctorInfoNew() {
+            let AccountId = storage.getItem('AccountId')
+            var _this = this
+            let url = this.api.userApi.GetDoctorInfoNew
+            let data = {
+                AccountId: AccountId
+            }
+            this.$fetchPost(url, data, 150).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.status == 0) {
+                    console.log(result.data)
+                    _this.doctorInfo = result.data
+                } else {
+                    yktoast(result)
+                }
+            })
+        },
+        //获取患者详情
+        getJZMZPatient() {
+            var _this = this
+            let url = this.api.userApi.GetJZMZPatient
+            let data = {
+                patientId: this.$route.query.userId
+            }
+            this.$fetchGet(url, data, 4112).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                //供给量
+                /**  默认高蛋白
+								 * 默认无瘦体重，根据标准体重开始运算供给量
+									·标准体重kg=目前身高(cm)-105
+									·推荐能量摄入E=标准体重*20kcal
+									·蛋白质PRO=能量×30%
+									·脂肪FAT=能量×30%
+									·碳水化合物CHO=能量×40%
+								 */
+                _this.patientInfo = result
+                _this.filtersPlanSupply(result)
+            })
+        },
+        //计算供给量
+        filtersPlanSupply(result) {
+            // Number(math.format(a*b,14)).toFixed(1)
+            const precision = 14 //num表示精度，最大为14，表示单一文本框最大的数字位数，包括小数点前后
+            if (
+                this.activeVal == 'HighProtein' ||
+                this.activeVal == 'FastDiet'
+            ) {
+                //高蛋白 轻断食
+                if (this.LBW > 0) {
+                    //有瘦体重
+                    let BMR = Number(
+                        math.format(370 + 21.6 * this.LBW, precision)
+                    ).toFixed(1)
+                    this.planSupply.energy = Number(
+                        math.format(BMR * 1.2 - 500, precision)
+                    ).toFixed(1)
+                    this.planSupply.protein = Number(
+                        math.format(this.LBW * 2.2, precision)
+                    ).toFixed(1)
+                    let energy = this.planSupply.energy
+                    this.planSupply.fat = Number(
+                        math.format(energy * 0.3, precision)
+                    ).toFixed(1)
+                    this.planSupply.CHO = Number(
+                        math.format(energy * 0.4, precision)
+                    ).toFixed(1)
+                } else {
+                    //无瘦体重
+                    let _basicW = Number(
+                        math.format(result.Height - 105, precision)
+                    ).toFixed(1) //标准体重
+                    this.planSupply.energy = Number(
+                        math.format(_basicW * 20, precision)
+                    ).toFixed(1)
+                    this.planSupply.protein = Number(
+                        math.format(_basicW * 0.3, precision)
+                    ).toFixed(1)
+                    this.planSupply.fat = Number(
+                        math.format(_basicW * 0.3, precision)
+                    ).toFixed(1)
+                    this.planSupply.CHO = Number(
+                        math.format(_basicW * 0.4, precision)
+                    ).toFixed(1)
+                }
+
+                /**
+								 * 【轻断食】
+									断食日
+									男：推荐能量摄入E=600kcal 
+									女：推荐能量摄入E=500kcal
+								 */
+                if (result.Sex == 0) {
+                    //男
+                    this.planSupply.fastingSupply = 600
+                } else {
+                    this.planSupply.fastingSupply = 500
+                }
+            } else if (this.activeVal == 'LimitEnergy') {
+                //限能量
+                if (this.LBW > 0) {
+                    //有瘦体重
+                    let BMR = Number(
+                        math.format(370 + 21.6 * this.LBW, precision)
+                    ).toFixed(1)
+                    this.planSupply.energy = Number(
+                        math.format(BMR * 1.2 - 500, precision)
+                    ).toFixed(1)
+                    let enery = this.planSupply.energy
+                    this.planSupply.protein = Number(
+                        math.format(enery * 0.2, precision)
+                    ).toFixed(1)
+                    this.planSupply.fat = Number(
+                        math.format(enery * 0.2, precision)
+                    ).toFixed(1)
+                    this.planSupply.CHO = Number(
+                        math.format(enery * 0.6, precision)
+                    ).toFixed(1)
+                } else {
+                    //无瘦体重
+                    let _basicW = Number(
+                        math.format(result.Height - 105, precision)
+                    ).toFixed(1) //标准体重
+                    this.planSupply.energy = Number(
+                        math.format(_basicW * 20, precision)
+                    ).toFixed(1)
+                    this.planSupply.protein = Number(
+                        math.format(_basicW * 0.2, precision)
+                    ).toFixed(1)
+                    this.planSupply.fat = Number(
+                        math.format(_basicW * 0.2, precision)
+                    ).toFixed(1)
+                    this.planSupply.CHO = Number(
+                        math.format(_basicW * 0.6, precision)
+                    ).toFixed(1)
+                }
+            }
+        },
+        //切换方案类型
+        tabClick(e) {
+            this.activeVal = e
+            this.filtersPlanSupply(this.patientInfo)
+        },
         //方案时间
         showDatePicker() {
             if (!this.datePicker) {
                 this.datePicker = this.$createDatePicker({
                     title: '选择方案时间',
-                    min: new Date(2008, 7, 8),
-                    max: new Date(2020, 9, 20),
+                    // min: new Date(2008, 7, 8),
+                    // max: new Date(2020, 9, 20),
                     value: new Date(),
                     onSelect: this.selectHandle,
                     onCancel: this.cancelHandle
@@ -719,7 +1144,7 @@ export default {
                     max: new Date(2020, 9, 20),
                     value: new Date(),
                     onSelect: this.selectHandleF,
-                    onCancel: this.cancelHandle
+                    onCancel: this.cancelHandleF
                 })
             }
             this.datePicker.show()
@@ -727,7 +1152,7 @@ export default {
         selectHandleF(date, selectedVal, selectedText) {
             this.followDate = selectedText.join('-')
         },
-        cancelHandle() {
+        cancelHandleF() {
             console.log('点击了取消')
         },
         //上一步
@@ -740,26 +1165,144 @@ export default {
             this.pageIndex++
             console.log(`当前页码：${this.pageIndex}`)
             if (this.pageIndex == 2) document.title = '饮食要求'
+            if (this.pageIndex == 3) {
+                this.GetPatientEmptyWeightLossPlan()
+                this.GetPatientWeightLossPlanTemplates()
+                if (this.activeVal == 'HighProtein') {
+                    document.title = '高蛋白饮食方案'
+                    return
+                } else if (this.activeVal == 'FastDiet') {
+                    document.title = '轻断食饮食方案'
+                    return
+                } else if (this.activeVal == 'LimitEnergy') {
+                    document.title = '限能量饮食方案'
+                    return
+                }
+            }
             if (this.pageIndex == 4) document.title = '食谱执行说明'
-            if (this.pageIndex == 5) document.title = '运行方案'
-            if (this.pageIndex == 6) document.title = '复诊与随访'
+            if (this.pageIndex == 5) {
+                document.title = '运行方案'
+            }
+            if (this.pageIndex == 6) {
+                document.title = '复诊与随访'
+                this.getSportsAnswerStr()
+                this.getZmotionAnswerStr()
+            }
+        },
+        //获取方案模板列表
+        GetPatientWeightLossPlanTemplates() {
+            var _this = this
+            let url = this.api.userApi.GetPatientWeightLossPlanTemplates
+            let data = {
+                doctorId: this.doctorId,
+                typeCode: this.activeVal
+            }
+            this.$fetchGet(url, data, 4330).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+
+                //重新组装数组符合组件
+                let listNew = result.map(item => {
+                    let { ID, Name } = item
+                    return { ID, Name }
+                })
+                let newTmpList = convertKey(listNew, ['GroupID', 'GroupName'])
+                _this.templatesList = newTmpList
+            })
+        },
+        //取消插入模板
+        cancleInsTmp() {
+            console.log('取消插入模板')
+        },
+        //确定插入模板
+        confirmInsTmp() {
+            console.log('确定插入模板')
+            if (!this.selGroupTmpId) {
+                this.GetPatientEmptyWeightLossPlan()
+                return
+            }
+            var _this = this
+            let url = this.api.userApi.GetPatientWeightLossPlanTemplate
+            let data = {
+                templateId: this.selGroupTmpId
+            }
+            this.$fetchGet(url, data, 4331).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                _this.DietQuestionnaire = result.DietQuestionnaire
+                _this.DietEkadeshQuestionnaire = result.DietEkadeshQuestionnaire
+            })
+        },
+        selGroupTmp(val) {
+            if (val.length > 0) {
+                console.log(
+                    `选择的模板名称--${val[0].GroupID}--${val[0].GroupName}`
+                )
+                let tmpID = val[0].GroupID
+                this.selGroupTmpId = tmpID
+            } else {
+                this.selGroupTmpId = ''
+            }
+        },
+        //获取减重方案
+        GetPatientEmptyWeightLossPlan() {
+            var _this = this
+            let url = this.api.userApi.GetPatientEmptyWeightLossPlan
+            let data = {
+                typeCode: this.activeVal
+            }
+            this.$fetchGet(url, data, 4112).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result) {
+                    _this.planInfo = result
+
+                    _this.DietQuestionnaire = result.DietQuestionnaire
+                    _this.DietEkadeshQuestionnaire =
+                        result.DietEkadeshQuestionnaire
+
+                    _this.sportEvent =
+                        result.SportsQuestionnaire.QuestionGroups[0].Questions[0].QuestionOptions
+                    _this.adviseSports =
+                        result.SportsQuestionnaire.QuestionGroups[1].Questions
+                    _this.Zmotion =
+                        result.SportsQuestionnaire.QuestionGroups[2].Questions
+
+                    _this.WeightLossPlan = result.WeightLossPlan
+                } else {
+                    yktoast(result)
+                }
+            })
         },
         //完成
         submitTap() {
             console.log('点击完成提交')
+            let AccountId = storage.getItem('AccountId')
         },
+        //插入模板
         InsertTmp() {
-            this.$router.push({
-                path: '/InsertTemplate'
-            })
+            this.$refs.insTmp.show()
         },
-
-        // 多选组件值 分组
-        childByValueCheck(childValue) {
-            // childValue就是子组件传过来的值
+        //复诊
+        childByValueCheckR(childValue) {
             console.log(childValue)
-            // debugger  checkedVal
-            let val = childValue
+            let val = childValue[0].value
+            if (val == 1) {
+                this.reVisitTime = true
+            } else {
+                this.reVisitTime = false
+            }
+            this.IsReVisiting = val
+        },
+        //随访计划 单选
+        childByValueCheckF(childValue) {
+            console.log(childValue)
+            this.FollowUpVisitPlan = childValue[0].value
         }
     }
 }
@@ -1028,9 +1571,11 @@ export default {
                 align-items: center;
                 input {
                     background: none;
-                    width: 56px;
+                    width: 80px;
                     font-size: 16px;
                     color: #3a3a3a;
+                    text-align: right;
+                    margin-right: 7px;
                 }
             }
             .desc {
@@ -1086,5 +1631,8 @@ export default {
     border-radius: 4px;
     font-size: 14px;
     color: #3a3a3a;
+}
+.mealDesImg {
+    width: 100%;
 }
 </style>
