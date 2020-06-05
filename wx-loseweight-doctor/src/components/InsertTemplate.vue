@@ -6,10 +6,10 @@
                     <div class="pb70">
                         <div class="tmpList" v-if="list && list.length > 0">
                             <template v-if="list && list.length > 0">
+                                <!-- :isRemoveSelf="true"  单选取消自己 -->
                                 <Options
                                     :options="list"
                                     :selectPatientGroup="selectPatientGroup"
-																		:isRemoveSelf="true"
                                     @toparents="childByValue"
                                 ></Options>
                             </template>
@@ -82,12 +82,12 @@ export default {
         },
         cancelTap() {
             this.$emit('cancle')
-            this.selectPatientGroup = []
+            // this.selectPatientGroup = []
             this.hide()
         },
         submitTap() {
             this.$emit('confirm')
-            this.hide()
+            
         }
     }
 }

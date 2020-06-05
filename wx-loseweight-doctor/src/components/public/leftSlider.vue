@@ -11,7 +11,7 @@
                 <!-- 插槽中放具体项目中需要内容 -->
                 <slot></slot>
             </div>
-            <div class="remove" ref="remove" @click.prevent="deleteItem(index)">
+            <div class="remove" ref="remove" @click.prevent="deleteItem(id)">
                 <!-- <img src="../../img/qxsc.png" /> -->
                 <span>删除</span>
             </div>
@@ -21,7 +21,8 @@
 <script type="text/ecmascript-6">
 export default {
     props: {
-        index: Number
+        index: Number,
+        id: String
     },
     data() {
         return {
@@ -117,8 +118,8 @@ export default {
                     'transform:translateX(0' + 'rem)'
             }
         },
-        deleteItem: function(index) {
-            this.$emit('deleteItem', index)
+        deleteItem: function(id) {
+            this.$emit('deleteItem', id)
             this.deleteSlider = 'transform:translateX(0' + 'rem)'
         }
     }
@@ -147,8 +148,8 @@ export default {
         position: absolute;
         width: 1rem;
         height: 100%;
-				background: #f1f1f1;
-				border-radius: 0 4px 4px 0;
+        background: #f1f1f1;
+        border-radius: 0 4px 4px 0;
         right: 0;
         top: 0;
         color: #fff;

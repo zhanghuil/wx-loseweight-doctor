@@ -11,12 +11,15 @@ const userApi = {
 	SubmitPwd: webApi + '/api/System/Doctor/SubmitPwd', //忘记密码
 	ModifyPwd: webApi + '/api/System/Doctor/ModifyPwd', //修改密码
 	GetJZMZPatients: webApi + '/api/System/JZMZPatient/GetJZMZPatients',  //获取减重病人
+	ShieldPatient: webApi + '/api/System/JZMZPatient/ShieldPatient',  //屏蔽患者
 	GetJZMZPatient: webApi + '/api/System/JZMZPatient/GetJZMZPatient',  //获取减重病人详情信息
 	GetWeightRecordByType: webApi + '/api/System/WeightRecord/GetWeightRecordByType', //获取患者体重记录  
 	GetRecordedRegistrations: webApi + '/api/System/MedicalRecord/GetRecordedRegistrations', //获取病人完成的评估表 
 	GetWeightLossPlans: webApi + '/api/System/MedicalRecord/GetWeightLossPlans', //获取病人减重方案列表
 	GetPatientWeightLossPlan: webApi + '/api/System/MedicalRecord/GetPatientWeightLossPlan', //获取减重方案
 	GetPatientEmptyWeightLossPlan: webApi + '/api/System/MedicalRecord/GetPatientEmptyWeightLossPlan',  //获取空白减重方案--制定方案
+	SavePatientWeightLossPlan: webApi + '/api/System/MedicalRecord/SavePatientWeightLossPlan',  //保存减重方案
+	RecallPatientWeightLossPlan: webApi + '/api/System/MedicalRecord/RecallPatientWeightLossPlan',  //撤回减重方案 
 
 	GetPatientMedical: webApi + '/api/System/Patient/GetPatientMedical',  //获取病人医生信息
 	GetJZMZDoctorQRCode: webApi + '/api/System/Doctor/GetJZMZDoctorQRCode', //获取减重门诊公众号医生二维码
@@ -32,19 +35,12 @@ const userApi = {
 
 	GetPatientFollowUpVisit: webApi + '/api/System/MedicalRecord/GetPatientFollowUpVisit',  //获取患者随访信息
 	GetPatientDiagnose: webApi + '/api/System/MedicalRecord/GetPatientDiagnose',  //获取患者首诊信息
-	SavePatientWeightLossPlan: webApi + '/api/System/MedicalRecord/SavePatientWeightLossPlan',  //保存减重方案
-
 
 	GetPatientWeightLossPlanTypes: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTypes', //获取减重方案模板分类列表
 	GetPatientWeightLossPlanTemplates: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTemplates',  //获取减重方案模板列表 
 	GetPatientWeightLossPlanTemplate: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTemplate',  //获取减重方案模板详情
 	SaveWeightLossPlanTemplate: webApi + '/api/System/WeightLossPlanTemplate/SaveWeightLossPlanTemplate',  //保存减重方案模板
 	DeleteTemplate: webApi + '/api/System/WeightLossPlanTemplate/DeleteTemplate',  //删除减重方案模板
-
-
-
-
-
 }
 export default {
 	userApi

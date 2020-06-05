@@ -1,5 +1,9 @@
 <template>
-    <div class="paItem" @click="lookDetails(item.PatientID, item.Name)">
+    <div
+        class="paItem"
+        :class="item.ReVisitingDate ? 'flstart' : 'flcenter'"
+        @click="lookDetails(item.PatientID, item.Name)"
+    >
         <div>
             <img class="txImg" :src="item.AvatarUrl" @error="imgError()" />
         </div>
@@ -13,7 +17,7 @@
                 >
             </p>
             <p class="time">首诊：{{ item.DiagnoseDate | formatDateStr }}</p>
-            <p class="time">
+            <p class="time" v-show="item.ReVisitingDate">
                 计划下次复诊：{{ item.ReVisitingDate | formatDateStr }}
             </p>
         </div>
@@ -64,9 +68,14 @@ export default {
     box-shadow: 0 2px 10px 0 rgba(120, 121, 164, 0.1);
     border-radius: 4px;
     display: flex;
-    align-items: flex-start;
     font-size: 14px;
     color: #6d6d6d;
+    &.flstart {
+        align-items: flex-start;
+    }
+    &.flcenter {
+        align-items: center;
+    }
     .txImg {
         width: 50px;
         height: 50px;

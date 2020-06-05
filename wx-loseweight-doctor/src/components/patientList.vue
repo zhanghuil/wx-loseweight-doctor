@@ -365,12 +365,62 @@ export default {
     methods: {
         //操作按钮
         editBtn(id) {
-            this.planId = id
+            if (id == this.planId) {
+                this.planId = ''
+            } else {
+                this.planId = id
+            }
         },
         //复制减重方案
-        copyTap(id) {},
+        copyTap(id) {
+            this.$router.push({
+                path: '/draftPlan',
+                query: { userId: this.$route.query.userId, planId: id }
+            })
+        },
+        //撤回操作提示框
+        withdrawTap(id) {
+            this.$createDialog({
+                type: 'confirm',
+                content: '确定要撤回此方案',
+                confirmBtn: {
+                    text: '撤回',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    this.recallPlan(id)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
         //撤回减重方案
-        withdrawTap(id) {},
+        recallPlan(id) {
+            var _this = this
+            let url = this.api.userApi.RecallPatientWeightLossPlan
+            let data = {
+                planId: id
+            }
+            this.$fetchDelete(url, data, 4109).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                yktoast('撤回成功')
+                _this.planId = ''
+                _this.getWeightLossPlans()
+            })
+        },
         getParams() {
             this.userName = this.$route.query.userName
             this.userId = this.$route.query.userId
@@ -428,7 +478,7 @@ export default {
                 _this.infoList = result
             })
         },
-        //获取减重方案
+        //获取减重方案列表
         getWeightLossPlans() {
             var _this = this
             let url = this.api.userApi.GetWeightLossPlans

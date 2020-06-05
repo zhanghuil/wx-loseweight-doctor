@@ -16,6 +16,9 @@
             <div class="panelBox">
                 <div class="infoTit">
                     <div class="rel">
+                        <i
+                            class="icon iconfont icon-wuuiconsuotanhao tipsIcon"
+                        ></i>
                         <div class="title b">阶段减重目标</div>
                         <div class="bg_img"></div>
                     </div>
@@ -25,9 +28,8 @@
                         class="targetInput"
                         type="number"
                         @input="oninput"
-                        v-model="num"
-                        min="0.00"
-                        max="100"
+                        placeholder="0.0"
+                        v-model="targetNum"
                     />
                     <span class="f12 c-6d">kg</span>
                 </div>
@@ -130,6 +132,7 @@
                                     </div>
                                 </div>
                                 <div class="itemList">
+                                    2
                                     <div class="df">
                                         <div class="w90">脂肪</div>
                                         <div class="f14 c-3a">
@@ -272,21 +275,34 @@
                                 <div class="wrap">
                                     <div class="f14 c-3a">{{ n.Name }}</div>
                                     <div class="pr10">
-                                        <template v-if="n.Precision > 0">
-                                            <input
-                                                placeholder="请输入"
-                                                v-model="
-                                                    n.QuestionAnswerInfo
-                                                        .DecimalValue
-                                                "
-                                            />
+                                        <template v-if="n.TypeCode == 'Num'">
+                                            <template v-if="n.Precision > 0">
+                                                <input
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        n.QuestionAnswerInfo
+                                                            .DecimalValue
+                                                    "
+                                                />
+                                            </template>
+                                            <template v-else>
+                                                <input
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        n.QuestionAnswerInfo
+                                                            .IntValue
+                                                    "
+                                                />
+                                            </template>
                                         </template>
-                                        <template v-else>
+                                        <template
+                                            v-else-if="n.TypeCode == 'Text'"
+                                        >
                                             <input
                                                 placeholder="请输入"
                                                 v-model="
                                                     n.QuestionAnswerInfo
-                                                        .IntValue
+                                                        .StrValue
                                                 "
                                             />
                                         </template>
@@ -338,22 +354,41 @@
                                             </div>
                                             <div class="pr10">
                                                 <template
-                                                    v-if="n.Precision > 0"
+                                                    v-if="n.TypeCode == 'Num'"
+                                                >
+                                                    <template
+                                                        v-if="n.Precision > 0"
+                                                    >
+                                                        <input
+                                                            placeholder="请输入"
+                                                            v-model="
+                                                                n
+                                                                    .QuestionAnswerInfo
+                                                                    .DecimalValue
+                                                            "
+                                                        />
+                                                    </template>
+                                                    <template v-else>
+                                                        <input
+                                                            placeholder="请输入"
+                                                            v-model="
+                                                                n
+                                                                    .QuestionAnswerInfo
+                                                                    .IntValue
+                                                            "
+                                                        />
+                                                    </template>
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        n.TypeCode == 'Text'
+                                                    "
                                                 >
                                                     <input
                                                         placeholder="请输入"
                                                         v-model="
                                                             n.QuestionAnswerInfo
-                                                                .DecimalValue
-                                                        "
-                                                    />
-                                                </template>
-                                                <template v-else>
-                                                    <input
-                                                        placeholder="请输入"
-                                                        v-model="
-                                                            n.QuestionAnswerInfo
-                                                                .IntValue
+                                                                .StrValue
                                                         "
                                                     />
                                                 </template>
@@ -404,22 +439,49 @@
                                             </div>
                                             <div class="pr10">
                                                 <template
-                                                    v-if="n.Precision > 0"
+                                                    v-if="n.TypeCode == 'Num'"
+                                                >
+                                                    <template
+                                                        v-if="n.Precision > 0"
+                                                    >
+                                                        <input
+                                                            :disabled="
+                                                                n.IsFixed
+                                                            "
+                                                            placeholder="请输入"
+                                                            v-model="
+                                                                n
+                                                                    .QuestionAnswerInfo
+                                                                    .DecimalValue
+                                                            "
+                                                        />
+                                                    </template>
+                                                    <template v-else>
+                                                        <input
+                                                            :disabled="
+                                                                n.IsFixed
+                                                            "
+                                                            placeholder="请输入"
+                                                            v-model="
+                                                                n
+                                                                    .QuestionAnswerInfo
+                                                                    .IntValue
+                                                            "
+                                                        />
+                                                    </template>
+                                                </template>
+                                                <template
+                                                    v-else-if="
+                                                        n.TypeCode == 'Text'
+                                                    "
                                                 >
                                                     <input
+                                                        type="text"
+                                                        :disabled="n.IsFixed"
                                                         placeholder="请输入"
                                                         v-model="
                                                             n.QuestionAnswerInfo
-                                                                .DecimalValue
-                                                        "
-                                                    />
-                                                </template>
-                                                <template v-else>
-                                                    <input
-                                                        placeholder="请输入"
-                                                        v-model="
-                                                            n.QuestionAnswerInfo
-                                                                .IntValue
+                                                                .StrValue
                                                         "
                                                     />
                                                 </template>
@@ -705,6 +767,7 @@ export default {
     components: { drawerFoot, ruler, checkbox, InsertTemplate },
     data() {
         return {
+            planId: '', //减重方案id
             templateName: '', //模板名称
             templatesList: [], //模板列表
             selGroupTmpId: '', //选中模板id
@@ -723,8 +786,8 @@ export default {
             doctorId: '', //医生id
 
             planInfo: {},
-            WeightLossPlan: {},
             sportEvent: [], //运动项目
+            sportEventChecked: [], //选中的运动项目
             adviseSports: [], //建议运动
             Zmotion: [], //阻抗运动
             DietQuestionnaire: {}, //方案  非断食日
@@ -737,7 +800,7 @@ export default {
             drawerHeight: '245px',
             planDate: '', //方案时间
             followDate: '请选择', //复诊时间
-            num: 0.0, //减重目标
+            targetNum: '', //减重目标
             tabs: [
                 {
                     name: '高蛋白',
@@ -754,7 +817,7 @@ export default {
             ], //方案类型
             activeVal: 'HighProtein',
             NumValue: 100, //瘦体重默认值
-            LBW: 0, //瘦体重
+            LBW: '', //瘦体重
 
             imgUrl: '',
 
@@ -762,14 +825,14 @@ export default {
                 //下次复诊
                 {
                     Name: '不需要',
-                    value: 0
+                    value: false
                 },
                 {
                     Name: '需要',
-                    value: 1
+                    value: true
                 }
             ],
-            isReVisiting: '',
+            IsReVisiting: false, //是否需要复诊
             reVisitTime: false, //复诊时间选择框默认隐藏
             followOptions: [
                 //随访计划
@@ -795,6 +858,13 @@ export default {
         this.planDate = formatDate(new Date(), 'yyyy-MM-dd')
         this.getJZMZPatient()
         this.getDoctorInfoNew()
+        // 方案id
+        let planId = this.$route.query.planId
+        if (planId) {
+            this.planId = planId
+            this.getPatientWeightLossPlan()
+        }
+
         let AccountId = storage.getItem('AccountId')
         this.doctorId = AccountId
     },
@@ -814,41 +884,68 @@ export default {
             this.LBW = this.NumValue
             this.filtersPlanSupply(this.patientInfo)
         },
-
-        //获取饮食方案答案数据
-        getAnswerStr(typeCode) {
-            // typeCode //模板类型 todo
+        getAnswerArr(array) {
             let questionInfoArr = []
-            let questionGroups = this.DietQuestionnaire.QuestionGroups
+            let questionGroups = array
             for (let i = 0; i < questionGroups.length; i++) {
                 let array = questionGroups[i].Questions
                 for (let j = 0; j < array.length; j++) {
                     // debugger
                     const element = array[j]
-
-                    if (element.Precision > 0) {
-                        //小数值
+                    if (element.TypeCode == 'Num') {
+                        //是数值
+                        if (element.Precision > 0) {
+                            //小数值
+                            var items = {
+                                DecimalValue: '',
+                                QuestionID: ''
+                            }
+                            items.DecimalValue =
+                                element.QuestionAnswerInfo.DecimalValue
+                        } else {
+                            //整数值
+                            var items = {
+                                IntValue: '',
+                                QuestionID: ''
+                            }
+                            items.IntValue = element.QuestionAnswerInfo.IntValue
+                        }
+                    } else if (element.TypeCode == 'Text') {
+                        //字符串
                         var items = {
-                            DecimalValue: '',
+                            StrValue: '',
                             QuestionID: ''
                         }
-                        items.DecimalValue =
-                            element.QuestionAnswerInfo.DecimalValue
-                    } else {
-                        //整数值
-                        var items = {
-                            IntValue: '',
-                            QuestionID: ''
-                        }
-                        items.IntValue = element.QuestionAnswerInfo.IntValue
+                        items.StrValue = element.QuestionAnswerInfo.DecimalValue
                     }
-
                     items.QuestionID = element.QuestionAnswerInfo.QuestionID
                     questionInfoArr.push(items)
                 }
             }
             return questionInfoArr
             console.log(questionInfoArr)
+        },
+        //获取饮食方案答案数据
+        getAnswerStr(typeCode) {
+            // typeCode 模板类型
+            if (typeCode == 'HighProtein' || typeCode == 'LimitEnergy') {
+                //高蛋白、限能量饮食
+                let arr = this.getAnswerArr(
+                    this.DietQuestionnaire.QuestionGroups
+                )
+                this.DietAnswerInfoStr = JSON.stringify(arr)
+                this.EkadeshDietAnswerInfoStr = ''
+            } else {
+                //断食日
+                let arr = this.getAnswerArr(
+                    this.DietQuestionnaire.QuestionGroups
+                )
+                let arrFasts = this.getAnswerArr(
+                    this.DietEkadeshQuestionnaire.QuestionGroups
+                )
+                this.DietAnswerInfoStr = JSON.stringify(arr)
+                this.EkadeshDietAnswerInfoStr = JSON.stringify(arrFasts)
+            }
         },
         // 获取运动方案答案-有氧运动项目
         childByValueCheck(childValue) {
@@ -857,16 +954,17 @@ export default {
             let val = childValue
             let questionID = val[0].QuestionID //题目ID
             let questionIDArr = val.map(n => n.ID)
-            this.SportsAnswerInfoStr = {
-                QuestionID: questionID,
-                StrValue: questionIDArr.join(',')
-            }
-            console.log(this.SportsAnswerInfoStr)
+            this.sportEventChecked = [
+                {
+                    QuestionID: questionID,
+                    StrValue: questionIDArr.join(',')
+                }
+            ]
         },
-        //获取运动方案答案-运动频率与时长
-        getSportsAnswerStr() {
+        //获取运动方案答案-运动频率与时长(阻抗运动项目)
+        getSportsAnswerStr(array) {
             let questionInfoArr = []
-            let questionGroups = this.adviseSports
+            let questionGroups = array
             for (let i = 0; i < questionGroups.length; i++) {
                 const element = questionGroups[i]
 
@@ -893,36 +991,7 @@ export default {
             return questionInfoArr
             console.log(questionInfoArr)
         },
-        //获取运动方案答案-阻抗运动项目
-        getZmotionAnswerStr() {
-            let questionInfoArr = []
-            let questionGroups = this.Zmotion
-            for (let i = 0; i < questionGroups.length; i++) {
-                const element = questionGroups[i]
 
-                if (element.Precision > 0) {
-                    //小数值
-                    var items = {
-                        DecimalValue: '',
-                        QuestionID: ''
-                    }
-                    items.DecimalValue = element.QuestionAnswerInfo.DecimalValue
-                } else {
-                    //整数值
-                    var items = {
-                        IntValue: '',
-                        QuestionID: ''
-                    }
-                    items.IntValue = element.QuestionAnswerInfo.IntValue
-                }
-
-                items.QuestionID = element.QuestionAnswerInfo.QuestionID
-                questionInfoArr.push(items)
-            }
-            // debugger
-            return questionInfoArr
-            console.log(questionInfoArr)
-        },
         //取消保存模板操作
         cancleTmp() {
             console.log('点击了取消保存模板')
@@ -936,7 +1005,7 @@ export default {
                 yktoast('请输入模板名称')
                 return
             }
-
+            this.getAnswerStr(this.activeVal)
             // 保存减重方案模板
             var _this = this
             let AccountId = storage.getItem('AccountId')
@@ -946,10 +1015,8 @@ export default {
                 DoctorID: AccountId, //模板制定医生ID
                 HospID: this.doctorInfo.HosId, //医院ID
                 TypeCode: this.activeVal, //模板类型
-                DietAnswerInfoStr: JSON.stringify(
-                    this.getAnswerStr(this.activeVal)
-                ),
-                EkadeshDietAnswerInfoStr: ''
+                DietAnswerInfoStr: this.DietAnswerInfoStr,
+                EkadeshDietAnswerInfoStr: this.EkadeshDietAnswerInfoStr
             }
             console.log(data)
             this.$fetchPost(url, data, 4332).then(response => {
@@ -965,12 +1032,29 @@ export default {
         },
 
         oninput(e) {
-            // 通过正则过滤小数点后两位
-            e.target.value =
-                e.target.value.match(/^\d*(\.?\d{0,1})/g)[0] || null
-
-            console.log('e', e.target.value)
+            this.targetNum = this.dealInputVal(this.targetNum)
+            console.log(`减重目标：${this.targetNum}`)
         },
+        //阶段减重目标
+        dealInputVal(value) {
+            value = value.replace(/^0*(0\.|[1-9])/, '$1')
+            value = value.replace(/[^\d.]/g, '') //清除"数字"和"."以外的字符
+            value = value.replace(/^\./g, '') //验证第一个字符是数字而不是字符
+            value = value.replace(/\.{1,}/g, '.') //只保留第一个.清除多余的
+            value = value
+                .replace('.', '$#$')
+                .replace(/\./g, '')
+                .replace('$#$', '.')
+            value = value.replace(/^(\-)*(\d*)\.(\d).*$/, '$1$2.$3') //只能输入两个小数
+            value =
+                value.indexOf('.') > 0
+                    ? value.split('.')[0].substring(0, 3) +
+                      '.' +
+                      value.split('.')[1]
+                    : value.substring(0, 3)
+            return value
+        },
+
         //获取医生信息
         getDoctorInfoNew() {
             let AccountId = storage.getItem('AccountId')
@@ -1151,23 +1235,16 @@ export default {
         },
         selectHandleF(date, selectedVal, selectedText) {
             this.followDate = selectedText.join('-')
+            console.log(`复诊时间：${this.followDate}`)
         },
         cancelHandleF() {
             console.log('点击了取消')
         },
-        //上一步
-        prevTap() {
-            if (this.pageIndex > 1) this.pageIndex--
-            console.log(`当前页码：${this.pageIndex}`)
-        },
-        //下一步
-        nextTap() {
-            this.pageIndex++
-            console.log(`当前页码：${this.pageIndex}`)
+        //设置每一页标题
+        setPageTit() {
+            if (this.pageIndex == 1) document.title = '制定减重方案'
             if (this.pageIndex == 2) document.title = '饮食要求'
             if (this.pageIndex == 3) {
-                this.GetPatientEmptyWeightLossPlan()
-                this.GetPatientWeightLossPlanTemplates()
                 if (this.activeVal == 'HighProtein') {
                     document.title = '高蛋白饮食方案'
                     return
@@ -1180,13 +1257,45 @@ export default {
                 }
             }
             if (this.pageIndex == 4) document.title = '食谱执行说明'
-            if (this.pageIndex == 5) {
-                document.title = '运行方案'
+            if (this.pageIndex == 5) document.title = '运行方案'
+            if (this.pageIndex == 6) document.title = '复诊与随访'
+        },
+        //上一步
+        prevTap() {
+            if (this.pageIndex > 1) this.pageIndex--
+            this.setPageTit()
+            console.log(`当前页码：${this.pageIndex}`)
+        },
+        //下一步
+        nextTap() {
+            this.pageIndex++
+            console.log(`当前页码：${this.pageIndex}`)
+            this.setPageTit()
+            if (this.pageIndex == 3) {
+                //饮食方案
+                if (!this.planId) {
+                    this.GetPatientEmptyWeightLossPlan() //获取空模板
+                }
+
+                this.GetPatientWeightLossPlanTemplates() //获取模板列表
+            }
+            if (this.pageIndex == 4) {
+                this.getAnswerStr(this.activeVal)
             }
             if (this.pageIndex == 6) {
-                document.title = '复诊与随访'
-                this.getSportsAnswerStr()
-                this.getZmotionAnswerStr()
+                //校验必填项  运动方案
+                if (this.sportEventChecked.length == 0) {
+                    yktoast('有未填写项')
+                    this.pageIndex--
+                    console.log(this.pageIndex)
+                    return
+                }
+
+                let sportEvent = this.sportEventChecked //运动项目
+                let sportsTime = this.getSportsAnswerStr(this.adviseSports) //运动频率与时长
+                let sportsTimeZ = this.getSportsAnswerStr(this.Zmotion) //阻抗运动
+                let newArr = [...sportEvent, ...sportsTime, ...sportsTimeZ]
+                this.SportsAnswerInfoStr = JSON.stringify(newArr)
             }
         },
         //获取方案模板列表
@@ -1221,9 +1330,14 @@ export default {
         confirmInsTmp() {
             console.log('确定插入模板')
             if (!this.selGroupTmpId) {
-                this.GetPatientEmptyWeightLossPlan()
+                yktoast('请选择模板')
                 return
             }
+            this.$refs.insTmp.hide()
+            // if (!this.selGroupTmpId) {
+            //     this.GetPatientEmptyWeightLossPlan()
+            //     return
+            // }
             var _this = this
             let url = this.api.userApi.GetPatientWeightLossPlanTemplate
             let data = {
@@ -1250,7 +1364,33 @@ export default {
                 this.selGroupTmpId = ''
             }
         },
-        //获取减重方案
+        //获取减重方案-编辑复制
+        getPatientWeightLossPlan() {
+            var _this = this
+            let url = this.api.userApi.GetPatientWeightLossPlan
+            let data = {
+                planId: this.$route.query.planId
+            }
+            this.$fetchGet(url, data, 4112).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                _this.planInfo = result
+
+                _this.DietQuestionnaire = result.DietQuestionnaire
+                _this.DietEkadeshQuestionnaire = result.DietEkadeshQuestionnaire
+
+                _this.sportEvent =
+                    result.SportsQuestionnaire.QuestionGroups[0].Questions[0].QuestionOptions
+                _this.adviseSports =
+                    result.SportsQuestionnaire.QuestionGroups[1].Questions
+                _this.Zmotion =
+                    result.SportsQuestionnaire.QuestionGroups[2].Questions
+            })
+        },
+        //获取空白减重方案
         GetPatientEmptyWeightLossPlan() {
             var _this = this
             let url = this.api.userApi.GetPatientEmptyWeightLossPlan
@@ -1272,8 +1412,6 @@ export default {
                         result.SportsQuestionnaire.QuestionGroups[1].Questions
                     _this.Zmotion =
                         result.SportsQuestionnaire.QuestionGroups[2].Questions
-
-                    _this.WeightLossPlan = result.WeightLossPlan
                 } else {
                     yktoast(result)
                 }
@@ -1283,6 +1421,37 @@ export default {
         submitTap() {
             console.log('点击完成提交')
             let AccountId = storage.getItem('AccountId')
+            if (this.IsReVisiting && this.followDate == '请选择') {
+                //需要下次复诊
+                yktoast('请选择复诊时间')
+                return
+            }
+            // 保存减重方案
+            var _this = this
+            let url = this.api.userApi.SavePatientWeightLossPlan
+            let data = {
+                PatientID: this.$route.query.userId, //患者ID
+                DoctorID: AccountId, //方案制定医生ID
+                TypeCode: this.activeVal, //方案类型
+                PlanDate: this.planDate, //方案日期
+                WeightLossGoals: this.targetNum, //减重目标
+                LBW: this.LBW, //瘦体重
+                IsReVisiting: this.IsReVisiting, //是否需要复诊 ,
+                ReVisitingDate: this.followDate, //复诊时间
+                FollowUpVisitPlan: this.FollowUpVisitPlan, //随访周期计划
+                DietAnswerInfoStr: this.DietAnswerInfoStr, //饮食问卷答案字符
+                EkadeshDietAnswerInfoStr: this.EkadeshDietAnswerInfoStr, //断食日饮食问卷答案字符
+                SportsAnswerInfoStr: this.SportsAnswerInfoStr //运动问卷答案字符
+            }
+            this.$fetchPost(url, data, 4108).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result) {
+                    yktoast('已推送方案给患者')
+                    _this.$router.go(-1)
+                } else {
+                    yktoast(result)
+                }
+            })
         },
         //插入模板
         InsertTmp() {
@@ -1292,12 +1461,14 @@ export default {
         childByValueCheckR(childValue) {
             console.log(childValue)
             let val = childValue[0].value
-            if (val == 1) {
+            if (val) {
                 this.reVisitTime = true
             } else {
                 this.reVisitTime = false
+                this.followDate = ''
             }
             this.IsReVisiting = val
+            console.log(`是否需要复诊：${val}`)
         },
         //随访计划 单选
         childByValueCheckF(childValue) {
@@ -1309,6 +1480,13 @@ export default {
 </script>
 
 <style lang="less">
+.tipsIcon {
+    color: #fc7a56;
+    position: absolute;
+    font-size: 12px;
+    left: -13px;
+    top: 2px;
+}
 .weightRuler {
     text-align: center;
     padding: 1px 0 8px;
@@ -1351,6 +1529,10 @@ export default {
     color: #3a3a3a;
     text-align: center;
     line-height: 26px;
+    &::placeholder {
+        font-size: 26px;
+        color: #3a3a3a;
+    }
 }
 .navList {
     display: flex;

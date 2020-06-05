@@ -33,7 +33,11 @@
             </div>
             <div class="listPanel">
                 <div v-for="(item, index) in patientsList" :key="index">
-                    <leftSlider :index="index" @deleteItem="deleteItem">
+                    <leftSlider
+                        :index="index"
+                        :id="item.PatientID"
+                        @deleteItem="deleteItem"
+                    >
                         <paItem :item="item" @lookTap="lookDetails"></paItem>
                     </leftSlider>
                 </div>
@@ -119,6 +123,7 @@
 </template>
 
 <script>
+import qs from 'qs'
 import leftSlider from '@/components/public/leftSlider'
 import Options from '@/components/public/options'
 import drawer from '@/components/public/drawer'
@@ -208,9 +213,52 @@ export default {
     },
     methods: {
         //删除患者
-        deleteItem: function(index) {
-            //todo
+        deleteItem: function(id) {
             console.log('删除这个患者')
+            this.$createDialog({
+                type: 'confirm',
+                content: '是否删除此患者',
+                confirmBtn: {
+                    text: '确定',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    this.shieldPatient(id)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
+        //屏蔽患者
+        shieldPatient(id) {
+            let AccountId = storage.getItem('AccountId')
+            var _this = this
+            let url = this.api.userApi.ShieldPatient
+            let data = {
+                Value: AccountId
+            }
+            this.$fetchPut(
+                `${url}?patientId=${id}`,
+                qs.stringify(data),
+                4114
+            ).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                yktoast('删除成功')
+                _this.getJZMZPatients()
+            })
         },
         //筛选重置操作
         resetTap() {

@@ -165,6 +165,7 @@
                             <div
                                 v-for="(item, index) in bigRecipesTabs"
                                 :key="index"
+                                :class="'tab' + index"
                             >
                                 <div
                                     class="item"
@@ -419,7 +420,7 @@
                     >
                 </div>
             </div>
-            <div class="wrapper p15">
+            <div class="wrapper p15" v-show="WeightLossPlan.SportsAdvice">
                 <div class="f16 c-3a b">运动建议</div>
                 <div class="c-6d f14 mt15 lh21">
                     {{ WeightLossPlan.SportsAdvice }}
@@ -440,7 +441,7 @@
                 v-if="WeightLossPlan.FollowUpVisitPlan != 0"
             >
                 <div class="f16 c-3a b">随访计划</div>
-                <div class="c-6d f14 mt15 hl21">
+                <div class="c-6d f14 mt15 lh21">
                     {{ WeightLossPlan.FollowUpPlan }}
                 </div>
             </div>
@@ -808,6 +809,16 @@ export default {
 
 .bigNavBar {
     display: flex;
+    .tab0 {
+        .item {
+            border-radius: 4px 0 0 0;
+        }
+    }
+    .tab1 {
+        .item {
+            border-radius: 0 4px 0 0;
+        }
+    }
 }
 
 .bigNavBar .item {
@@ -815,16 +826,19 @@ export default {
     background: #9198f7;
     font-size: 14px;
     color: #ffffff;
-    padding: 3px 15px 1px 15px;
+    width: 86px;
+		box-sizing: border-box;
+		text-align: center;
+    padding: 7px 0 11px 0;
 }
 
-.bigNavBar .item:first-child {
-    border-radius: 4px 0 0 0;
-}
+// .bigNavBar .item:first-child {
+//     border-radius: 4px 0 0 0;
+// }
 
-.bigNavBar .item:last-child {
-    border-radius: 0 4px 0 0;
-}
+// .bigNavBar .item:last-child {
+//     border-radius: 0 4px 0 0;
+// }
 
 .bigNavBar .on {
     opacity: 1;
