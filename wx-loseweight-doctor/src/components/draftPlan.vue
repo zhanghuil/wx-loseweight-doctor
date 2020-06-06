@@ -17,6 +17,7 @@
                 <div class="infoTit">
                     <div class="rel">
                         <i
+                            v-show="targetNumError"
                             class="icon iconfont icon-wuuiconsuotanhao tipsIcon"
                         ></i>
                         <div class="title b">阶段减重目标</div>
@@ -26,9 +27,8 @@
                 <div class="tc targetBox">
                     <input
                         class="targetInput"
-                        type="number"
+                        type="text"
                         @input="oninput"
-                        placeholder="0.0"
                         v-model="targetNum"
                     />
                     <span class="f12 c-6d">kg</span>
@@ -260,7 +260,11 @@
                         index) in DietQuestionnaire.QuestionGroups"
                         :key="index"
                     >
-                        <div class="flex-between">
+                        <div class="flex-between rel">
+                            <i
+                                v-show="item.TargetNumError"
+                                class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon2"
+                            ></i>
                             <div class="f16 c-3a">
                                 {{ item.Name }}
                                 <i
@@ -278,6 +282,13 @@
                                         <template v-if="n.TypeCode == 'Num'">
                                             <template v-if="n.Precision > 0">
                                                 <input
+                                                    @input="
+                                                        checkInput(
+                                                            index,
+                                                            idx,
+                                                            'DecimalValue'
+                                                        )
+                                                    "
                                                     placeholder="请输入"
                                                     v-model="
                                                         n.QuestionAnswerInfo
@@ -287,6 +298,13 @@
                                             </template>
                                             <template v-else>
                                                 <input
+                                                    @input="
+                                                        checkInput(
+                                                            index,
+                                                            idx,
+                                                            'IntValue'
+                                                        )
+                                                    "
                                                     placeholder="请输入"
                                                     v-model="
                                                         n.QuestionAnswerInfo
@@ -299,6 +317,13 @@
                                             v-else-if="n.TypeCode == 'Text'"
                                         >
                                             <input
+                                                @input="
+                                                    checkInput(
+                                                        index,
+                                                        idx,
+                                                        'StrValue'
+                                                    )
+                                                "
                                                 placeholder="请输入"
                                                 v-model="
                                                     n.QuestionAnswerInfo
@@ -331,7 +356,11 @@
                                 index) in DietQuestionnaire.QuestionGroups"
                                 :key="index"
                             >
-                                <div class="flex-between">
+                                <div class="flex-between rel">
+                                    <i
+                                        v-show="item.TargetNumError"
+                                        class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon2"
+                                    ></i>
                                     <div class="f16 c-3a">
                                         {{ item.Name }}
                                         <i
@@ -360,6 +389,13 @@
                                                         v-if="n.Precision > 0"
                                                     >
                                                         <input
+                                                            @input="
+                                                                checkInput(
+                                                                    index,
+                                                                    idx,
+                                                                    'DecimalValue'
+                                                                )
+                                                            "
                                                             placeholder="请输入"
                                                             v-model="
                                                                 n
@@ -370,6 +406,13 @@
                                                     </template>
                                                     <template v-else>
                                                         <input
+                                                            @input="
+                                                                checkInput(
+                                                                    index,
+                                                                    idx,
+                                                                    'IntValue'
+                                                                )
+                                                            "
                                                             placeholder="请输入"
                                                             v-model="
                                                                 n
@@ -385,6 +428,13 @@
                                                     "
                                                 >
                                                     <input
+                                                        @input="
+                                                            checkInput(
+                                                                index,
+                                                                idx,
+                                                                'StrValue'
+                                                            )
+                                                        "
                                                         placeholder="请输入"
                                                         v-model="
                                                             n.QuestionAnswerInfo
@@ -416,7 +466,11 @@
                                 index) in DietEkadeshQuestionnaire.QuestionGroups"
                                 :key="index"
                             >
-                                <div class="flex-between">
+                                <div class="flex-between rel">
+                                    <i
+                                        v-show="item.TargetNumError"
+                                        class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon2"
+                                    ></i>
                                     <div class="f16 c-3a">
                                         {{ item.Name }}
                                         <i
@@ -445,6 +499,14 @@
                                                         v-if="n.Precision > 0"
                                                     >
                                                         <input
+                                                            @input="
+                                                                checkInput(
+                                                                    index,
+                                                                    idx,
+                                                                    'DecimalValue',
+                                                                    1
+                                                                )
+                                                            "
                                                             :disabled="
                                                                 n.IsFixed
                                                             "
@@ -458,6 +520,14 @@
                                                     </template>
                                                     <template v-else>
                                                         <input
+                                                            @input="
+                                                                checkInput(
+                                                                    index,
+                                                                    idx,
+                                                                    'IntValue',
+                                                                    1
+                                                                )
+                                                            "
                                                             :disabled="
                                                                 n.IsFixed
                                                             "
@@ -476,7 +546,14 @@
                                                     "
                                                 >
                                                     <input
-                                                        type="text"
+                                                        @input="
+                                                            checkInput(
+                                                                index,
+                                                                idx,
+                                                                'StrValue',
+                                                                1
+                                                            )
+                                                        "
                                                         :disabled="n.IsFixed"
                                                         placeholder="请输入"
                                                         v-model="
@@ -542,16 +619,28 @@
                         <span>有氧运动</span>
                     </div>
                     <div class="con">
-                        <div class="p15">
+                        <div class="p15 rel">
                             <checkbox
                                 :isMultiply="true"
                                 :options="sportEvent"
+                                ref="validIsCheck"
                                 name="建议有氧运动项目"
                                 @toparents="childByValueCheck"
                             ></checkbox>
                         </div>
                         <div class="line"></div>
-                        <div class="f16 c-3a px15 pt15">建议运动频率与时长</div>
+                        <div class="px15 pt15">
+                            <div class="rel">
+                                <i
+                                    v-show="adviseSportsError"
+                                    class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon3"
+                                ></i>
+                                <div class="f16 c-3a">
+                                    建议运动频率与时长
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="panelCon">
                             <ol>
                                 <li
@@ -565,6 +654,14 @@
                                         <div class="pr10">
                                             <template v-if="item.Precision > 0">
                                                 <input
+                                                    type="text"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'DecimalValue',
+                                                            'adviseSports'
+                                                        )
+                                                    "
                                                     placeholder="请输入"
                                                     v-model="
                                                         item.QuestionAnswerInfo
@@ -574,6 +671,14 @@
                                             </template>
                                             <template v-else>
                                                 <input
+                                                    type="text"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'IntValue',
+                                                            'adviseSports'
+                                                        )
+                                                    "
                                                     placeholder="请输入"
                                                     v-model="
                                                         item.QuestionAnswerInfo
@@ -596,7 +701,17 @@
                         <span>阻抗运动</span>
                     </div>
                     <div class="con">
-                        <div class="f16 c-3a px15 pt15">建议抗阻运动项目</div>
+                        <div class="px15 pt15">
+                            <div class="rel">
+                                <i
+                                    v-show="ZmotionError"
+                                    class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon3"
+                                ></i>
+                                <div class="f16 c-3a">
+                                    建议抗阻运动项目
+                                </div>
+                            </div>
+                        </div>
                         <div class="f12 c-6d px15 mt10">
                             APP（Keep，轻+，Fit 等）；哑铃操；健身房器械锻炼等
                         </div>
@@ -613,6 +728,14 @@
                                         <div class="pr10">
                                             <template v-if="item.Precision > 0">
                                                 <input
+                                                    type="text"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'DecimalValue',
+                                                            'Zmotion'
+                                                        )
+                                                    "
                                                     placeholder="请输入"
                                                     v-model="
                                                         item.QuestionAnswerInfo
@@ -622,6 +745,14 @@
                                             </template>
                                             <template v-else>
                                                 <input
+                                                    type="text"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'IntValue',
+                                                            'Zmotion'
+                                                        )
+                                                    "
                                                     placeholder="请输入"
                                                     v-model="
                                                         item.QuestionAnswerInfo
@@ -649,13 +780,18 @@
                         :options="isReVisitingOptions"
                         name="下次复诊"
                         @toparents="childByValueCheckR"
+                        ref="validIsCheckR"
                     ></checkbox>
                     <div
                         v-show="reVisitTime"
                         class="yk_wx_cell yk-wx-cell2"
                         @click="showDateFollow"
                     >
-                        <div class="cell_bd flex-center">
+                        <div class="cell_bd flex-center rel">
+                            <i
+															v-show="followDateError"
+                                class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon6"
+                            ></i>
                             <div>
                                 <img
                                     src="../assets/time@2x.png"
@@ -677,6 +813,7 @@
                         :options="followOptions"
                         name="随访计划"
                         @toparents="childByValueCheckF"
+                        ref="validIsCheckF"
                     ></checkbox>
                 </li>
             </ul>
@@ -788,19 +925,24 @@ export default {
             planInfo: {},
             sportEvent: [], //运动项目
             sportEventChecked: [], //选中的运动项目
+
             adviseSports: [], //建议运动
+            adviseSportsError: false,
             Zmotion: [], //阻抗运动
+            ZmotionError: false,
             DietQuestionnaire: {}, //方案  非断食日
             DietEkadeshQuestionnaire: {}, //轻断食断食日饮食方案
 
-            pageIndex: 1,
+            pageIndex: 2,
             display: false, //体重弹窗
             showTmp: false, //保存模板弹窗
             drawerWidth: '100%',
             drawerHeight: '245px',
             planDate: '', //方案时间
-            followDate: '请选择', //复诊时间
-            targetNum: '', //减重目标
+						followDate: '请选择', //复诊时间
+						followDateError:false,
+            targetNum: '0.0', //减重目标
+            targetNumError: false, //减重目标是否为空||‘000.0’
             tabs: [
                 {
                     name: '高蛋白',
@@ -855,6 +997,7 @@ export default {
     computed: {},
     filters: {},
     created() {
+        if (this.pageIndex == 1) document.title = '制定减重方案'
         this.planDate = formatDate(new Date(), 'yyyy-MM-dd')
         this.getJZMZPatient()
         this.getDoctorInfoNew()
@@ -949,6 +1092,10 @@ export default {
         },
         // 获取运动方案答案-有氧运动项目
         childByValueCheck(childValue) {
+            if (!childValue || childValue.length <= 0) {
+                this.sportEventChecked = []
+                return
+            }
             // childValue就是子组件传过来的值
             console.log(childValue)
             let val = childValue
@@ -1030,7 +1177,99 @@ export default {
                 }
             })
         },
+        // 频率与时长控制数字键盘，仅能输入整数，且不超过3位数
+        checkNum(index, type, sportDataName) {
+            //let value =  this.adviseSports[index].QuestionAnswerInfo[type]
+            let value = this[sportDataName][index].QuestionAnswerInfo[type]
 
+            let convertValue
+            if (value) {
+                value = value.replace(/[^\d.]/g, '') //清除"数字"和"."以外的字符
+                value = value.substring(0, 3)
+            }
+            if (value == null || value == undefined) convertValue = ''
+            else if (value == '00') convertValue = 0
+            else convertValue = value.replace(/[^0-9]/g, '')
+
+            this[sportDataName][index].QuestionAnswerInfo[type] = convertValue
+            if (convertValue) this[sportDataName + 'Error'] = false
+        },
+        //饮食方案   可以整数或小数，整数部分最多可输入4位，小数部分最多可输入1位
+        //DietQuestionnaire 0||null :非断食日，1：轻断食断食日饮食方案
+        checkInput(index, idx, type, isDietQuestionnaire) {
+            let questionnaires = this.DietQuestionnaire
+            if (isDietQuestionnaire == 1)
+                questionnaires = this.DietEkadeshQuestionnaire
+            let value =
+                questionnaires.QuestionGroups[index].Questions[idx]
+                    .QuestionAnswerInfo[type]
+
+            let convertValue = this.dealYinShiInputVal(value)
+            questionnaires.QuestionGroups[index].Questions[
+                idx
+            ].QuestionAnswerInfo[type] = convertValue
+
+            if (convertValue) {
+                //查找是否存在其他为空的
+                let isValid = true
+                this.dealYinShiInputVal(value)
+                if (questionnaires.QuestionGroups[index].IsRequired) {
+                    for (
+                        let questionIndex = 0;
+                        questionIndex <
+                        questionnaires.QuestionGroups[index].Questions.length;
+                        questionIndex++
+                    ) {
+                        //具体题目
+                        let question =
+                            questionnaires.QuestionGroups[index].Questions[
+                                questionIndex
+                            ]
+                        if (!question.IsRequired) continue
+                        //找到类型 DecimalValue int。。 text..
+                        let type = this.getTypeName(
+                            question.TypeCode,
+                            question.Precision
+                        )
+                        //找到input值
+                        let value =
+                            questionnaires.QuestionGroups[index].Questions[
+                                questionIndex
+                            ].QuestionAnswerInfo[type]
+                        if (!value || !parseFloat(value)) {
+                            isValid = false
+                        }
+                    }
+                }
+                if (isValid) {
+                    this.$set(
+                        questionnaires.QuestionGroups[index],
+                        'TargetNumError',
+                        false
+                    )
+                }
+            }
+        },
+        //饮食方案 校验
+        dealYinShiInputVal(value) {
+            if (value == null || value == undefined) return ''
+            value = value.replace(/^0*(0\.|[1-9])/, '$1')
+            value = value.replace(/[^\d.]/g, '') //清除"数字"和"."以外的字符
+            value = value.replace(/^\./g, '') //验证第一个字符是数字而不是字符
+            value = value.replace(/\.{1,}/g, '.') //只保留第一个.清除多余的
+            value = value
+                .replace('.', '$#$')
+                .replace(/\./g, '')
+                .replace('$#$', '.')
+            value = value.replace(/^(\-)*(\d*)\.(\d).*$/, '$1$2.$3') //只能输入1个小数
+            value =
+                value.indexOf('.') > 0
+                    ? value.split('.')[0].substring(0, 4) +
+                      '.' +
+                      value.split('.')[1]
+                    : value.substring(0, 4)
+            return value
+        },
         oninput(e) {
             this.targetNum = this.dealInputVal(this.targetNum)
             console.log(`减重目标：${this.targetNum}`)
@@ -1045,13 +1284,14 @@ export default {
                 .replace('.', '$#$')
                 .replace(/\./g, '')
                 .replace('$#$', '.')
-            value = value.replace(/^(\-)*(\d*)\.(\d).*$/, '$1$2.$3') //只能输入两个小数
+            value = value.replace(/^(\-)*(\d*)\.(\d).*$/, '$1$2.$3') //只能输入1个小数
             value =
                 value.indexOf('.') > 0
                     ? value.split('.')[0].substring(0, 3) +
                       '.' +
                       value.split('.')[1]
                     : value.substring(0, 3)
+            if (parseFloat(value)) this.targetNumError = false
             return value
         },
 
@@ -1234,7 +1474,8 @@ export default {
             this.datePicker.show()
         },
         selectHandleF(date, selectedVal, selectedText) {
-            this.followDate = selectedText.join('-')
+						this.followDate = selectedText.join('-')
+						this.followDateError = false
             console.log(`复诊时间：${this.followDate}`)
         },
         cancelHandleF() {
@@ -1266,28 +1507,168 @@ export default {
             this.setPageTit()
             console.log(`当前页码：${this.pageIndex}`)
         },
+        getTypeName(code, precision) {
+            let name = ''
+            switch (code) {
+                case 'Num':
+                    if (precision > 0) name = 'DecimalValue'
+                    else name = 'IntValue'
+                    break
+                case 'Text':
+                    name = 'StrValue'
+                    break
+                default:
+                    name = ''
+            }
+            return name
+        },
+        validQuestionnairesCommon(questionnaires) {
+            let isValid = true
+            //筛选必填项
+            let requireQuestionGroup = questionnaires
+            // .filter(
+            //     n => n.IsRequired == true
+            // )
+            if (!requireQuestionGroup || requireQuestionGroup.length <= 0)
+                return true
+
+            //循环校验
+            for (let index = 0; index < requireQuestionGroup.length; index++) {
+                if (!requireQuestionGroup[index].IsRequired) continue
+                if (!isValid) break
+                for (
+                    let questionIndex = 0;
+                    questionIndex <
+                    requireQuestionGroup[index].Questions.length;
+                    questionIndex++
+                ) {
+                    //具体题目
+                    let question =
+                        requireQuestionGroup[index].Questions[questionIndex]
+                    if (!question.IsRequired) continue
+                    //找到类型 DecimalValue int。。 text..
+                    let type = this.getTypeName(
+                        question.TypeCode,
+                        question.Precision
+                    )
+                    //找到input值
+                    let value =
+                        questionnaires[index].Questions[questionIndex]
+                            .QuestionAnswerInfo[type]
+
+                    //校验
+                    if (!value || !parseFloat(value)) {
+                        this.$set(
+                            requireQuestionGroup[index],
+                            'TargetNumError',
+                            true
+                        )
+                        yktoast('有未填写项')
+                        isValid = false
+                        break
+                    }
+                    this.$set(
+                        requireQuestionGroup[index],
+                        'TargetNumError',
+                        false
+                    )
+                }
+            }
+            return isValid
+        },
+        validYinShi2() {
+            let isValid = true
+            //高蛋白、限能量饮食方案
+            if (
+                this.activeVal == 'HighProtein' ||
+                this.activeVal == 'LimitEnergy'
+            ) {
+                //DietQuestionnaire
+                isValid = this.validQuestionnairesCommon(
+                    this.DietQuestionnaire.QuestionGroups
+                )
+            } else if (this.activeVal == 'FastDiet') {
+                //轻断食
+                isValid = this.validQuestionnairesCommon(
+                    this.DietQuestionnaire.QuestionGroups
+                )
+                if (!isValid) return isValid
+                isValid = this.validQuestionnairesCommon(
+                    this.DietEkadeshQuestionnaire.QuestionGroups
+                )
+            }
+            return isValid
+        },
         //下一步
         nextTap() {
-            this.pageIndex++
             console.log(`当前页码：${this.pageIndex}`)
-            this.setPageTit()
-            if (this.pageIndex == 3) {
+            // debugger
+            if (this.pageIndex == 1) {
+                if (!this.targetNum || !parseFloat(this.targetNum)) {
+                    this.targetNumError = true
+                    yktoast('有未填写项')
+                    return
+                }
+            } else if (this.pageIndex == 2) {
                 //饮食方案
                 if (!this.planId) {
                     this.GetPatientEmptyWeightLossPlan() //获取空模板
                 }
-
                 this.GetPatientWeightLossPlanTemplates() //获取模板列表
-            }
-            if (this.pageIndex == 4) {
+            } else if (this.pageIndex == 3) {
                 this.getAnswerStr(this.activeVal)
-            }
-            if (this.pageIndex == 6) {
-                //校验必填项  运动方案
-                if (this.sportEventChecked.length == 0) {
+                let isValid = this.validYinShi2()
+                if (!isValid) return
+            } else if (this.pageIndex == 5) {
+                //1、建议有氧运动项目
+                let isCheck = this.$refs.validIsCheck.validIsCheck()
+                if (!isCheck) {
                     yktoast('有未填写项')
-                    this.pageIndex--
-                    console.log(this.pageIndex)
+                    return
+                }
+                //todo 20200606 方法提出来
+                //2、建议运动频率与时长
+                //adviseSports
+                let adviseSportsValid = true
+                for (
+                    let adviseSportsIndex = 0;
+                    adviseSportsIndex < this.adviseSports.length;
+                    adviseSportsIndex++
+                ) {
+                    let item = this.adviseSports[adviseSportsIndex]
+                    let value = item.QuestionAnswerInfo.DecimalValue
+                    if (item.Precision <= 0) {
+                        value = item.QuestionAnswerInfo.IntValue
+                    }
+
+                    if (!value || !parseFloat(value)) {
+                        adviseSportsValid = false
+                        break
+                    }
+                }
+                if (!adviseSportsValid) {
+                    this.adviseSportsError = true
+                    yktoast('有未填写项')
+                    return
+                }
+                //阻抗运动
+                //Zmotion
+                let ZmotionValid = true
+                for (let index = 0; index < this.Zmotion.length; index++) {
+                    let item = this.Zmotion[index]
+                    let value = item.QuestionAnswerInfo.DecimalValue
+                    if (item.Precision <= 0) {
+                        value = item.QuestionAnswerInfo.IntValue
+                    }
+
+                    if (!value || !parseFloat(value)) {
+                        ZmotionValid = false
+                        break
+                    }
+                }
+                if (!ZmotionValid) {
+                    this.ZmotionError = true
+                    yktoast('有未填写项')
                     return
                 }
 
@@ -1297,6 +1678,9 @@ export default {
                 let newArr = [...sportEvent, ...sportsTime, ...sportsTimeZ]
                 this.SportsAnswerInfoStr = JSON.stringify(newArr)
             }
+
+            this.pageIndex++
+            this.setPageTit()
         },
         //获取方案模板列表
         GetPatientWeightLossPlanTemplates() {
@@ -1420,14 +1804,31 @@ export default {
         //完成
         submitTap() {
             console.log('点击完成提交')
-            let AccountId = storage.getItem('AccountId')
-            if (this.IsReVisiting && this.followDate == '请选择') {
-                //需要下次复诊
-                yktoast('请选择复诊时间')
+            
+            //复诊与随访 校验必填项
+            //1、下次复诊
+            let isCheck = this.$refs.validIsCheckR.validIsCheck()
+            if (!isCheck) {
+                yktoast('有未填写项')
                 return
             }
+            if (this.IsReVisiting && (this.followDate==''|| this.followDate == '请选择')) {
+                //需要下次复诊
+								yktoast('请选择复诊时间')
+								this.followDateError = true
+                return
+						}
+						this.followDateError = false
+            //2、随访计划
+            isCheck = this.$refs.validIsCheckF.validIsCheck()
+            if (!isCheck) {
+                yktoast('有未填写项')
+                return
+            }
+
             // 保存减重方案
             var _this = this
+            let AccountId = storage.getItem('AccountId')
             let url = this.api.userApi.SavePatientWeightLossPlan
             let data = {
                 PatientID: this.$route.query.userId, //患者ID
@@ -1462,10 +1863,12 @@ export default {
             console.log(childValue)
             let val = childValue[0].value
             if (val) {
-                this.reVisitTime = true
+								this.reVisitTime = true
+								if(this.followDate&&this.followDate!='请选择') this.followDateError = false
             } else {
-                this.reVisitTime = false
-                this.followDate = ''
+								this.reVisitTime = false
+								this.followDate = ''
+								this.followDateError = false
             }
             this.IsReVisiting = val
             console.log(`是否需要复诊：${val}`)
@@ -1486,6 +1889,13 @@ export default {
     font-size: 12px;
     left: -13px;
     top: 2px;
+}
+.tipsIcon2 {
+    font-size: 12px !important;
+    top: 2.5px;
+}
+.tipsIcon6 {
+    top: 8px;
 }
 .weightRuler {
     text-align: center;

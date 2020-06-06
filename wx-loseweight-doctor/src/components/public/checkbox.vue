@@ -1,6 +1,12 @@
 <template>
     <div class="chooserList">
-        <div class="tit">{{ name }}</div>
+        <div class="rel">
+            <i
+                v-show="targetCheckBoxError"
+                class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon3"
+            ></i>
+            <div class="tit">{{ name }}</div>
+        </div>
         <ul>
             <li
                 v-for="(item, index) in options"
@@ -47,7 +53,8 @@ export default {
     },
     data() {
         return {
-            currValArr: []
+            currValArr: [],
+            targetCheckBoxError: false //是否显示error图标
         }
     },
     methods: {
@@ -65,6 +72,7 @@ export default {
                     this.currValArr.splice(this.currValArr.indexOf(item), 1)
                 }
             }
+            this.validIsCheck()
             this.$emit('toparents', this.currValArr)
         },
         checkActive(item) {
@@ -72,11 +80,27 @@ export default {
                 this.currValArr.length = 1
             }
             return this.currValArr.indexOf(item) !== -1
+        },
+        isEmpty(obj) {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) return false
+            }
+            return true
+        },
+        validIsCheck() {
+            let isEmpty = this.isEmpty(this.currValArr)
+            if (this.currValArr.length <= 0 || isEmpty)
+                this.targetCheckBoxError = true
+            else this.targetCheckBoxError = false
+            return !this.targetCheckBoxError
         }
     }
 }
 </script>
 <style lang="less" scoped>
+.tipsIcon3 {
+    top: 1px;
+}
 .chooserList {
     .tit {
         font-size: 16px;
