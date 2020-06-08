@@ -44,7 +44,8 @@ export default {
             value: false
         },
         currArr: Array,
-        options: Array, //传入的数组
+				options: Array, //传入的数组
+				selectArr: Array, //传入的选中数组
         isMultiply: {
             //是否是多选。默认为false：单选；true：多选
             type: Boolean,
@@ -55,6 +56,15 @@ export default {
         return {
             currValArr: [],
             targetCheckBoxError: false //是否显示error图标
+        }
+		},
+		watch: {
+        selectArr: {
+            handler(newVal, oldVal) {
+                this.currValArr = newVal //newVal即是chartData
+            },
+            deep: true,
+            immediate: true
         }
     },
     methods: {

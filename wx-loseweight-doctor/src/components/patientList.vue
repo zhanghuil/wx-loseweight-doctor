@@ -147,10 +147,10 @@
         </div>
         <!-- 评估表 -->
         <div v-show="activeIndex == 0" class="listBox">
-            <div class="add">
+            <!-- <div class="add">
                 <img src="../assets/icon0@2x.png" alt="" />
                 医生评估表
-            </div>
+            </div> -->
             <div v-for="(item, index) in infoList" :key="index">
                 <div v-if="item.TypeCode == 'SFDJ'">
                     <!-- 随访登记 -->
@@ -355,6 +355,12 @@ export default {
         }
     },
     created() {
+        let typeIndex = storage.getItem('index')
+        if (typeIndex) {
+            this.activeIndex = typeIndex
+            storage.setItem('index', '')
+        }
+
         document.title = this.$route.query.userName
         this.getParams()
         this.getJZMZPatient()
@@ -373,6 +379,30 @@ export default {
         },
         //复制减重方案
         copyTap(id) {
+            this.$createDialog({
+                type: 'confirm',
+                content: '确定要复制此方案',
+                confirmBtn: {
+                    text: '复制',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    this.copyPlan(id)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
+        copyPlan(id) {
             this.$router.push({
                 path: '/draftPlan',
                 query: { userId: this.$route.query.userId, planId: id }

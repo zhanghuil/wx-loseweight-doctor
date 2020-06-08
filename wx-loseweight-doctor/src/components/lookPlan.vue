@@ -233,13 +233,13 @@
                                                     <div>{{ meal.Name }}</div>
                                                     <div>
                                                         {{
-                                                            meal.Precision > 1
-                                                                ? meal
-                                                                      .QuestionAnswerInfo
-                                                                      .DecimalValue
-                                                                : meal
-                                                                      .QuestionAnswerInfo
-                                                                      .IntValue
+                                                            meal
+                                                                .QuestionAnswerInfo[
+                                                                getTypeName(
+                                                                    meal.TypeCode,
+                                                                    meal.Precision
+                                                                )
+                                                            ]
                                                         }}
                                                         {{ meal.Suffix }}
                                                     </div>
@@ -256,7 +256,9 @@
                             >
                                 <cube-scroll
                                     ref="scroll"
-                                    :data="DietQuestionnaire.QuestionGroups"
+                                    :data="
+                                        DietEkadeshQuestionnaire.QuestionGroups
+                                    "
                                     direction="horizontal"
                                     class="horizontal-scroll-list-wrap"
                                 >
@@ -264,7 +266,7 @@
                                         <div
                                             class="list-item"
                                             v-for="(item,
-                                            index) in DietQuestionnaire.QuestionGroups"
+                                            index) in DietEkadeshQuestionnaire.QuestionGroups"
                                             :key="index"
                                         >
                                             <div
@@ -283,12 +285,11 @@
                                 </cube-scroll>
                                 <div
                                     class="tab__panel"
-                                    v-if="planInfo.DietEkadeshQuestionnaire"
+                                    v-if="DietEkadeshQuestionnaire"
                                 >
                                     <div
-                                        v-for="(item, idx) in planInfo
-                                            .DietEkadeshQuestionnaire
-                                            .QuestionGroups"
+                                        v-for="(item,
+                                        idx) in DietEkadeshQuestionnaire.QuestionGroups"
                                         :key="idx"
                                     >
                                         <div
@@ -307,13 +308,13 @@
                                                     <div>{{ meal.Name }}</div>
                                                     <div>
                                                         {{
-                                                            meal.Precision > 1
-                                                                ? meal
-                                                                      .QuestionAnswerInfo
-                                                                      .DecimalValue
-                                                                : meal
-                                                                      .QuestionAnswerInfo
-                                                                      .IntValue
+                                                            meal
+                                                                .QuestionAnswerInfo[
+                                                                getTypeName(
+                                                                    meal.TypeCode,
+                                                                    meal.Precision
+                                                                )
+                                                            ]
                                                         }}
                                                         {{ meal.Suffix }}
                                                     </div>
@@ -377,13 +378,12 @@
                                             <div>{{ meal.Name }}</div>
                                             <div>
                                                 {{
-                                                    meal.Precision > 1
-                                                        ? meal
-                                                              .QuestionAnswerInfo
-                                                              .DecimalValue
-                                                        : meal
-                                                              .QuestionAnswerInfo
-                                                              .IntValue
+                                                    meal.QuestionAnswerInfo[
+                                                        getTypeName(
+                                                            meal.TypeCode,
+                                                            meal.Precision
+                                                        )
+                                                    ]
                                                 }}
                                                 {{ meal.Suffix }}
                                             </div>
@@ -468,7 +468,8 @@ export default {
             planInfo: {},
             WeightLossPlan: {},
             SportsQuestionnaire: {},
-            DietQuestionnaire: {},
+            DietQuestionnaire: {}, //非断食日
+            DietEkadeshQuestionnaire: {}, //断食日
 
             ellState: true, // 文字是否收起，默认收起
             ellState2: true, // 文字是否收起，默认收起
@@ -493,6 +494,26 @@ export default {
         this.getDoctorInfoNew()
     },
     methods: {
+        //获取食谱克数 todo
+        /**
+         * typeCode：类型num(Precision>0?'DecimalValue':'IntValue')
+         * Precision：精度
+         */
+        getTypeName(code, precision) {
+            let name = ''
+            switch (code) {
+                case 'Num':
+                    if (precision > 0) name = 'DecimalValue'
+                    else name = 'IntValue'
+                    break
+                case 'Text':
+                    name = 'StrValue'
+                    break
+                default:
+                    name = ''
+            }
+            return name
+        },
         //获取减重方案
         getPatientWeightLossPlan() {
             var _this = this
@@ -505,6 +526,9 @@ export default {
                 if (result) {
                     _this.planInfo = result
                     _this.DietQuestionnaire = result.DietQuestionnaire
+                    _this.DietEkadeshQuestionnaire =
+                        result.DietEkadeshQuestionnaire //断食日
+
                     _this.SportsQuestionnaire = result.SportsQuestionnaire
                     _this.WeightLossPlan = result.WeightLossPlan
                 } else {
@@ -535,6 +559,7 @@ export default {
         },
         BigTabClick: function(e) {
             this.bigActiveIndex = e
+            this.activeIndex = 0
         },
         /**
          * 收起/展开按钮点击事件
@@ -827,8 +852,8 @@ export default {
     font-size: 14px;
     color: #ffffff;
     width: 86px;
-		box-sizing: border-box;
-		text-align: center;
+    box-sizing: border-box;
+    text-align: center;
     padding: 7px 0 11px 0;
 }
 

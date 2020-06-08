@@ -128,6 +128,8 @@ export default new Router({
 			name: 'draftPlan',
 			component: resolve => require(['@/components/draftPlan'], resolve),
 			meta: {
+				isUseCache: false, // 默认不缓存
+				keepAlive: false,
 				title: '制定减重方案',
 				requiresAuth: true  // 添加表示需要验证
 			}

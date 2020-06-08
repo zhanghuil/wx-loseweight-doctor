@@ -13,6 +13,7 @@
                                 placeholder="输入患者称呼或手机号搜索"
                                 @focus="focusShow"
                                 @keyup.enter="searchEnterFun"
+																maxlength="50"
                             />
                             <i
                                 v-show="blurHidden"

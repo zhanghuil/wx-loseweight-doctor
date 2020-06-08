@@ -25,21 +25,42 @@
                         class="navBarItem"
                         :class="queryType == item.id ? 'on' : ''"
                     >
-                        <div class="item" @click="tabClick(item.id)">
+                        <div class="item" @click="handleChange(item.id, index)">
                             {{ item.name }}
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="listPanel">
-                <div v-for="(item, index) in patientsList" :key="index">
-                    <leftSlider
-                        :index="index"
-                        :id="item.PatientID"
-                        @deleteItem="deleteItem"
-                    >
-                        <paItem :item="item" @lookTap="lookDetails"></paItem>
-                    </leftSlider>
+            <div
+                class="emptyBox"
+                v-show="patientsList && patientsList.length == 0"
+            >
+                <img class="emptyImg" src="../assets/empty@2x.png" alt="" />
+                <p>无相关内容</p>
+            </div>
+            <div
+                class="listPanelBox"
+                ref="listPanelBox"
+                v-show="patientsList && patientsList.length > 0"
+            >
+                <div class="content">
+                    <div class="listPanel">
+                        <div v-for="(item, index) in patientsList" :key="index">
+                            <leftSlider
+                                :index="index"
+                                :id="item.PatientID"
+                                @deleteItem="deleteItem"
+                            >
+                                <paItem
+                                    :item="item"
+                                    @lookTap="lookDetails"
+                                ></paItem>
+                            </leftSlider>
+                        </div>
+                        <div class="loading" v-show="loading">
+                            {{ loadingTXT }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -132,6 +153,7 @@ import search from '@/components/search'
 import { yktoast, convertKey } from '../common/js/util'
 import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
+import BScroll from 'better-scroll'
 export default {
     name: 'index',
     components: { drawer, Options, leftSlider, paItem, search },
@@ -179,10 +201,15 @@ export default {
                 }
             ],
             queryType: 0, //查询类型 0 全部 1今日患者 2明日患者
-            activeIndex: 0,
             display: false, //筛选弹窗
             drawerWidth: '280px',
-            drawerHeight: '100%'
+            drawerHeight: '100%',
+            //  上拉加载更多
+            loading: false,
+            loadingTXT: 'loading....',
+            page: 1,
+            totalPage: 0, //总页码
+            isClickTab: false
         }
     },
     filters: {
@@ -211,7 +238,64 @@ export default {
         this.getSubDoctor() //获取下属医生
         this.getPatientGroups() //患者组
     },
+    mounted() {
+        this.loadMore()
+    },
     methods: {
+        //加载更多start  tabClick
+        async handleChange(id, index) {
+            this.isClickTab = true
+            this.scroll.refresh()
+            this.scroll.maxScrollY = -300
+            this.loadingTXT = 'loading....'
+            this.queryType = id
+            this.patientsList = []
+            this.page = 0
+            await this.getJZMZPatients()
+            this.loadMore()
+        },
+        loadMore() {
+            var _this = this
+            this.$nextTick(() => {
+                if (!this.scroll) {
+                    this.scroll = new BScroll(this.$refs.listPanelBox, {
+                        click: true,
+                        probeType: 3,
+                        useTransition: false,
+                        scrollY: true,
+                        bindToWrapper: true,
+                        HWCompositing: true
+                    })
+                    this.scroll.maxScrollY = -300
+                    this.scroll.on('scrollEnd', pos => {
+                        this.loading = true
+                        if (_this.isClickTab) {
+                            this.scroll.maxScrollY = -300
+                        }
+                        _this.isClickTab = false
+                        // debugger
+                        if (_this.page == _this.totalPage) {
+                            _this.loadingTXT = '---到底了---'
+                            _this.loading = true
+                            return
+                        }
+                        if (
+                            this.scroll.y <= this.scroll.maxScrollY + 50 &&
+                            this.loading
+                        ) {
+                            console.log('滚动加载数据')
+                            _this.page++
+                            _this.getJZMZPatients()
+                            _this.loading = false
+                        }
+                    })
+                } else {
+                    _this.loading = false
+                    _this.scroll.refresh()
+                }
+            })
+        },
+        //加载更多end
         //删除患者
         deleteItem: function(id) {
             console.log('删除这个患者')
@@ -375,7 +459,7 @@ export default {
             var _this = this
             let url = this.api.userApi.GetJZMZPatients
             let data = {
-                PageIndex: 0,
+                PageIndex: this.page,
                 PageSize: 10,
                 Keyword: this.searchValue, //搜索关键词
                 DoctorId: this.doctorId,
@@ -386,7 +470,9 @@ export default {
             this.$fetchPost(url, data, 4111).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.Data) {
-                    _this.patientsList = result.Data
+                    _this.patientsList = _this.patientsList.concat(result.Data)
+                    // debugger
+                    _this.totalPage = result.Page.TotalPage
                 }
                 // yktoast()
             })
@@ -396,7 +482,7 @@ export default {
             var _this = this
             let url = this.api.userApi.GetJZMZPatients
             let data = {
-                PageIndex: 0,
+                PageIndex: this.page,
                 PageSize: 10,
                 Keyword: this.searchValue, //搜索关键词
                 DoctorId: this.doctorId,
@@ -477,7 +563,7 @@ export default {
 .header {
     background: #ffffff;
     position: fixed;
-    z-index: 10;
+    z-index: 101;
     top: 0;
     left: 0;
     width: 100%;
@@ -505,7 +591,7 @@ export default {
     .menuTab {
         background: #f7f7f7;
         position: fixed;
-        z-index: 10;
+        z-index: 101;
         top: 68px;
         left: 0;
         width: 100%;
@@ -538,6 +624,11 @@ export default {
             font-size: 14px;
             color: #6d6d6d;
         }
+    }
+    .listPanelBox {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
     }
     .listPanel {
         padding: 132px 15px 52px;
@@ -593,6 +684,27 @@ export default {
                 color: #ffffff;
             }
         }
+    }
+}
+.footer {
+    z-index: 101;
+}
+.loading {
+    text-align: center;
+    padding: 30px 0;
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #6d6d6d;
+}
+.emptyBox {
+    padding-top: 240px;
+    text-align: center;
+    font-size: 14px;
+    color: #6d6d6d;
+    .emptyImg {
+        width: 138px;
+        height: 100px;
+        margin-bottom: 20px;
     }
 }
 </style>

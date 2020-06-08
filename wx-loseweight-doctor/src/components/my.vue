@@ -5,7 +5,7 @@
             <div class="myTopCon">
                 <img src="../assets/tx1.png" class="img" alt="" />
                 <div class="con">
-                    <p class="name">
+                    <p class="name" @click="lookInfo">
                         {{ doctorInfo.Name }}<i class="icon cubeic-arrow"></i>
                     </p>
                     <p class="hos">{{ doctorInfo.HosName }}</p>
@@ -64,7 +64,7 @@
                         <div><i class="icon cubeic-arrow"></i></div>
                     </li>
                 </router-link>
-                <li>
+                <!-- <li>
                     <div class="L">
                         <div>
                             <img
@@ -76,7 +76,7 @@
                         <div>减重方案模板管理</div>
                     </div>
                     <div><i class="icon cubeic-arrow"></i></div>
-                </li>
+                </li> -->
             </ul>
         </div>
         <div class="exitBox" @click="exitTap">退出</div>
@@ -124,6 +124,11 @@ export default {
         this.getDoctorInfoNew()
     },
     methods: {
+        lookInfo() {
+            this.$router.push({
+                path: '/myInfo'
+            })
+        },
         //退出  清除缓存
         exitTap() {
             yktoast('退出成功')

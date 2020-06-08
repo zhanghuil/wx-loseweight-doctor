@@ -623,6 +623,7 @@
                             <checkbox
                                 :isMultiply="true"
                                 :options="sportEvent"
+                                :selectArr="selectSportEvent"
                                 ref="validIsCheck"
                                 name="建议有氧运动项目"
                                 @toparents="childByValueCheck"
@@ -778,6 +779,7 @@
                 <li class="wrapper2">
                     <checkbox
                         :options="isReVisitingOptions"
+                        :selectArr="isReVisitingSelArr"
                         name="下次复诊"
                         @toparents="childByValueCheckR"
                         ref="validIsCheckR"
@@ -789,7 +791,7 @@
                     >
                         <div class="cell_bd flex-center rel">
                             <i
-															v-show="followDateError"
+                                v-show="followDateError"
                                 class="icon iconfont icon-wuuiconsuotanhao tipsIcon tipsIcon6"
                             ></i>
                             <div>
@@ -811,6 +813,7 @@
                     <!-- <div class="f16 c-3a">随访计划</div> -->
                     <checkbox
                         :options="followOptions"
+                        :selectArr="followSelectArr"
                         name="随访计划"
                         @toparents="childByValueCheckF"
                         ref="validIsCheckF"
@@ -876,7 +879,8 @@
             </div>
         </drawerFoot>
         <!-- 插入模板 start-->
-        <template v-if="templatesList && templatesList.length > 0">
+        <!-- v-if="templatesList && templatesList.length > 0" -->
+        <template>
             <InsertTemplate
                 ref="insTmp"
                 :list="templatesList"
@@ -923,8 +927,10 @@ export default {
             doctorId: '', //医生id
 
             planInfo: {},
+            WeightLossPlan: {},
             sportEvent: [], //运动项目
-            sportEventChecked: [], //选中的运动项目
+            selectSportEvent: [], //已经选择的运动项目-赋默认值
+            sportEventChecked: [], //选中的运动项目提交使用
 
             adviseSports: [], //建议运动
             adviseSportsError: false,
@@ -933,14 +939,14 @@ export default {
             DietQuestionnaire: {}, //方案  非断食日
             DietEkadeshQuestionnaire: {}, //轻断食断食日饮食方案
 
-            pageIndex: 2,
+            pageIndex: 1,
             display: false, //体重弹窗
             showTmp: false, //保存模板弹窗
             drawerWidth: '100%',
             drawerHeight: '245px',
             planDate: '', //方案时间
-						followDate: '请选择', //复诊时间
-						followDateError:false,
+            followDate: '请选择', //复诊时间
+            followDateError: false,
             targetNum: '0.0', //减重目标
             targetNumError: false, //减重目标是否为空||‘000.0’
             tabs: [
@@ -974,6 +980,7 @@ export default {
                     value: true
                 }
             ],
+            isReVisitingSelArr: [], //选中的
             IsReVisiting: false, //是否需要复诊
             reVisitTime: false, //复诊时间选择框默认隐藏
             followOptions: [
@@ -991,27 +998,89 @@ export default {
                     value: '30'
                 }
             ],
+            followSelectArr: [], //选中的
             FollowUpVisitPlan: '' //随访周期计划 = ['0', '7', '14', '30', '90', '180', '360', '-1'],
         }
     },
     computed: {},
     filters: {},
     created() {
+        let AccountId = storage.getItem('AccountId')
+        this.doctorId = AccountId
         if (this.pageIndex == 1) document.title = '制定减重方案'
         this.planDate = formatDate(new Date(), 'yyyy-MM-dd')
         this.getJZMZPatient()
         this.getDoctorInfoNew()
-        // 方案id
-        let planId = this.$route.query.planId
-        if (planId) {
-            this.planId = planId
-            this.getPatientWeightLossPlan()
-        }
+        this.GetPatientWeightLossPlanTemplates() //获取模板列表
+        this.getPlan()
 
-        let AccountId = storage.getItem('AccountId')
-        this.doctorId = AccountId
+        //渲染填写过的方案信息 todo
+				// storage.removeItem('planFormData')
+        /*let planFormData = storage.getObjItem('planFormData')
+        if (planFormData) {
+            let data = JSON.parse(planFormData)
+            this.targetNum = data.WeightLossGoals
+            this.planDate = data.planDate
+            this.activeVal = data.activeVal
+            this.LBW = data.LBW
+        }*/
+        //渲染填写过的方案信息 end
+    },
+    watch: {
+        // DietQuestionnaire: {
+        //     //注意：当观察的数据为对象或数组时，curVal和oldVal是相等的，因为这两个形参指向的是同一个数据对象
+        //     handler(curVal, oldVal) {
+        //         // 自动保存方法
+        //         alert('发生改变啦-需要保持呀')
+        //     },
+        //     deep: true,
+        //     immediate: true
+        // }
+    },
+
+    mounted() {
+        if (window.history && window.history.pushState) {
+            // 向历史记录中插入了当前页
+            history.pushState(null, null, document.URL)
+            window.addEventListener('popstate', this.goBack, false)
+        }
+    },
+    destroyed() {
+        window.removeEventListener('popstate', this.goBack, false)
     },
     methods: {
+        // goBack() {
+        //     console.log('点击了浏览器的返回按钮')
+        //     //设置方案页面缓存 todo
+        //     storage.setObjItem(
+        //         'planFormData',
+        //         JSON.stringify(this.planFormData())
+        //     )
+
+        //     window.history.back()
+        // },
+        planFormData() {
+            return {
+                WeightLossGoals: this.targetNum, //减重目标
+                planDate: this.planDate
+                    ? this.planDate
+                    : formatDate(new Date(), 'yyyy-MM-dd'), //方案日期
+                activeVal: this.activeVal, //方案类型
+                LBW: this.LBW //瘦体重
+            }
+        },
+        //获取方案模板
+        getPlan() {
+            // 方案id
+            let planId = this.$route.query.planId
+            if (planId) {
+                this.planId = planId
+                this.getPatientWeightLossPlan()
+            } else {
+                //饮食方案
+                this.GetPatientEmptyWeightLossPlan() //获取空模板
+            }
+        },
         //子组件传递刻度表
         rulerNum(value) {
             this.NumValue = value
@@ -1059,7 +1128,7 @@ export default {
                             StrValue: '',
                             QuestionID: ''
                         }
-                        items.StrValue = element.QuestionAnswerInfo.DecimalValue
+                        items.StrValue = element.QuestionAnswerInfo.StrValue
                     }
                     items.QuestionID = element.QuestionAnswerInfo.QuestionID
                     questionInfoArr.push(items)
@@ -1441,6 +1510,8 @@ export default {
         tabClick(e) {
             this.activeVal = e
             this.filtersPlanSupply(this.patientInfo)
+            this.GetPatientEmptyWeightLossPlan() //获取空模板
+            this.GetPatientWeightLossPlanTemplates() //获取模板列表
         },
         //方案时间
         showDatePicker() {
@@ -1474,8 +1545,8 @@ export default {
             this.datePicker.show()
         },
         selectHandleF(date, selectedVal, selectedText) {
-						this.followDate = selectedText.join('-')
-						this.followDateError = false
+            this.followDate = selectedText.join('-')
+            this.followDateError = false
             console.log(`复诊时间：${this.followDate}`)
         },
         cancelHandleF() {
@@ -1609,12 +1680,6 @@ export default {
                     yktoast('有未填写项')
                     return
                 }
-            } else if (this.pageIndex == 2) {
-                //饮食方案
-                if (!this.planId) {
-                    this.GetPatientEmptyWeightLossPlan() //获取空模板
-                }
-                this.GetPatientWeightLossPlanTemplates() //获取模板列表
             } else if (this.pageIndex == 3) {
                 this.getAnswerStr(this.activeVal)
                 let isValid = this.validYinShi2()
@@ -1768,10 +1833,37 @@ export default {
 
                 _this.sportEvent =
                     result.SportsQuestionnaire.QuestionGroups[0].Questions[0].QuestionOptions
+                //运动项目赋默认值
+                let checkArr = _this.sportEvent.filter(n => n.checked == true)
+                _this.selectSportEvent = checkArr
                 _this.adviseSports =
                     result.SportsQuestionnaire.QuestionGroups[1].Questions
                 _this.Zmotion =
                     result.SportsQuestionnaire.QuestionGroups[2].Questions
+                //赋值
+                let WeightLossPlan = result.WeightLossPlan
+                _this.targetNum = WeightLossPlan.WeightLossGoals //减重目标
+                _this.planDate = formatDate(
+                    new Date(WeightLossPlan.PlanDate),
+                    'yyyy-MM-dd'
+                ) //方案日期
+                _this.activeVal = WeightLossPlan.TypeCode //方案类型
+                //下次复诊
+                _this.isReVisitingSelArr = _this.isReVisitingOptions.filter(
+                    n => n.value == WeightLossPlan.IsReVisiting
+                )
+                if (_this.isReVisitingSelArr[0].value == true) {
+                    //需要复诊 显示复诊时间
+                    _this.reVisitTime = true
+                    _this.followDate = formatDate(
+                        new Date(WeightLossPlan.ReVisitingDate),
+                        'yyyy-MM-dd'
+                    )
+                }
+                //随访计划
+                _this.followSelectArr = _this.followOptions.filter(
+                    n => n.value == WeightLossPlan.FollowUpVisitPlan
+                )
             })
         },
         //获取空白减重方案
@@ -1804,7 +1896,7 @@ export default {
         //完成
         submitTap() {
             console.log('点击完成提交')
-            
+
             //复诊与随访 校验必填项
             //1、下次复诊
             let isCheck = this.$refs.validIsCheckR.validIsCheck()
@@ -1812,20 +1904,22 @@ export default {
                 yktoast('有未填写项')
                 return
             }
-            if (this.IsReVisiting && (this.followDate==''|| this.followDate == '请选择')) {
+            if (
+                this.IsReVisiting &&
+                (this.followDate == '' || this.followDate == '请选择')
+            ) {
                 //需要下次复诊
-								yktoast('请选择复诊时间')
-								this.followDateError = true
+                yktoast('请选择复诊时间')
+                this.followDateError = true
                 return
-						}
-						this.followDateError = false
+            }
+            this.followDateError = false
             //2、随访计划
             isCheck = this.$refs.validIsCheckF.validIsCheck()
             if (!isCheck) {
                 yktoast('有未填写项')
                 return
             }
-
             // 保存减重方案
             var _this = this
             let AccountId = storage.getItem('AccountId')
@@ -1849,6 +1943,8 @@ export default {
                 if (result) {
                     yktoast('已推送方案给患者')
                     _this.$router.go(-1)
+                    //回到减重方案列表
+                    storage.setItem('index', 1)
                 } else {
                     yktoast(result)
                 }
@@ -1863,12 +1959,13 @@ export default {
             console.log(childValue)
             let val = childValue[0].value
             if (val) {
-								this.reVisitTime = true
-								if(this.followDate&&this.followDate!='请选择') this.followDateError = false
+                this.reVisitTime = true
+                if (this.followDate && this.followDate != '请选择')
+                    this.followDateError = false
             } else {
-								this.reVisitTime = false
-								this.followDate = ''
-								this.followDateError = false
+                this.reVisitTime = false
+                this.followDate = ''
+                this.followDateError = false
             }
             this.IsReVisiting = val
             console.log(`是否需要复诊：${val}`)
