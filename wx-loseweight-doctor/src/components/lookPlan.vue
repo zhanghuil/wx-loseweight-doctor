@@ -138,7 +138,7 @@
                         class="txt"
                         :class="ellState ? 'ellipsis' : 'unellipsis'"
                     >
-                        <div>{{ WeightLossPlan.DietRequire }}</div>
+                        <div v-html="WeightLossPlan.DietRequire"></div>
                     </div>
                     <span
                         v-if="
@@ -404,7 +404,7 @@
                         class="txt"
                         :class="ellState2 ? 'ellipsis' : 'unellipsis'"
                     >
-                        <div>{{ WeightLossPlan.DietExecExplain }}</div>
+                        <div v-html="WeightLossPlan.DietExecExplain"></div>
                     </div>
                     <span
                         v-if="
@@ -422,9 +422,7 @@
             </div>
             <div class="wrapper p15" v-show="WeightLossPlan.SportsAdvice">
                 <div class="f16 c-3a b">运动建议</div>
-                <div class="c-6d f14 mt15 lh21">
-                    {{ WeightLossPlan.SportsAdvice }}
-                </div>
+                <div class="c-6d f14 mt15 lh21" v-html="WeightLossPlan.SportsAdvice"></div>
             </div>
 
             <div class="wrapper p15" v-if="WeightLossPlan.IsReVisiting">

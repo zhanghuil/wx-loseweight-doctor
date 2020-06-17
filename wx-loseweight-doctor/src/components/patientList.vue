@@ -147,10 +147,10 @@
         </div>
         <!-- 评估表 -->
         <div v-show="activeIndex == 0" class="listBox">
-            <!-- <div class="add">
+            <div class="add" @click="doctorForm">
                 <img src="../assets/icon0@2x.png" alt="" />
                 医生评估表
-            </div> -->
+            </div>
             <div v-for="(item, index) in infoList" :key="index">
                 <div v-if="item.TypeCode == 'SFDJ'">
                     <!-- 随访登记 -->
@@ -369,6 +369,10 @@ export default {
         this.getWeightLossPlans()
     },
     methods: {
+				//医生评估表
+				doctorForm(){
+					yktoast('努力开发中...')
+				},
         //操作按钮
         editBtn(id) {
             if (id == this.planId) {

@@ -91,6 +91,7 @@ export default {
 
     methods: {
         optionsClick(item) {
+					// debugger
             if (this.isMultiply === false) {
                 //单选
                 if (this.isRemoveSelf == false) {

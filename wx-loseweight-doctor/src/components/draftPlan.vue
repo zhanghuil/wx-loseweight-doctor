@@ -1002,9 +1002,8 @@ export default {
             FollowUpVisitPlan: '' //随访周期计划 = ['0', '7', '14', '30', '90', '180', '360', '-1'],
         }
     },
-    computed: {},
-    filters: {},
     created() {
+			console.log(this.$router)
         let AccountId = storage.getItem('AccountId')
         this.doctorId = AccountId
         if (this.pageIndex == 1) document.title = '制定减重方案'
@@ -1015,7 +1014,7 @@ export default {
         this.getPlan()
 
         //渲染填写过的方案信息 todo
-				// storage.removeItem('planFormData')
+        // storage.removeItem('planFormData')
         /*let planFormData = storage.getObjItem('planFormData')
         if (planFormData) {
             let data = JSON.parse(planFormData)
@@ -1025,28 +1024,6 @@ export default {
             this.LBW = data.LBW
         }*/
         //渲染填写过的方案信息 end
-    },
-    watch: {
-        // DietQuestionnaire: {
-        //     //注意：当观察的数据为对象或数组时，curVal和oldVal是相等的，因为这两个形参指向的是同一个数据对象
-        //     handler(curVal, oldVal) {
-        //         // 自动保存方法
-        //         alert('发生改变啦-需要保持呀')
-        //     },
-        //     deep: true,
-        //     immediate: true
-        // }
-    },
-
-    mounted() {
-        if (window.history && window.history.pushState) {
-            // 向历史记录中插入了当前页
-            history.pushState(null, null, document.URL)
-            window.addEventListener('popstate', this.goBack, false)
-        }
-    },
-    destroyed() {
-        window.removeEventListener('popstate', this.goBack, false)
     },
     methods: {
         // goBack() {
@@ -1532,6 +1509,7 @@ export default {
         },
         //复诊时间
         showDateFollow() {
+					// debugger
             if (!this.datePicker) {
                 this.datePicker = this.$createDatePicker({
                     title: '选择复诊时间',
@@ -1833,9 +1811,18 @@ export default {
 
                 _this.sportEvent =
                     result.SportsQuestionnaire.QuestionGroups[0].Questions[0].QuestionOptions
+                let sportEventAnswerInfo =
+                    result.SportsQuestionnaire.QuestionGroups[0].Questions[0]
+                        .QuestionAnswerInfo
                 //运动项目赋默认值
                 let checkArr = _this.sportEvent.filter(n => n.checked == true)
-                _this.selectSportEvent = checkArr
+                _this.selectSportEvent = checkArr //选项赋默认选择
+                _this.sportEventChecked = [
+                    {
+                        QuestionID: sportEventAnswerInfo.QuestionID,
+                        StrValue: sportEventAnswerInfo.StrValue
+                    }
+                ]
                 _this.adviseSports =
                     result.SportsQuestionnaire.QuestionGroups[1].Questions
                 _this.Zmotion =
@@ -1859,11 +1846,13 @@ export default {
                         new Date(WeightLossPlan.ReVisitingDate),
                         'yyyy-MM-dd'
                     )
-                }
+								}
+								_this.IsReVisiting = WeightLossPlan.IsReVisiting
                 //随访计划
                 _this.followSelectArr = _this.followOptions.filter(
                     n => n.value == WeightLossPlan.FollowUpVisitPlan
-                )
+								)
+								_this.FollowUpVisitPlan = WeightLossPlan.FollowUpVisitPlan
             })
         },
         //获取空白减重方案
@@ -1938,6 +1927,7 @@ export default {
                 EkadeshDietAnswerInfoStr: this.EkadeshDietAnswerInfoStr, //断食日饮食问卷答案字符
                 SportsAnswerInfoStr: this.SportsAnswerInfoStr //运动问卷答案字符
             }
+						
             this.$fetchPost(url, data, 4108).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result) {

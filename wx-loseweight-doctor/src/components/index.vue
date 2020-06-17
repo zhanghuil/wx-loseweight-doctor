@@ -209,6 +209,7 @@ export default {
             loadingTXT: 'loading....',
             page: 1,
             totalPage: 0, //总页码
+            TotalCount: 0, // 总条数
             isClickTab: false
         }
     },
@@ -250,7 +251,8 @@ export default {
             this.loadingTXT = 'loading....'
             this.queryType = id
             this.patientsList = []
-            this.page = 0
+            this.page = 1
+            this.TotalCount = 0
             await this.getJZMZPatients()
             this.loadMore()
         },
@@ -275,7 +277,9 @@ export default {
                         _this.isClickTab = false
                         // debugger
                         if (_this.page == _this.totalPage) {
-                            _this.loadingTXT = '---到底了---'
+                            if (_this.TotalCount >= 10)
+                                _this.loadingTXT = '---到底了---'
+                            else _this.loadingTXT = ''
                             _this.loading = true
                             return
                         }
@@ -370,7 +374,7 @@ export default {
                 }
             }
             this.$refs.drawerFilter.closeByButton()
-            this.getJZMZPatients()
+            this.getJZMZPatients(1)
             //缓存筛选器中的选中值
             storage.setObjItem('filterResultsGroup', this.currfilterInfo())
         },
@@ -448,15 +452,26 @@ export default {
                     let checkedValArray = filterInfo.doctorId.split(',')
                     checkedValArray.forEach(n => {
                         let group = newDoctorList.find(e => e.GroupID == n)
-                        if (group) _this.selectDoctorGroup.push(group)
+                        if (
+                            group &&
+                            !_this.selectDoctorGroup.find(
+                                k => k.GroupID == group.GroupID
+                            )
+                        )
+                            _this.selectDoctorGroup.push(group)
                     })
                 }
                 //end
             })
         },
         //获取减重患者病人
-        getJZMZPatients() {
+        getJZMZPatients(pageIndex) {
             var _this = this
+            if (pageIndex && pageIndex == 1) {
+                _this.patientsList = []
+                _this.totalPage = 0
+            }
+
             let url = this.api.userApi.GetJZMZPatients
             let data = {
                 PageIndex: this.page,
@@ -473,6 +488,7 @@ export default {
                     _this.patientsList = _this.patientsList.concat(result.Data)
                     // debugger
                     _this.totalPage = result.Page.TotalPage
+                    _this.TotalCount = result.Page.TotalCount
                 }
                 // yktoast()
             })
@@ -507,6 +523,7 @@ export default {
         //切换头部患者列表tab项
         tabClick(id) {
             this.queryType = id
+            // this.page = 1
             this.getJZMZPatients()
         },
         // 更新时间
