@@ -289,7 +289,7 @@
                                                             'DecimalValue'
                                                         )
                                                     "
-                                                    placeholder="请输入"
+                                                    :placeholder="n.Placeholder"
                                                     v-model="
                                                         n.QuestionAnswerInfo
                                                             .DecimalValue
@@ -305,7 +305,7 @@
                                                             'IntValue'
                                                         )
                                                     "
-                                                    placeholder="请输入"
+                                                    :placeholder="n.Placeholder"
                                                     v-model="
                                                         n.QuestionAnswerInfo
                                                             .IntValue
@@ -324,7 +324,7 @@
                                                         'StrValue'
                                                     )
                                                 "
-                                                placeholder="请输入"
+                                                :placeholder="n.Placeholder"
                                                 v-model="
                                                     n.QuestionAnswerInfo
                                                         .StrValue
@@ -396,7 +396,7 @@
                                                                     'DecimalValue'
                                                                 )
                                                             "
-                                                            placeholder="请输入"
+                                                            :placeholder="n.Placeholder"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -413,7 +413,7 @@
                                                                     'IntValue'
                                                                 )
                                                             "
-                                                            placeholder="请输入"
+                                                            :placeholder="n.Placeholder"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -435,7 +435,7 @@
                                                                 'StrValue'
                                                             )
                                                         "
-                                                        placeholder="请输入"
+                                                        :placeholder="n.Placeholder"
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue
@@ -510,7 +510,7 @@
                                                             :disabled="
                                                                 n.IsFixed
                                                             "
-                                                            placeholder="请输入"
+                                                            :placeholder="n.Placeholder"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -531,7 +531,7 @@
                                                             :disabled="
                                                                 n.IsFixed
                                                             "
-                                                            placeholder="请输入"
+                                                            :placeholder="n.Placeholder"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -555,7 +555,7 @@
                                                             )
                                                         "
                                                         :disabled="n.IsFixed"
-                                                        placeholder="请输入"
+                                                        :placeholder="n.Placeholder"
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue

@@ -50,7 +50,7 @@ export default {
             ).then(response => {
                 let result = response.data.data //请求返回数据
                 if (!result) {
-                    yktoast(result)
+                    yktoast('更新失败，请稍后重试')
                     return
                 }
                 yktoast('更新成功')
@@ -75,11 +75,15 @@ export default {
                     v.checked = false
                 })
                 _this.checkedList = result
-                
+
                 let _patientGroup = storage.getObjItem('patientGroup')
                 _patientGroup.forEach(e => {
                     let group = result.find(n => n.GroupID == e.ID)
-                    if (group) _this.selectPatientGroup.push(group)
+                    if (group) {
+                        _this.selectPatientGroup.push(group)
+                        let selMap = _this.selectPatientGroup.map(item => item.GroupID)
+                        _this.selGroupId = selMap.join(',')
+                    }
                 })
                 console.log(_this.selectPatientGroup)
             })

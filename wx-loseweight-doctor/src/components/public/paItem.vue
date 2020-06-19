@@ -13,7 +13,7 @@
                 <span
                     >{{ item.Weight }}kg，{{ item.Sex == 0 ? '男' : '女' }}，{{
                         item.Age
-                    }}岁</span
+                    }}</span
                 >
             </p>
             <p class="time">首诊：{{ item.DiagnoseDate | formatDateStr }}</p>
