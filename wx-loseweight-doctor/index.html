@@ -10,6 +10,16 @@
 </head>
 
 <body>
+	<script>
+		// 用于适配ipad以及ipad pro
+		;/(iPad)/i.test(navigator.userAgent) &&
+			((head = document.getElementsByTagName('head')),
+			(viewport = document.createElement('meta')),
+			(viewport.name = 'viewport'),
+			(viewport.content =
+				'target-densitydpi=device-dpi, width=480px, user-scalable=no'),
+			head.length > 0 && head[head.length - 1].appendChild(viewport))
+	</script>
   <script>
     // var vConsole = new VConsole();
     document.getElementsByTagName('html')[0].style.fontSize = (document.documentElement.clientWidth || document.body

@@ -35,6 +35,7 @@ axios.interceptors.request.use((config) => {
 
 axios.interceptors.response.use(
 	response => {
+		console.log(response.data.code)
 		if (response.data.code === 4003) {
 			Toast({
 				mes: '您没有权限操作！',
@@ -67,6 +68,7 @@ axios.interceptors.response.use(
 )
 
 //返回一个Promise(发送post请求)
+console.log(storage.getItem('Token'))
 var tokenValue = storage.getItem('Token') || ''
 var timestamp = Date.parse(new Date())
 timestamp = (timestamp / 1000).toString()
@@ -137,7 +139,8 @@ export function fetchGet(url, param, authCode) {
 	})
 	toast.show()
 	return new Promise((resolve, reject) => {
-		axios.get(url, { params: param }, {
+		axios.get(url, {
+			params: param,
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 				token: tokenValue,
@@ -166,7 +169,8 @@ export function fetchDelete(url, param, authCode) {
 	})
 	toast.show()
 	return new Promise((resolve, reject) => {
-		axios.delete(url, { params: param }, {
+		axios.delete(url, {
+			params: param,
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 				token: tokenValue,

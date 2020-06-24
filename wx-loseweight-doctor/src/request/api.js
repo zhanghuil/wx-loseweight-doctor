@@ -8,7 +8,7 @@ const userApi = {
 	JZDoctorPhoneLogin: webApi + '/api/System/Auth/JZDoctorPhoneLogin', //验证码登录
 	GetCodeNew: webApi + '/api/System/Login/GetCodeNew', //获取验证码 
 	JZDoctorPhonePasswordLogin: webApi + '/api/System/Auth/JZDoctorPhonePasswordLogin', //验证码登录 
-	SubmitPwd: webApi + '/api/System/Doctor/SubmitPwd', //忘记密码
+	DoctorResetPassword: webApi + '/api/System/Auth/DoctorResetPassword', //忘记密码
 	ModifyPwd: webApi + '/api/System/Doctor/ModifyPwd', //修改密码
 	GetJZMZPatients: webApi + '/api/System/JZMZPatient/GetJZMZPatients',  //获取减重病人
 	ShieldPatient: webApi + '/api/System/JZMZPatient/ShieldPatient',  //屏蔽患者
@@ -17,6 +17,7 @@ const userApi = {
 	GetRecordedRegistrations: webApi + '/api/System/MedicalRecord/GetRecordedRegistrations', //获取病人完成的评估表 
 	GetWeightLossPlans: webApi + '/api/System/MedicalRecord/GetWeightLossPlans', //获取病人减重方案列表
 	GetPatientWeightLossPlan: webApi + '/api/System/MedicalRecord/GetPatientWeightLossPlan', //获取减重方案
+	CopyWeightLossPlan: webApi + '/api/System/MedicalRecord/CopyWeightLossPlan', //复制减重方案
 	GetPatientEmptyWeightLossPlan: webApi + '/api/System/MedicalRecord/GetPatientEmptyWeightLossPlan',  //获取空白减重方案--制定方案
 	SavePatientWeightLossPlan: webApi + '/api/System/MedicalRecord/SavePatientWeightLossPlan',  //保存减重方案
 	RecallPatientWeightLossPlan: webApi + '/api/System/MedicalRecord/RecallPatientWeightLossPlan',  //撤回减重方案 

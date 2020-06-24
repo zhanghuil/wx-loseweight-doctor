@@ -140,7 +140,13 @@ export default {
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
         background: #ffffff;
-        transition: all 0.5s;
+				transition: all 0.5s;
+				@media screen and (min-width: 768px) {
+            height: 350px!important;
+				}
+				@media screen and (min-width: 768px) and (max-width: 1024px) {
+            height: 285px!important;
+        }
     }
     .main-show {
         opacity: 1;
@@ -181,11 +187,15 @@ export default {
         }
     }
     .drawer-body {
-        // padding: 20px;
+        padding-bottom: 70px;
         font-size: 14px;
         overflow: auto;
+        @media screen and (min-width: 768px) {
+            height: 350px!important;
+        }
     }
     .footerEdit {
+        height: 70px;
         position: absolute;
     }
 }

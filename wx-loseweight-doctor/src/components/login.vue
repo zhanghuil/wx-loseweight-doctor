@@ -22,6 +22,7 @@
                         <input
                             class="input"
                             type="tel"
+                            @input="telChange($event)"
                             v-model.trim="loginModel.phone"
                             placeholder="手机号"
                             @focus="focusShow(1)"
@@ -72,6 +73,7 @@
                         <input
                             class="input"
                             type="tel"
+														@input="telPwdChange($event)"
                             v-model.trim="loginModel.phonePwd"
                             placeholder="手机号"
                             @focus="focusShow(2)"
@@ -90,7 +92,7 @@
                             v-model.trim="loginModel.password"
                             placeholder="密码"
                             @focus="focusShow"
-                            maxlength="11"
+                            maxlength="18"
                         />
                         <i
                             class="clear iconfont"
@@ -159,7 +161,17 @@ export default {
         }
     },
     methods: {
-        codeLogin() {},
+        telChange(e) {
+            this.loginModel.phone = this.checkTel(e.target.value)
+				},
+				telPwdChange(e){
+					this.loginModel.phonePwd = this.checkTel(e.target.value)
+				},
+				//验证手机号只能输入数字
+				checkTel(value){
+					value = value.replace(/[^\d]/g,'')
+					return value
+				},
         // 忘记密码
         forgetPwdTap() {
             this.$router.push({
@@ -223,7 +235,7 @@ export default {
             }
             this.$fetchPost(url, data, 404).then(response => {
                 let result = response.data.data //请求返回数据
-                if (result.State == 1) {
+                if (result.State != 0) {
                     yktoast(result.Msg)
                     return
                 }
@@ -237,21 +249,24 @@ export default {
         },
         // 密码登录
         loginPwdSubmit() {
+            var _this = this
             let url = this.api.userApi.JZDoctorPhonePasswordLogin
             let data = {
                 Phone: this.loginModel.phonePwd,
                 Password: this.loginModel.password
             }
             this.$fetchPost(url, data, 405).then(response => {
-                debugger
                 let result = response.data.data //请求返回数据
-                if (result.State == 1) {
+                if (result.State != 0) {
                     yktoast(result.Msg)
                     return
                 }
                 yktoast('登录成功')
                 storage.setItem('AccountId', result.Data.AccountId)
                 storage.setItem('Token', result.Data.Token)
+                _this.$router.replace({
+                    path: '/'
+                })
             })
         }
     },

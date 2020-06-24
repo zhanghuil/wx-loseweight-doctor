@@ -66,7 +66,7 @@
                     :class="isLogin ? 'loginSubmit' : 'loginDefault'"
                     @click.self="loginSubmit"
                 >
-                    登 录
+                    重 置
                 </button>
             </div>
         </div>
@@ -132,7 +132,7 @@ export default {
             let url = this.api.userApi.GetCodeNew
             let data = {
                 VerifyMedia: this.loginModel.phone,
-                VerifySource: 'LoseWeightDoctorAuth'
+                VerifySource: 'DoctorFindPwd'
             }
             this.$fetchPost(url, data, 103).then(response => {
                 let result = response.data.data //请求返回数据
@@ -153,19 +153,19 @@ export default {
         },
         loginSubmit() {
             var _this = this
-            let url = this.api.userApi.SubmitPwd
+            let url = this.api.userApi.DoctorResetPassword
             let data = {
                 Phone: this.loginModel.phone,
-                code: this.loginModel.messageCode,
-                Pwd: this.loginModel.password
+                AuthCode: this.loginModel.messageCode,
+                Password: this.loginModel.password
             }
             this.$fetchPost(url, data, 152).then(response => {
-                let result = response.data.data //请求返回数据
-                if (result.status == 1) {
-                    yktoast(result.data)
+								let result = response.data.data //请求返回数据
+                if (result.State != 0) {
+                    yktoast(result.Msg)
                     return
                 }
-                yktoast(result.data)
+                yktoast(result.Msg)
                 _this.$router.replace({
                     path: '/'
                 })

@@ -13,7 +13,7 @@
                             :type="showPass ? 'text' : 'password'"
                             v-model.trim="loginModel.password"
                             placeholder="原密码"
-                            maxlength="6"
+                            maxlength="18"
                         />
                         <i
                             class="clear iconfont"
@@ -27,7 +27,7 @@
                             :type="showPassN ? 'text' : 'password'"
                             v-model.trim="loginModel.newPasswoed"
                             placeholder="新密码"
-                            maxlength="6"
+                            maxlength="18"
                         />
                         <i
                             class="clear iconfont"

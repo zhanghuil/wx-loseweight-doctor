@@ -1,301 +1,340 @@
 <template>
-    <div class="wrapperPa">
-        <div class="patientPanel">
-            <div class="item">
-                <div>
-                    <img class="txImg" src="../assets/tx1.png" alt="" />
+    <div>
+        <div class="wrapperPa" v-if="patientInfo">
+            <div class="patientPanel">
+                <div class="item">
+                    <div>
+                        <img
+                            class="txImg"
+                            :src="patientInfo.AvatarUrl"
+                            @error="imgError()"
+                        />
+                    </div>
+                    <div>
+                        <p class="pb8">
+                            <strong>{{ patientInfo.Name }}</strong>
+                            <span
+                                >{{ patientInfo.Weight }}kg，{{
+                                    patientInfo.Sex == 0 ? '男' : '女'
+                                }}，{{ patientInfo.Age }}</span
+                            >
+                        </p>
+                        <p class="time" v-show="patientInfo.DiagnoseDate">
+                            首诊：{{
+                                patientInfo.DiagnoseDate | formatDateStr2
+                            }}
+                        </p>
+                        <p class="time" v-show="patientInfo.ReVisitingDate">
+                            计划复诊：{{
+                                patientInfo.ReVisitingDate | formatDateStr2
+                            }}
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <p class="pb8">
-                        <strong>{{ patientInfo.Name }}</strong>
-                        <span
-                            >{{ patientInfo.Weight }}kg，{{
-                                patientInfo.Sex == 0 ? '男' : '女'
-                            }}，{{ patientInfo.Age }}岁</span
-                        >
-                    </p>
-                    <p class="time" v-show="patientInfo.DiagnoseDate">
-                        首诊：{{ patientInfo.DiagnoseDate | formatDateStr2 }}
-                    </p>
-                    <p class="time" v-show="patientInfo.ReVisitingDate">
-                        计划复诊：{{
-                            patientInfo.ReVisitingDate | formatDateStr2
-                        }}
-                    </p>
-                </div>
-            </div>
-            <div class="infoPanel">
-                <div class="item currentPanel" v-show="patientInfo.Weight">
-                    <div class="tip">当前</div>
-                    <div class="flex-between">
-                        <div>
-                            <p class="num">{{ patientInfo.Weight }}</p>
-                            <p>体重（kg）</p>
+                <div class="infoPanel">
+                    <div class="item currentPanel" v-show="patientInfo.Weight">
+                        <div class="tip">当前</div>
+                        <div class="flex-between">
+                            <div>
+                                <p class="num">{{ patientInfo.Weight }}</p>
+                                <p>体重（kg）</p>
+                            </div>
+                            <div>
+                                <p class="num">{{ patientInfo.BMI }}</p>
+                                <p>BMI指标</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="num">{{ patientInfo.BMI }}</p>
-                            <p>BMI指标</p>
+                    </div>
+                    <div class="item" v-show="patientInfo.DiagnoseWeight">
+                        <div class="tip">首诊</div>
+                        <div class="flex-between">
+                            <div>
+                                <p class="num">
+                                    {{ patientInfo.DiagnoseWeight }}
+                                </p>
+                                <p>体重（kg）</p>
+                            </div>
+                            <div>
+                                <p class="num">{{ patientInfo.DiagnoseBMI }}</p>
+                                <p>BMI指标</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="item" v-show="patientInfo.DiagnoseWeight">
-                    <div class="tip">首诊</div>
-                    <div class="flex-between">
-                        <div>
-                            <p class="num">{{ patientInfo.DiagnoseWeight }}</p>
-                            <p>体重（kg）</p>
-                        </div>
-                        <div>
-                            <p class="num">{{ patientInfo.DiagnoseBMI }}</p>
-                            <p>BMI指标</p>
-                        </div>
-                    </div>
-                </div>
             </div>
-        </div>
-        <!-- 患者组 -->
-        <div class="groupPanel" @click="lookPaGroup(patientInfo.PatientGroup)">
-            <div class="L">
-                <div>
-                    <img
-                        class="cell_icon"
-                        src="../assets/group@2x.png"
-                        alt=""
-                    />
-                </div>
-                <div v-if="patientGroup && patientGroup.length == 0">
-                    暂无所属患者组
-                </div>
-                <div v-else class="groupPanelTxt">
-                    <span
-                        v-for="(g, idx) in patientInfo.PatientGroup"
-                        :key="idx"
-                        >{{ g.Name }}</span
-                    >
-                </div>
-            </div>
-            <div><i class="icon cubeic-arrow"></i></div>
-        </div>
-        <!-- 体重柱状图 start-->
-        <div class="weightChart">
-            <div class="infoTit">
-                <div class="rel">
-                    <div class="title b">体重</div>
-                    <div class="bg_img"></div>
-                </div>
-                <div class="c-a f14">单位：kg</div>
-            </div>
-            <div class="px15">
-                <cube-scroll
-                    ref="scroll"
-                    :data="weightData"
-                    direction="horizontal"
-                    class="horizontal-scroll-list-wrap"
-                >
-                    <ul class="list-wrapper weightScroll">
-                        <li
-                            v-for="(item, index) in weightData"
-                            :key="index"
-                            class="list-item"
-                            @click="showTap(index)"
-                        >
-                            <div class="tips" v-show="index == showTipIndex">
-                                <div class="arrow2">
-                                    <i></i>
-                                    <span></span>
-                                </div>
-                                <div class="tipTxt">
-                                    {{ item.CurrentWeight }}
-                                </div>
-                            </div>
-                            <div
-                                class="img"
-                                :style="{ height: item.heightClass + 'px' }"
-                            ></div>
-                            <div class="txt">
-                                {{ item.RecordDate | formatDateStr }}
-                            </div>
-                        </li>
-                    </ul>
-                </cube-scroll>
-                <div class="tagTab">
-                    <ul>
-                        <li
-                            class="item"
-                            v-for="(item, index) in tagTab"
-                            :key="index"
-                            :class="item.id == tagTabId ? 'on' : ''"
-                            @click="tagTabTap(item.id)"
-                        >
-                            {{ item.name }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <!-- 体重柱状图 end-->
-        <div class="navList">
+            <!-- 患者组 -->
             <div
-                v-for="(item, index) in tabs"
-                :key="index"
-                class="weui-navbar__item"
-                :class="activeIndex == index ? 'on' : ''"
-                @click="tabClick(index)"
+                class="groupPanel"
+                @click="lookPaGroup(patientInfo.PatientGroup)"
             >
-                <div class="weui-navbar__title">{{ item }}</div>
-            </div>
-        </div>
-        <!-- 评估表 -->
-        <div v-show="activeIndex == 0" class="listBox">
-            <div class="add" @click="doctorForm">
-                <img src="../assets/icon0@2x.png" alt="" />
-                医生评估表
-            </div>
-            <div v-for="(item, index) in infoList" :key="index">
-                <div v-if="item.TypeCode == 'SFDJ'">
-                    <!-- 随访登记 -->
-                    <div
-                        class="info"
-                        @click="lookInfo('follow', item.FollowUpVisit.ID)"
-                    >
-                        {{ item.RecordDate | formatDateStr }} 随访登记(患者)
+                <div class="L">
+                    <div>
+                        <img
+                            class="cell_icon"
+                            src="../assets/group@2x.png"
+                            alt=""
+                        />
+                    </div>
+                    <div v-if="patientGroup && patientGroup.length == 0">
+                        暂无所属患者组
+                    </div>
+                    <div v-else class="groupPanelTxt">
+                        <span
+                            v-for="(g, idx) in patientInfo.PatientGroup"
+                            :key="idx"
+                            >{{ g.Name }}</span
+                        >
                     </div>
                 </div>
-                <!-- 首诊登记 -->
-                <div v-if="item.TypeCode == 'SZDJ'">
-                    <div
-                        class="info"
-                        @click="lookInfo('first', $route.query.userId)"
-                    >
-                        {{ item.RecordDate | formatDateStr }} 首诊登记(患者)
-                    </div>
-                </div>
+                <div><i class="icon cubeic-arrow"></i></div>
             </div>
-            <!-- 医生评估表 -->
-            <div class="rel dn">
-                <div class="info">
-                    <span>03/20 评估表(医生)</span>
-                    <i class="icon iconfont icon-gengduomore10"></i>
+            <!-- 体重柱状图 start-->
+            <div class="weightChart" v-if="weightData">
+                <div class="infoTit">
+                    <div class="rel">
+                        <div class="title b">体重</div>
+                        <div class="bg_img"></div>
+                    </div>
+                    <div class="c-a f14">单位：kg</div>
                 </div>
-                <div class="editBoxwrap">
-                    <div class="editBox">
-                        <div class="arrow">
-                            <i></i>
-                            <span></span>
-                        </div>
-                        <ul class="w-100">
-                            <li class="editImg">
-                                <img src="../assets/edit1@2x.png" alt="" /> 编辑
+                <div class="px15">
+                    <cube-scroll
+                        ref="scroll"
+                        :data="weightData"
+                        direction="horizontal"
+                        class="horizontal-scroll-list-wrap"
+                    >
+                        <ul class="list-wrapper weightScroll">
+                            <li
+                                v-for="(item, index) in weightData"
+                                :key="index"
+                                class="list-item"
+                                @click="showTap(index)"
+                            >
+                                <div
+                                    class="tips"
+                                    v-show="index == showTipIndex"
+                                >
+                                    <div class="arrow2">
+                                        <i></i>
+                                        <span></span>
+                                    </div>
+                                    <div class="tipTxt">
+                                        {{ item.CurrentWeight }}
+                                    </div>
+                                </div>
+                                <div
+                                    class="img"
+                                    :style="{ height: item.heightClass + 'px' }"
+                                ></div>
+                                <div class="txt">
+                                    {{ item.RecordDate | formatDateStr }}
+                                </div>
                             </li>
-                            <li class="editImg">
-                                <img src="../assets/edit4@2x.png" alt="" /> 删除
+                        </ul>
+                    </cube-scroll>
+                    <div class="tagTab">
+                        <ul>
+                            <li
+                                class="item"
+                                v-for="(item, index) in tagTab"
+                                :key="index"
+                                :class="item.id == tagTabId ? 'on' : ''"
+                                @click="tagTabTap(item.id)"
+                            >
+                                {{ item.name }}
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- 减重方案 -->
-        <div v-show="activeIndex == 1" class="listBox">
-            <div class="add" @click="draftPlan">
-                <img src="../assets/icon0@2x.png" alt="" />
-                制定新的减重方案
+            <!-- 体重柱状图 end-->
+            <div class="navList">
+                <div
+                    v-for="(item, index) in tabs"
+                    :key="index"
+                    class="weui-navbar__item"
+                    :class="activeIndex == index ? 'on' : ''"
+                    @click="tabClick(index)"
+                >
+                    <div class="weui-navbar__title">{{ item }}</div>
+                </div>
             </div>
-            <div
-                class="wrapper2"
-                v-for="(item, index) in planList"
-                :key="index"
-            >
-                <div class="title">
-                    <span class="plan"
-                        >{{ item.RecordDate | formatDateStr }} 减重方案</span
-                    >
-                    <span class="state" v-if="item.WeightLossPlan.State == 6"
-                        >已撤回</span
-                    >
-                    <i
-                        class="icon iconfont icon-gengduomore10"
-                        @click="editBtn(item.WeightLossPlan.ID)"
-                    ></i>
+            <!-- 评估表 -->
+            <div v-show="activeIndex == 0" class="listBox">
+                <div class="add" @click="doctorForm">
+                    <img src="../assets/icon0@2x.png" alt="" />
+                    医生评估表
+                </div>
+                <div v-for="(item, index) in infoList" :key="index">
+                    <div v-if="item.TypeCode == 'SFDJ'">
+                        <!-- 随访登记 -->
+                        <div
+                            class="info"
+                            @click="lookInfo('follow', item.FollowUpVisit.ID)"
+                        >
+                            {{ item.RecordDate | formatDateStr }} 随访登记(患者)
+                        </div>
+                    </div>
+                    <!-- 首诊登记 -->
+                    <div v-if="item.TypeCode == 'SZDJ'">
+                        <div
+                            class="info"
+                            @click="lookInfo('first', $route.query.userId)"
+                        >
+                            {{ item.RecordDate | formatDateStr }} 首诊登记(患者)
+                        </div>
+                    </div>
+                </div>
+                <!-- 医生评估表 -->
+                <div class="rel dn">
+                    <div class="info">
+                        <span>03/20 评估表(医生)</span>
+                        <i class="icon iconfont icon-gengduomore10"></i>
+                    </div>
+                    <div class="editBoxwrap">
+                        <div class="editBox">
+                            <div class="arrow">
+                                <i></i>
+                                <span></span>
+                            </div>
+                            <ul class="w-100">
+                                <li class="editImg">
+                                    <img src="../assets/edit1@2x.png" alt="" />
+                                    编辑
+                                </li>
+                                <li class="editImg">
+                                    <img src="../assets/edit4@2x.png" alt="" />
+                                    删除
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 减重方案 -->
+            <div v-show="activeIndex == 1" class="listBox">
+                <div class="add" @click="draftPlan">
+                    <img src="../assets/icon0@2x.png" alt="" />
+                    制定新的减重方案
                 </div>
                 <div
-                    class="editBoxwrap"
-                    v-show="planId == item.WeightLossPlan.ID"
+                    class="wrapper2"
+                    v-for="(item, index) in planList"
+                    :key="index"
                 >
-                    <div class="editBox">
-                        <div class="arrow">
-                            <i></i>
-                            <span></span>
+                    <div class="title">
+                        <span class="plan"
+                            >{{
+                                item.RecordDate | formatDateStr
+                            }}
+                            减重方案</span
+                        >
+                        <span
+                            class="state"
+                            v-if="item.WeightLossPlan.State == 6"
+                            >已撤回</span
+                        >
+                        <i
+                            class="icon iconfont icon-gengduomore10"
+                            @click="editBtn(item.WeightLossPlan.ID)"
+                        ></i>
+                    </div>
+                    <div
+                        class="editBoxwrap"
+                        v-show="planId == item.WeightLossPlan.ID"
+                    >
+                        <div class="editBox">
+                            <div class="arrow">
+                                <i></i>
+                                <span></span>
+                            </div>
+                            <ul class="w-100">
+                                <li
+                                    class="editImg"
+                                    v-if="item.IsModifiable == true"
+                                    @click="withdrawTap(item.WeightLossPlan.ID)"
+                                >
+                                    <img src="../assets/edit2@2x.png" alt="" />
+                                    撤回
+                                </li>
+                                <li
+                                    class="editImg"
+                                    @click="copyTap(item.WeightLossPlan.ID)"
+                                >
+                                    <img src="../assets/edit3@2x.png" alt="" />
+                                    复制
+                                </li>
+                            </ul>
                         </div>
-                        <ul class="w-100">
-                            <li
-                                class="editImg"
-                                v-if="item.IsModifiable == true"
-                                @click="withdrawTap(item.WeightLossPlan.ID)"
-                            >
-                                <img src="../assets/edit2@2x.png" alt="" /> 撤回
-                            </li>
-                            <li
-                                class="editImg"
-                                @click="copyTap(item.WeightLossPlan.ID)"
-                            >
-                                <img src="../assets/edit3@2x.png" alt="" /> 复制
-                            </li>
-                        </ul>
+                    </div>
+                    <div
+                        class="planTxt"
+                        @click="lookPlan(item.WeightLossPlan.ID)"
+                    >
+                        <template
+                            v-if="item.WeightLossPlan.TypeCode == 'HighProtein'"
+                        >
+                            <img src="../assets/icon0.png" alt="" />
+                        </template>
+                        <template
+                            v-else-if="
+                                item.WeightLossPlan.TypeCode == 'FastDiet'
+                            "
+                        >
+                            <img src="../assets/icon2.png" alt="" />
+                        </template>
+                        <template
+                            v-else-if="
+                                item.WeightLossPlan.TypeCode == 'LimitEnergy'
+                            "
+                        >
+                            <img src="../assets/icon3.png" alt="" />
+                        </template>
+
+                        <div class="">#{{ item.WeightLossPlan.Name }}#</div>
                     </div>
                 </div>
-                <div class="planTxt" @click="lookPlan(item.WeightLossPlan.ID)">
-                    <template
-                        v-if="item.WeightLossPlan.TypeCode == 'HighProtein'"
-                    >
-                        <img src="../assets/icon0.png" alt="" />
-                    </template>
-                    <template
-                        v-else-if="item.WeightLossPlan.TypeCode == 'FastDiet'"
-                    >
-                        <img src="../assets/icon2.png" alt="" />
-                    </template>
-                    <template
-                        v-else-if="
-                            item.WeightLossPlan.TypeCode == 'LimitEnergy'
-                        "
-                    >
-                        <img src="../assets/icon3.png" alt="" />
-                    </template>
 
-                    <div class="">#{{ item.WeightLossPlan.Name }}#</div>
+                <div class="wrapper2 dn">
+                    <div class="title">
+                        <span class="plan">03/22 减重方案</span>
+                        <span class="state">已撤回</span>
+                        <i class="icon iconfont icon-gengduomore10"></i>
+                    </div>
+                    <div class="editBoxwrap">
+                        <div class="editBox">
+                            <div class="arrow">
+                                <i></i>
+                                <span></span>
+                            </div>
+                            <ul class="w-100">
+                                <li class="editImg">
+                                    <img src="../assets/edit2@2x.png" alt="" />
+                                    撤回
+                                </li>
+                                <li class="editImg">
+                                    <img src="../assets/edit3@2x.png" alt="" />
+                                    复制
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="planTxt">
+                        <img src="../assets/icon3.png" alt="" />
+                        <div class="">#限能量方案#</div>
+                    </div>
                 </div>
             </div>
+            <!-- end -->
+        </div>
 
-            <div class="wrapper2 dn">
-                <div class="title">
-                    <span class="plan">03/22 减重方案</span>
-                    <span class="state">已撤回</span>
-                    <i class="icon iconfont icon-gengduomore10"></i>
-                </div>
-                <div class="editBoxwrap">
-                    <div class="editBox">
-                        <div class="arrow">
-                            <i></i>
-                            <span></span>
-                        </div>
-                        <ul class="w-100">
-                            <li class="editImg">
-                                <img src="../assets/edit2@2x.png" alt="" /> 撤回
-                            </li>
-                            <li class="editImg">
-                                <img src="../assets/edit3@2x.png" alt="" /> 复制
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="planTxt">
-                    <img src="../assets/icon3.png" alt="" />
-                    <div class="">#限能量方案#</div>
-                </div>
+        <div class="noPlanWrapper" v-else>
+            <div class="noPlan">
+                <img class="img" src="../assets/empty@2x.png" />
+                <div class="f14 c-6d mt10">您已无权查看该患者信息</div>
             </div>
         </div>
-        <!-- end -->
     </div>
 </template>
 
@@ -307,6 +346,8 @@ export default {
     name: 'patientList',
     data() {
         return {
+            errorImg0: require('@/assets/tx1.png'),
+            errorImg1: require('@/assets/tx2.png'),
             patientInfo: {}, //患者信息
             patientGroup: [], //患者所属组
             formId: '',
@@ -369,10 +410,15 @@ export default {
         this.getWeightLossPlans()
     },
     methods: {
-				//医生评估表
-				doctorForm(){
-					yktoast('努力开发中...')
-				},
+        imgError() {
+            let img = event.srcElement
+            img.src = this.errorImg0
+            img.onerror = null //防止闪图
+        },
+        //医生评估表
+        doctorForm() {
+            yktoast('努力开发中...')
+        },
         //操作按钮
         editBtn(id) {
             if (id == this.planId) {
@@ -447,7 +493,7 @@ export default {
             this.$fetchDelete(url, data, 4109).then(response => {
                 let result = response.data.data //请求返回数据
                 if (!result) {
-                    yktoast(result)
+                    yktoast('已撤回')
                     return
                 }
                 yktoast('撤回成功')
@@ -467,9 +513,10 @@ export default {
                 patientId: this.$route.query.userId
             }
             this.$fetchGet(url, data, 4112).then(response => {
-                let result = response.data.data //请求返回数据
+								let result = response.data.data //请求返回数据
                 if (!result) {
-                    yktoast(result)
+                    yktoast('您已无权查看该患者信息')
+                    _this.patientInfo = null
                     return
                 }
                 _this.patientInfo = result
@@ -1022,5 +1069,24 @@ export default {
             content: '';
         }
     }
+}
+.noPlanWrapper {
+    position: absolute;
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.noPlan {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    width: 138px;
+    height: 127px;
+}
+
+.noPlan .img {
+    width: 128px;
+    height: 100px;
 }
 </style>

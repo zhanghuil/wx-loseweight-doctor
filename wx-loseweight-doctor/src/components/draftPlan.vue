@@ -27,7 +27,7 @@
                 <div class="tc targetBox">
                     <input
                         class="targetInput"
-                        type="text"
+                        type="tel"
                         @input="oninput"
                         v-model="targetNum"
                     />
@@ -132,7 +132,6 @@
                                     </div>
                                 </div>
                                 <div class="itemList">
-                                    2
                                     <div class="df">
                                         <div class="w90">脂肪</div>
                                         <div class="f14 c-3a">
@@ -396,7 +395,9 @@
                                                                     'DecimalValue'
                                                                 )
                                                             "
-                                                            :placeholder="n.Placeholder"
+                                                            :placeholder="
+                                                                n.Placeholder
+                                                            "
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -413,7 +414,9 @@
                                                                     'IntValue'
                                                                 )
                                                             "
-                                                            :placeholder="n.Placeholder"
+                                                            :placeholder="
+                                                                n.Placeholder
+                                                            "
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -435,7 +438,9 @@
                                                                 'StrValue'
                                                             )
                                                         "
-                                                        :placeholder="n.Placeholder"
+                                                        :placeholder="
+                                                            n.Placeholder
+                                                        "
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue
@@ -510,7 +515,9 @@
                                                             :disabled="
                                                                 n.IsFixed
                                                             "
-                                                            :placeholder="n.Placeholder"
+                                                            :placeholder="
+                                                                n.Placeholder
+                                                            "
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -531,7 +538,9 @@
                                                             :disabled="
                                                                 n.IsFixed
                                                             "
-                                                            :placeholder="n.Placeholder"
+                                                            :placeholder="
+                                                                n.Placeholder
+                                                            "
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -555,7 +564,9 @@
                                                             )
                                                         "
                                                         :disabled="n.IsFixed"
-                                                        :placeholder="n.Placeholder"
+                                                        :placeholder="
+                                                            n.Placeholder
+                                                        "
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue
@@ -655,7 +666,7 @@
                                         <div class="pr10">
                                             <template v-if="item.Precision > 0">
                                                 <input
-                                                    type="text"
+                                                    type="tel"
                                                     @input="
                                                         checkNum(
                                                             index,
@@ -672,7 +683,7 @@
                                             </template>
                                             <template v-else>
                                                 <input
-                                                    type="text"
+                                                    type="tel"
                                                     @input="
                                                         checkNum(
                                                             index,
@@ -729,7 +740,7 @@
                                         <div class="pr10">
                                             <template v-if="item.Precision > 0">
                                                 <input
-                                                    type="text"
+                                                    type="tel"
                                                     @input="
                                                         checkNum(
                                                             index,
@@ -746,7 +757,7 @@
                                             </template>
                                             <template v-else>
                                                 <input
-                                                    type="text"
+                                                    type="tel"
                                                     @input="
                                                         checkNum(
                                                             index,
@@ -1003,7 +1014,7 @@ export default {
         }
     },
     created() {
-			console.log(this.$router)
+        console.log(this.$router)
         let AccountId = storage.getItem('AccountId')
         this.doctorId = AccountId
         if (this.pageIndex == 1) document.title = '制定减重方案'
@@ -1023,9 +1034,27 @@ export default {
             this.activeVal = data.activeVal
             this.LBW = data.LBW
         }*/
-        //渲染填写过的方案信息 end
+				//渲染填写过的方案信息 end
+				// this.outputSize()
     },
     methods: {
+        outputSize: function() {
+            var result1 = window.matchMedia('(min-width:1200px)')
+            var result2 = window.matchMedia('(min-width:992px)')
+            var result3 = window.matchMedia('(min-width:768px)')
+            console.log(window.innerWidth);
+            console.log(result3.matches);
+            if (result1.matches) {
+                console.log('>=1200 大型设备 大台式电脑')
+            } else if (result2.matches) {
+                console.log('992=< <=1200 中型设备 台式电脑')
+            } else if (result3.matches) {
+								console.log('768<= <=992 小型设备 平板电脑')
+								this.drawerHeight = '300px'
+            } else {
+                console.log('<=768 超小设备 手机')
+            }
+        },
         // goBack() {
         //     console.log('点击了浏览器的返回按钮')
         //     //设置方案页面缓存 todo
@@ -1052,7 +1081,7 @@ export default {
             let planId = this.$route.query.planId
             if (planId) {
                 this.planId = planId
-                this.getPatientWeightLossPlan()
+                this.CopyWeightLossPlan()
             } else {
                 //饮食方案
                 this.GetPatientEmptyWeightLossPlan() //获取空模板
@@ -1387,7 +1416,7 @@ export default {
         },
         //计算供给量
         filtersPlanSupply(result) {
-            // Number(math.format(a*b,14)).toFixed(1)
+            // Math.round(math.format(a*b,14)* 10) / 10
             const precision = 14 //num表示精度，最大为14，表示单一文本框最大的数字位数，包括小数点前后
             if (
                 this.activeVal == 'HighProtein' ||
@@ -1396,39 +1425,44 @@ export default {
                 //高蛋白 轻断食
                 if (this.LBW > 0) {
                     //有瘦体重
-                    let BMR = Number(
-                        math.format(370 + 21.6 * this.LBW, precision)
-                    ).toFixed(1)
-                    this.planSupply.energy = Number(
-                        math.format(BMR * 1.2 - 500, precision)
-                    ).toFixed(1)
-                    this.planSupply.protein = Number(
-                        math.format(this.LBW * 2.2, precision)
-                    ).toFixed(1)
+                    let BMR =
+                        Math.round(
+                            math.format(370 + 21.6 * this.LBW, precision) * 10
+                        ) / 10
+                    this.planSupply.energy =
+                        Math.round(
+                            math.format(BMR * 1.2 - 500, precision) * 10
+                        ) / 10
+                    this.planSupply.protein =
+                        Math.round(
+                            math.format(this.LBW * 2.2, precision) * 10
+                        ) / 10
                     let energy = this.planSupply.energy
-                    this.planSupply.fat = Number(
-                        math.format(energy * 0.3, precision)
-                    ).toFixed(1)
-                    this.planSupply.CHO = Number(
-                        math.format(energy * 0.4, precision)
-                    ).toFixed(1)
+                    this.planSupply.fat =
+                        Math.round(math.format(energy * 0.3, precision) * 10) /
+                        10
+                    this.planSupply.CHO =
+                        Math.round(math.format(energy * 0.4, precision) * 10) /
+                        10
                 } else {
                     //无瘦体重
-                    let _basicW = Number(
-                        math.format(result.Height - 105, precision)
-                    ).toFixed(1) //标准体重
-                    this.planSupply.energy = Number(
-                        math.format(_basicW * 20, precision)
-                    ).toFixed(1)
-                    this.planSupply.protein = Number(
-                        math.format(_basicW * 0.3, precision)
-                    ).toFixed(1)
-                    this.planSupply.fat = Number(
-                        math.format(_basicW * 0.3, precision)
-                    ).toFixed(1)
-                    this.planSupply.CHO = Number(
-                        math.format(_basicW * 0.4, precision)
-                    ).toFixed(1)
+                    let _basicW =
+                        Math.round(
+                            math.format(result.Height - 105, precision) * 10
+                        ) / 10 //标准体重
+                    this.planSupply.energy =
+                        Math.round(math.format(_basicW * 20, precision) * 10) /
+                        10
+                    let enery = this.planSupply.energy
+                    this.planSupply.protein =
+                        Math.round(math.format(enery * 0.3, precision) * 10) /
+                        10
+                    this.planSupply.fat =
+                        Math.round(math.format(enery * 0.3, precision) * 10) /
+                        10
+                    this.planSupply.CHO =
+                        Math.round(math.format(enery * 0.4, precision) * 10) /
+                        10
                 }
 
                 /**
@@ -1447,39 +1481,43 @@ export default {
                 //限能量
                 if (this.LBW > 0) {
                     //有瘦体重
-                    let BMR = Number(
-                        math.format(370 + 21.6 * this.LBW, precision)
-                    ).toFixed(1)
-                    this.planSupply.energy = Number(
-                        math.format(BMR * 1.2 - 500, precision)
-                    ).toFixed(1)
+                    let BMR =
+                        Math.round(
+                            math.format(370 + 21.6 * this.LBW, precision) * 10
+                        ) / 10
+                    this.planSupply.energy =
+                        Math.round(
+                            math.format(BMR * 1.2 - 500, precision) * 10
+                        ) / 10
                     let enery = this.planSupply.energy
-                    this.planSupply.protein = Number(
-                        math.format(enery * 0.2, precision)
-                    ).toFixed(1)
-                    this.planSupply.fat = Number(
-                        math.format(enery * 0.2, precision)
-                    ).toFixed(1)
-                    this.planSupply.CHO = Number(
-                        math.format(enery * 0.6, precision)
-                    ).toFixed(1)
+                    this.planSupply.protein =
+                        Math.round(math.format(enery * 0.2, precision) * 10) /
+                        10
+                    this.planSupply.fat =
+                        Math.round(math.format(enery * 0.2, precision) * 10) /
+                        10
+                    this.planSupply.CHO =
+                        Math.round(math.format(enery * 0.6, precision) * 10) /
+                        10
                 } else {
                     //无瘦体重
-                    let _basicW = Number(
-                        math.format(result.Height - 105, precision)
-                    ).toFixed(1) //标准体重
-                    this.planSupply.energy = Number(
-                        math.format(_basicW * 20, precision)
-                    ).toFixed(1)
-                    this.planSupply.protein = Number(
-                        math.format(_basicW * 0.2, precision)
-                    ).toFixed(1)
-                    this.planSupply.fat = Number(
-                        math.format(_basicW * 0.2, precision)
-                    ).toFixed(1)
-                    this.planSupply.CHO = Number(
-                        math.format(_basicW * 0.6, precision)
-                    ).toFixed(1)
+                    let _basicW =
+                        Math.round(
+                            math.format(result.Height - 105, precision) * 10
+                        ) / 10 //标准体重
+                    this.planSupply.energy =
+                        Math.round(math.format(_basicW * 20, precision) * 10) /
+                        10
+                    let enery = this.planSupply.energy
+                    this.planSupply.protein =
+                        Math.round(math.format(enery * 0.2, precision) * 10) /
+                        10
+                    this.planSupply.fat =
+                        Math.round(math.format(enery * 0.2, precision) * 10) /
+                        10
+                    this.planSupply.CHO =
+                        Math.round(math.format(enery * 0.6, precision) * 10) /
+                        10
                 }
             }
         },
@@ -1496,7 +1534,7 @@ export default {
                 this.datePicker = this.$createDatePicker({
                     title: '选择方案时间',
                     // min: new Date(2008, 7, 8),
-                    // max: new Date(2020, 9, 20),
+                    max: new Date(),
                     value: new Date(),
                     onSelect: this.selectHandle,
                     onCancel: this.cancelHandle
@@ -1509,18 +1547,18 @@ export default {
         },
         //复诊时间
         showDateFollow() {
-					// debugger
-            if (!this.datePicker) {
-                this.datePicker = this.$createDatePicker({
+            // debugger
+            if (!this.datePickerFollow) {
+                this.datePickerFollow = this.$createDatePicker({
                     title: '选择复诊时间',
-                    min: new Date(2008, 7, 8),
-                    max: new Date(2020, 9, 20),
+                    // min: new Date(2008, 7, 8),
+                    // max: new Date(2020, 9, 20),
                     value: new Date(),
                     onSelect: this.selectHandleF,
                     onCancel: this.cancelHandleF
                 })
             }
-            this.datePicker.show()
+            this.datePickerFollow.show()
         },
         selectHandleF(date, selectedVal, selectedText) {
             this.followDate = selectedText.join('-')
@@ -1792,9 +1830,9 @@ export default {
             }
         },
         //获取减重方案-编辑复制
-        getPatientWeightLossPlan() {
+        CopyWeightLossPlan() {
             var _this = this
-            let url = this.api.userApi.GetPatientWeightLossPlan
+            let url = this.api.userApi.CopyWeightLossPlan
             let data = {
                 planId: this.$route.query.planId
             }
@@ -1846,13 +1884,13 @@ export default {
                         new Date(WeightLossPlan.ReVisitingDate),
                         'yyyy-MM-dd'
                     )
-								}
-								_this.IsReVisiting = WeightLossPlan.IsReVisiting
+                }
+                _this.IsReVisiting = WeightLossPlan.IsReVisiting
                 //随访计划
                 _this.followSelectArr = _this.followOptions.filter(
                     n => n.value == WeightLossPlan.FollowUpVisitPlan
-								)
-								_this.FollowUpVisitPlan = WeightLossPlan.FollowUpVisitPlan
+                )
+                _this.FollowUpVisitPlan = WeightLossPlan.FollowUpVisitPlan
             })
         },
         //获取空白减重方案
@@ -1927,7 +1965,7 @@ export default {
                 EkadeshDietAnswerInfoStr: this.EkadeshDietAnswerInfoStr, //断食日饮食问卷答案字符
                 SportsAnswerInfoStr: this.SportsAnswerInfoStr //运动问卷答案字符
             }
-						
+
             this.$fetchPost(url, data, 4108).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result) {

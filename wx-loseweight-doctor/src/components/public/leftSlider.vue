@@ -154,16 +154,16 @@ export default {
         top: 0;
         color: #fff;
         text-align: center;
-        font-size: 0.16rem;
+        font-size: 16px;
         img {
-            width: 0.28rem;
-            height: 0.28rem;
+            width: 28px;
+            height: 28px;
         }
         span {
             display: block;
-            margin-top: 0.08rem;
+            // margin-top: 0.08rem;
             color: #999;
-            font-size: 0.14rem;
+            font-size: 12px;
         }
     }
 }

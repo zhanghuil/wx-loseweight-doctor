@@ -123,7 +123,7 @@ export default {
             this.$fetchDelete(url, data, 4125).then(response => {
                 let result = response.data.data //请求返回数据
                 if (!result) {
-                    yktoast(result)
+                    yktoast('患者组已删除')
                     return
                 }
                 this.$createToast({

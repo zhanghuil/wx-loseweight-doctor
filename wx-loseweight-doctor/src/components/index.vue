@@ -344,8 +344,10 @@ export default {
                     yktoast(result)
                     return
                 }
-                yktoast('删除成功')
-                _this.getJZMZPatients()
+								yktoast('删除成功')
+								//removeByid
+								_this.patientsList.splice(_this.patientsList.findIndex(item => item.PatientID === id), 1)
+                // _this.getJZMZPatients(1)
             })
         },
         //筛选重置操作
