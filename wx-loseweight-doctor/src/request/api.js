@@ -40,6 +40,7 @@ const userApi = {
 	GetPatientWeightLossPlanTypes: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTypes', //获取减重方案模板分类列表
 	GetPatientWeightLossPlanTemplates: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTemplates',  //获取减重方案模板列表 
 	GetPatientWeightLossPlanTemplate: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTemplate',  //获取减重方案模板详情
+	GetPatientEmptyWeightLossPlanTemplate: webApi + '/api/System/WeightLossPlanTemplate/GetPatientEmptyWeightLossPlanTemplate',  //获取空白减重方案模板
 	SaveWeightLossPlanTemplate: webApi + '/api/System/WeightLossPlanTemplate/SaveWeightLossPlanTemplate',  //保存减重方案模板
 	DeleteTemplate: webApi + '/api/System/WeightLossPlanTemplate/DeleteTemplate',  //删除减重方案模板
 }

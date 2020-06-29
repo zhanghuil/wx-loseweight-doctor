@@ -119,6 +119,29 @@ export default new Router({
 			}
 		},
 		{
+			path: '/templateMag',
+			name: 'templateMag',
+			component: resolve => require(['@/components/templateMag'], resolve),
+			meta: {
+				title: '模板管理',
+				requiresAuth: true  // 添加表示需要验证
+			}
+		},
+		{
+			path: '/templateList',
+			name: 'templateList',
+			component: resolve => require(['@/components/templateList'], resolve),
+			meta: {
+				title: '',
+				requiresAuth: true  // 添加表示需要验证
+			}
+		},
+		{
+			path: '/editTemplate',
+			name: 'editTemplate',
+			component: resolve => require(['@/components/editTemplate'], resolve)
+		},
+		{
 			path: '/editGroup',
 			name: 'editGroup',
 			component: resolve => require(['@/components/editGroup'], resolve)

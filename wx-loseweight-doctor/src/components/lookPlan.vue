@@ -422,7 +422,10 @@
             </div>
             <div class="wrapper p15" v-show="WeightLossPlan.SportsAdvice">
                 <div class="f16 c-3a b">运动建议</div>
-                <div class="c-6d f14 mt15 lh21" v-html="WeightLossPlan.SportsAdvice"></div>
+                <div
+                    class="c-6d f14 mt15 lh21"
+                    v-html="WeightLossPlan.SportsAdvice"
+                ></div>
             </div>
 
             <div class="wrapper p15" v-if="WeightLossPlan.IsReVisiting">
@@ -455,7 +458,7 @@
 </template>
 
 <script>
-import { yktoast } from '../common/js/util'
+import { yktoast, extractQueryParams } from '../common/js/util'
 import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
 export default {
@@ -488,6 +491,12 @@ export default {
         }
     },
     created() {
+        let queryParams = extractQueryParams(window.location.href)
+        let token = queryParams.token
+        if (token) {
+            console.log(`携带token值：${token}`)
+            storage.setItem('Token', token)
+        }
         this.getPatientWeightLossPlan()
         this.getDoctorInfoNew()
     },
@@ -545,7 +554,7 @@ export default {
             this.$fetchPost(url, data, 150).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.status == 0) {
-                    console.log(result.data)
+                    // console.log(result.data)
                     _this.doctorInfo = result.data
                 } else {
                     yktoast(result)

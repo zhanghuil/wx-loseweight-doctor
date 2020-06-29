@@ -288,6 +288,7 @@
                                                             'DecimalValue'
                                                         )
                                                     "
+																										type="tel"
                                                     :placeholder="n.Placeholder"
                                                     v-model="
                                                         n.QuestionAnswerInfo
@@ -304,6 +305,7 @@
                                                             'IntValue'
                                                         )
                                                     "
+																										type="tel"
                                                     :placeholder="n.Placeholder"
                                                     v-model="
                                                         n.QuestionAnswerInfo
@@ -324,6 +326,7 @@
                                                     )
                                                 "
                                                 :placeholder="n.Placeholder"
+																								type="tel"
                                                 v-model="
                                                     n.QuestionAnswerInfo
                                                         .StrValue
@@ -398,6 +401,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
+																														type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -417,6 +421,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
+																														type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -441,6 +446,7 @@
                                                         :placeholder="
                                                             n.Placeholder
                                                         "
+																												type="tel"
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue
@@ -518,6 +524,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
+																														type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -541,6 +548,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
+																														type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -567,6 +575,7 @@
                                                         :placeholder="
                                                             n.Placeholder
                                                         "
+																												type="tel"
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue

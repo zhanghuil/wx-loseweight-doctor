@@ -59,7 +59,7 @@ export default {
             this.$fetchGet(url, data, 4122).then(response => {
                 let result = response.data.data //请求返回数据
                 if (!result) {
-                    yktoast(result)
+                    yktoast('患者组已删除')
                     return
                 }
                 _this.name = result.Name
@@ -105,8 +105,8 @@ export default {
                 response => {
                     let result = response.data.data //请求返回数据
                     if (!result) {
-                        yktoast(result)
-                        return
+                        yktoast('患者组已删除')
+                    		return
 										}
 										yktoast('修改成功')
                     _this.$router.go(-1)

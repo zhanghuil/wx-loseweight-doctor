@@ -207,6 +207,8 @@
 </template>
 
 <script>
+import { yktoast, extractQueryParams } from '../common/js/util'
+import storage from '../common/js/storage'
 export default {
     name: 'lookInfo',
     data() {
@@ -238,6 +240,13 @@ export default {
         }
     },
     created() {
+        let queryParams = extractQueryParams(window.location.href)
+        let token = queryParams.token
+        if (token) {
+            console.log(`携带token值：${token}`)
+            storage.setItem('Token', token)
+        }
+
         let type = this.$route.query.type
         if (type == 'follow') {
             document.title = '随访信息'

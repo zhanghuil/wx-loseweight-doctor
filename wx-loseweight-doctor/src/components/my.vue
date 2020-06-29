@@ -64,19 +64,21 @@
                         <div><i class="icon cubeic-arrow"></i></div>
                     </li>
                 </router-link>
-                <!-- <li>
-                    <div class="L">
-                        <div>
-                            <img
-                                class="cell_icon"
-                                src="../assets/personal_5@2x.png"
-                                alt=""
-                            />
+                <router-link to="/templateMag">
+                    <li>
+                        <div class="L">
+                            <div>
+                                <img
+                                    class="cell_icon"
+                                    src="../assets/personal_5@2x.png"
+                                    alt=""
+                                />
+                            </div>
+                            <div>减重方案模板管理</div>
                         </div>
-                        <div>减重方案模板管理</div>
-                    </div>
-                    <div><i class="icon cubeic-arrow"></i></div>
-                </li> -->
+                        <div><i class="icon cubeic-arrow"></i></div>
+                    </li>
+                </router-link>
             </ul>
         </div>
         <div class="exitBox" @click="exitTap">退出</div>

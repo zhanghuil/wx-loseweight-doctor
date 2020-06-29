@@ -492,11 +492,11 @@ export default {
             }
             this.$fetchDelete(url, data, 4109).then(response => {
                 let result = response.data.data //请求返回数据
-                if (!result) {
-                    yktoast('已撤回')
+                if (result.State != 0) {
+                    yktoast(result.Msg)
                     return
                 }
-                yktoast('撤回成功')
+                yktoast(result.Msg)
                 _this.planId = ''
                 _this.getWeightLossPlans()
             })

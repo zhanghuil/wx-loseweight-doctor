@@ -200,7 +200,7 @@ export default {
                     name: '全部患者'
                 }
             ],
-            queryType: 0, //查询类型 0 全部 1今日患者 2明日患者
+            queryType: 1, //查询类型 0 全部 1今日患者 2明日患者
             display: false, //筛选弹窗
             drawerWidth: '280px',
             drawerHeight: '100%',

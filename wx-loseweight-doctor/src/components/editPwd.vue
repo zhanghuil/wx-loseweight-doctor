@@ -69,7 +69,11 @@ export default {
     computed: {
         //按钮
         isLogin() {
-            return !!this.loginModel.password && !!this.loginModel.newPasswoed
+						return !!this.loginModel.password && !!this.loginModel.newPasswoed
+						// return( 
+						// 	this.loginModel.password.length >= 6 &&
+            //   this.loginModel.newPasswoed.length >= 6
+						// )
         },
         disabled() {
             return (
@@ -80,6 +84,10 @@ export default {
     },
     methods: {
         loginSubmit() {
+					  if (this.loginModel.password.length < 6 || this.loginModel.newPasswoed.length < 6) {
+                yktoast('密码至少6位')
+                return
+            }
             if (this.loginModel.password == this.loginModel.newPasswoed) {
                 yktoast('密码不能相同')
                 return
