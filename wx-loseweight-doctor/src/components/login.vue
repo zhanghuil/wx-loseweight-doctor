@@ -100,9 +100,9 @@
                             @click="showPass = !showPass"
                         ></i>
                     </div>
-                    <div class="forgetPwd" @click="forgetPwdTap">
+                    <div class="forgetPwd">
                         <i class="iconfont icon-icon12 icon"></i>
-                        <span>忘记密码</span>
+                        <span @click="forgetPwdTap">忘记密码</span>
                     </div>
                 </div>
                 <button
@@ -198,7 +198,7 @@ export default {
         codeFn() {
             var _this = this
             //校验手机号格式
-            if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(this.loginModel.phone)) {
+            if (!/^[1][3,4,5,6,7,8,9][0-9]{9}$/.test(this.loginModel.phone)) {
                 yktoast('手机号格式不正确')
                 return
             }

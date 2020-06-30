@@ -155,5 +155,14 @@ export default new Router({
 				requiresAuth: true  // 添加表示需要验证
 			}
 		},
+		{
+			path: '/doctorEvalForm',
+			name: 'doctorEvalForm',
+			component: resolve => require(['@/components/doctorEvalForm'], resolve),
+			meta: {
+				title: '医生评估表',
+				requiresAuth: true  // 添加表示需要验证
+			}
+		},
 	]
 })

@@ -34,15 +34,22 @@ export function yktoast(txt) {
 
 /**
  * API接口参数加密
- * @example authCode内容为：接口编号+当前日期
+ * @example authCode内容为： md5加密转大写
  * @return 64196cb63ebf712f750ede4c0584222d
  */
 export function encryption(number, currentDate) {
-	let authCode = ''
-	var str = [currentDate, number].map(authCodeStr).join('+');
-	authCode = md5(str)
-	// console.log(str)
-	return authCode
+	// let authCode = ''
+	// var str = [currentDate, number].map(authCodeStr).join('+');
+	// authCode = md5(str)
+	// // console.log(str)
+	// return authCode
+	//当前时间戳
+	var SecretObj = {
+		interfaceNum: number, //接口编号
+		timestamp: currentDate
+	}
+	// console.log('加密串：'+JSON.stringify(SecretObj))
+	return md5(JSON.stringify(SecretObj)).toUpperCase()
 }
 
 function authCodeStr(n) {

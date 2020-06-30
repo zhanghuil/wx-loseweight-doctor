@@ -731,7 +731,7 @@ export default {
             this.$fetchPost(url, data, 150).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.status == 0) {
-                    console.log(result.data)
+                    // console.log(result.data)
                     _this.doctorInfo = result.data
                 } else {
                     yktoast(result)

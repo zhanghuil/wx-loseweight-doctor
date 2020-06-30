@@ -51,7 +51,7 @@ export default {
     methods: {
         imgError() {
             let img = event.srcElement
-            if (doctorInfo.Sex == 0) img.src = this.errorImg0
+            if (this.doctorInfo.Sex == 0) img.src = this.errorImg0
             else img.src = this.errorImg1
             img.onerror = null //防止闪图
         },

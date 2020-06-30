@@ -68,8 +68,6 @@ axios.interceptors.response.use(
 )
 
 //返回一个Promise(发送post请求)
-console.log(storage.getItem('Token'))
-var tokenValue = storage.getItem('Token') || ''
 var timestamp = Date.parse(new Date())
 timestamp = (timestamp / 1000).toString()
 
@@ -79,6 +77,7 @@ export function fetchPost(url, params, authCode) {
 		txt: 'Loading...',
 		mask: true
 	})
+	const tokenValue = storage.getItem('Token') || ''
 	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.post(url, params, {
@@ -108,6 +107,7 @@ export function fetchPut(url, params, authCode) {
 		txt: 'Loading...',
 		mask: true
 	})
+	const tokenValue = storage.getItem('Token') || ''
 	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.put(url, params, {
@@ -137,6 +137,7 @@ export function fetchGet(url, param, authCode) {
 		txt: 'Loading...',
 		mask: true
 	})
+	const tokenValue = storage.getItem('Token') || ''
 	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.get(url, {
@@ -167,6 +168,7 @@ export function fetchDelete(url, param, authCode) {
 		txt: 'Loading...',
 		mask: true
 	})
+	const tokenValue = storage.getItem('Token') || ''
 	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.delete(url, {

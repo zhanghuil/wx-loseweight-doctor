@@ -1,6 +1,6 @@
 <template>
     <div class="p15 pb70">
-        <div class="groupList">
+        <div class="groupList" v-if="list && list.length > 0">
             <!-- 组 -->
             <div
                 v-for="(item, index) in list"
@@ -10,6 +10,12 @@
             >
                 <span class="f16 c-3a">{{ item.GroupName }}</span>
                 <span class="f14 c-6d">（{{ item.PatientCount }}）</span>
+            </div>
+        </div>
+        <div class="noPlanWrapper" v-else>
+            <div class="noPlan">
+                <img class="img" src="../assets/empty@2x.png" />
+                <div class="f14 c-6d mt10">暂无相关患者组</div>
             </div>
         </div>
         <div class="footerEdit">
@@ -61,4 +67,25 @@ export default {
 </script>
 
 <style lang="less">
+.noPlanWrapper {
+    // position: absolute;
+    display: table;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    margin-top: 50%;
+}
+
+.noPlan {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    width: 138px;
+    height: 127px;
+}
+
+.noPlan .img {
+    width: 128px;
+    height: 100px;
+}
 </style>

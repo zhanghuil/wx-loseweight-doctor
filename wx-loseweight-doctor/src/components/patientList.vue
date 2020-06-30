@@ -418,6 +418,9 @@ export default {
         //医生评估表
         doctorForm() {
             yktoast('努力开发中...')
+            // this.$router.push({
+            //     path: '/doctorEvalForm'
+            // })
         },
         //操作按钮
         editBtn(id) {
@@ -513,7 +516,7 @@ export default {
                 patientId: this.$route.query.userId
             }
             this.$fetchGet(url, data, 4112).then(response => {
-								let result = response.data.data //请求返回数据
+                let result = response.data.data //请求返回数据
                 if (!result) {
                     yktoast('您已无权查看该患者信息')
                     _this.patientInfo = null
