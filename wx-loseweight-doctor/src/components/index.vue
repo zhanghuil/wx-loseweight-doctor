@@ -134,12 +134,12 @@
         </drawer>
         <!-- 筛选end -->
         <!-- 搜索 -->
-        <search
+        <!-- <search
             ref="search"
             :patientsListSearch="patientsListSearch"
             @searchVal="childSearchVal"
             @cancelBtn="cancelSearchTap"
-        ></search>
+        ></search> -->
     </div>
 </template>
 
@@ -159,8 +159,8 @@ export default {
     components: { drawer, Options, leftSlider, paItem, search },
     data() {
         return {
-            errorImg0: require('@/assets/tx1.png'),
-            errorImg1: require('@/assets/tx2.png'),
+            errorImg0: require('@/assets/p1.png'),
+            errorImg1: require('@/assets/p2.png'),
             patientsList: [], //患者列表
             patientsListSearch: [], //搜索患者列表
             accountId: '', //默认登录医生id
@@ -224,6 +224,11 @@ export default {
         }
     },
     created() {
+        let _queryType = storage.getItem('queryType')
+        console.log(`获取缓存查询类型：${_queryType}`)
+        if (_queryType) {
+            this.queryType = _queryType
+        }
         if (!storage.getItem('Token') || !storage.getItem('AccountId')) {
             this.$router.replace({
                 path: '/login'
@@ -344,9 +349,12 @@ export default {
                     yktoast(result)
                     return
                 }
-								yktoast('删除成功')
-								//removeByid
-								_this.patientsList.splice(_this.patientsList.findIndex(item => item.PatientID === id), 1)
+                yktoast('删除成功')
+                //removeByid
+                _this.patientsList.splice(
+                    _this.patientsList.findIndex(item => item.PatientID === id),
+                    1
+                )
                 // _this.getJZMZPatients(1)
             })
         },
@@ -368,6 +376,7 @@ export default {
         },
         //筛选确定操作
         confirmTap() {
+            // debugger
             //如果是科室负责人  医生选项不能为空
             if (this.doctorList) {
                 if (!this.doctorId) {
@@ -376,9 +385,13 @@ export default {
                 }
             }
             this.$refs.drawerFilter.closeByButton()
-            this.getJZMZPatients(1)
-            //缓存筛选器中的选中值
+            let selMap = this.selectDoctorGroup.map(item => item.GroupID)
+            this.doctorId = selMap.join(',')
+            //缓存筛选器中的选中值 selectDoctorGroup
+            // return
             storage.setObjItem('filterResultsGroup', this.currfilterInfo())
+            console.log(this.currfilterInfo())
+            this.getJZMZPatients(1)
         },
         imgError() {
             let img = event.srcElement
@@ -450,8 +463,9 @@ export default {
                 // 获取筛选器的缓存信息
                 let filterInfo = storage.getObjItem('filterResultsGroup')
                 if (filterInfo) {
-                    //给筛选器赋值  todo  有问题
+                    //给筛选器赋值
                     let checkedValArray = filterInfo.doctorId.split(',')
+                    _this.selectDoctorGroup = []
                     checkedValArray.forEach(n => {
                         let group = newDoctorList.find(e => e.GroupID == n)
                         if (
@@ -462,32 +476,41 @@ export default {
                         )
                             _this.selectDoctorGroup.push(group)
                     })
+                    // debugger
                 }
                 //end
             })
         },
         //获取减重患者病人
         getJZMZPatients(pageIndex) {
+            // debugger
             var _this = this
             if (pageIndex && pageIndex == 1) {
                 _this.patientsList = []
                 _this.totalPage = 0
             }
-
+            let filterInfo = storage.getObjItem('filterResultsGroup')
+            let DoctorId = filterInfo.doctorId
+                ? filterInfo.doctorId
+                : this.doctorId
             let url = this.api.userApi.GetJZMZPatients
             let data = {
                 PageIndex: this.page,
                 PageSize: 10,
                 Keyword: this.searchValue, //搜索关键词
-                DoctorId: this.doctorId,
+                DoctorId: DoctorId,
                 UpdateTimeDay: this.timeIndex, //更新时间天数 7,15,30
                 GroupId: this.checkedVal, // 分组
                 QueryType: this.queryType //查询类型 0 全部 1今日患者 2明日患者
-            }
+						}
+					
+						if (_this.page == 1) {
+								_this.patientsList = []
+						} 
             this.$fetchPost(url, data, 4111).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.Data) {
-                    _this.patientsList = _this.patientsList.concat(result.Data)
+										_this.patientsList = _this.patientsList.concat(result.Data)
                     // debugger
                     _this.totalPage = result.Page.TotalPage
                     _this.TotalCount = result.Page.TotalCount
@@ -525,14 +548,16 @@ export default {
         //切换头部患者列表tab项
         tabClick(id) {
             this.queryType = id
-            // this.page = 1
+            this.page = 1
             this.getJZMZPatients()
         },
         // 更新时间
         tabTimeClick(id) {
             this.timeIndex = id
         },
+        // 查看患者详情
         lookDetails(val) {
+            storage.setItem('queryType', this.queryType)
             this.$router.push({
                 path: '/patientList',
                 query: { userId: val.id, userName: val.name }
@@ -553,17 +578,18 @@ export default {
         },
         //医生
         childByValueDoc(childValue) {
-            debugger
+            // debugger
             // childValue就是子组件传过来的值
             console.log(childValue)
             let selMap = childValue.map(item => item.GroupID)
             this.doctorId = selMap.join(',')
         },
         searchTap() {
-            this.$refs.search.show()
-            // this.$router.push({
-            //     path: '/search'
-            // })
+            // this.$refs.search.show()
+            this.$router.push({
+                path: '/searchList',
+                query: { type: this.queryType, doctorId: this.doctorId }
+            })
         },
         //搜索框值
         childSearchVal(childValue) {

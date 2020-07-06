@@ -136,7 +136,8 @@ export default {
             yktoast('退出成功')
             storage.removeItem('filterResultsGroup')
             storage.removeItem('Token')
-            storage.removeItem('AccountId')
+						storage.removeItem('AccountId')
+						storage.removeItem('queryType')
             this.$router.replace({
                 path: '/login'
             })

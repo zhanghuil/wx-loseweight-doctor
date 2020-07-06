@@ -5,7 +5,15 @@
         @click="lookDetails(item.PatientID, item.Name)"
     >
         <div>
-            <img class="txImg" :src="item.AvatarUrl" @error="imgError()" />
+            <img v-if="item.AvatarUrl" class="txImg" :src="item.AvatarUrl" @error="imgError()" />
+						<template v-else>
+							<template v-if="item.Sex == 0">
+								<img class="txImg" src="../../assets/p1.png"/>
+							</template>
+							<template v-else>
+								<img class="txImg" src="../../assets/p2.png"/>
+							</template>
+						</template>		
         </div>
         <div>
             <p>
@@ -32,8 +40,8 @@ export default {
     },
     data() {
         return {
-            errorImg0: require('@/assets/tx1.png'),
-            errorImg1: require('@/assets/tx2.png')
+            errorImg0: require('@/assets/p1.png'),
+            errorImg1: require('@/assets/p2.png')
         }
     },
     filters: {

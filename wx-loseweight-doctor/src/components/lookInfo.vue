@@ -357,7 +357,11 @@ export default {
     color: #6d6d6d;
     padding-top: 15px;
     word-break: break-all;
-    word-wrap: break-word;
+		word-wrap: break-word;
+		span{
+			font-size: 14px;
+			line-height: 24px;
+		}
 }
 .weui-navbar {
     z-index: 100;

@@ -37,6 +37,7 @@ export default {
     methods: {
         //设置患者的分组
         setGroup() {
+						if(!this.selGroupId) return
             var _this = this
             let url = this.api.userApi.SetJZMZPatientGroup
             let patientId = this.$route.query.userId
@@ -63,7 +64,7 @@ export default {
             var _this = this
             let url = this.api.userApi.GetPatientGroups
             let data = {
-                doctorId: AccountId
+                doctorId: this.$route.query.doctorId
             }
             this.$fetchGet(url, data, 4121).then(response => {
                 let result = response.data.data //请求返回数据

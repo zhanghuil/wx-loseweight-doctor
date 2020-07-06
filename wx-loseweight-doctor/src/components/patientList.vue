@@ -101,10 +101,11 @@
                     <cube-scroll
                         ref="scroll"
                         :data="weightData"
+												:options="options"
                         direction="horizontal"
                         class="horizontal-scroll-list-wrap"
                     >
-                        <ul class="list-wrapper weightScroll">
+                        <ul class="list-wrapper weightScroll" id="weightScroll">
                             <li
                                 v-for="(item, index) in weightData"
                                 :key="index"
@@ -350,11 +351,14 @@ export default {
             errorImg1: require('@/assets/tx2.png'),
             patientInfo: {}, //患者信息
             patientGroup: [], //患者所属组
+            patientGroupDoctorID: '',
             formId: '',
             empty: true,
             tabs: ['评估表', '减重方案'],
             activeIndex: 0,
-
+						startX: 0,
+						scrollToTime: 700,
+      			scrollToEasing: 'bounce',
             tagTab: [
                 {
                     name: '日',
@@ -400,7 +404,13 @@ export default {
         if (typeIndex) {
             this.activeIndex = typeIndex
             storage.setItem('index', '')
-        }
+				}
+				let planType = storage.getItem('planType')
+				//todo
+				if(planType){
+					this.activeIndex = planType
+					storage.setItem('planType', '')
+				}
 
         document.title = this.$route.query.userName
         this.getParams()
@@ -409,6 +419,19 @@ export default {
         this.getRecordedRegistrations()
         this.getWeightLossPlans()
     },
+    computed: {
+        options() {
+            return {
+                eventPassthrough: 'vertical',
+                startX: this.startX
+            }
+        }
+		},
+		watch:{
+			startX() {
+				this.rebuildScroll()
+			}
+		},
     methods: {
         imgError() {
             let img = event.srcElement
@@ -417,10 +440,10 @@ export default {
         },
         //医生评估表
         doctorForm() {
-            yktoast('努力开发中...')
-            // this.$router.push({
-            //     path: '/doctorEvalForm'
-            // })
+            // yktoast('努力开发中...')
+            this.$router.push({
+                path: '/doctorEvalForm'
+            })
         },
         //操作按钮
         editBtn(id) {
@@ -524,8 +547,9 @@ export default {
                 }
                 _this.patientInfo = result
                 _this.patientGroup = result.PatientGroup
+                _this.patientGroupDoctorID = result.DoctorID
             })
-        },
+				},
         //获取患者体重记录
         getWeightRecordByType() {
             var _this = this
@@ -543,8 +567,35 @@ export default {
                 result.forEach(element => {
                     element.heightClass = element.CurrentWeight / 2
                 })
-                _this.weightData = result
+                
+								_this.weightData = result
+                this.$nextTick(() => {
+                    //todo  横向滑动到最右侧
+                    // _this.setWeightStartX(result)
+								})
             })
+				},
+				scrollTo() {
+					this.$refs.scroll.scrollTo(
+						this.startX,
+						0
+					)
+				},
+				rebuildScroll() {
+					this.$nextTick(() => {
+						this.$refs.scroll.destroy()
+						this.$refs.scroll.initScroll()
+						// this.scrollTo()
+						this.$refs.scroll.refresh()
+					})
+				},
+        setWeightStartX() {
+            var container = this.$el.querySelector('#weightScroll')
+						console.log(container.scrollWidth)
+						this.startX = -parseFloat(container.scrollWidth+15)
+            console.log(`获取的值：${this.startX}`)
+            // this.$refs.scroll.destroy()
+            // this.$refs.scroll.initScroll()
         },
         // 获取病人完成的评估表
         getRecordedRegistrations() {
@@ -584,7 +635,8 @@ export default {
                 path: '/patientGroup',
                 query: {
                     userName: this.userName,
-                    userId: this.$route.query.userId
+                    userId: this.$route.query.userId,
+                    doctorId: this.patientGroupDoctorID
                 }
             })
         },
@@ -608,6 +660,7 @@ export default {
         },
         //查看减重方案
         lookPlan(id) {
+            storage.setItem('planType', this.activeIndex)
             this.$router.push({
                 path: '/lookPlan',
                 query: { id: id }

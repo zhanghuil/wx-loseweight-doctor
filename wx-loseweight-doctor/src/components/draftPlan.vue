@@ -29,6 +29,7 @@
                         class="targetInput"
                         type="tel"
                         @input="oninput"
+                        @focus="onfocus"
                         v-model="targetNum"
                     />
                     <span class="f12 c-6d">kg</span>
@@ -288,7 +289,7 @@
                                                             'DecimalValue'
                                                         )
                                                     "
-																										type="tel"
+                                                    type="tel"
                                                     :placeholder="n.Placeholder"
                                                     v-model="
                                                         n.QuestionAnswerInfo
@@ -305,7 +306,7 @@
                                                             'IntValue'
                                                         )
                                                     "
-																										type="tel"
+                                                    type="tel"
                                                     :placeholder="n.Placeholder"
                                                     v-model="
                                                         n.QuestionAnswerInfo
@@ -326,7 +327,7 @@
                                                     )
                                                 "
                                                 :placeholder="n.Placeholder"
-																								type="tel"
+                                                type="tel"
                                                 v-model="
                                                     n.QuestionAnswerInfo
                                                         .StrValue
@@ -401,7 +402,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
-																														type="tel"
+                                                            type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -421,7 +422,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
-																														type="tel"
+                                                            type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -446,7 +447,7 @@
                                                         :placeholder="
                                                             n.Placeholder
                                                         "
-																												type="tel"
+                                                        type="tel"
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue
@@ -524,7 +525,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
-																														type="tel"
+                                                            type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -548,7 +549,7 @@
                                                             :placeholder="
                                                                 n.Placeholder
                                                             "
-																														type="tel"
+                                                            type="tel"
                                                             v-model="
                                                                 n
                                                                     .QuestionAnswerInfo
@@ -575,7 +576,7 @@
                                                         :placeholder="
                                                             n.Placeholder
                                                         "
-																												type="tel"
+                                                        type="tel"
                                                         v-model="
                                                             n.QuestionAnswerInfo
                                                                 .StrValue
@@ -842,16 +843,22 @@
             </ul>
         </div>
 
-        <div class="footerEdit" v-show="pageIndex == 1">
-            <button class="yk-btn" @click="nextTap">下一步</button>
-        </div>
-        <div class="footerEdit" v-show="pageIndex > 1">
-            <button class="yk-btn yk-btn-def" @click="prevTap">上一步</button>
-            <button class="yk-btn" @click="nextTap">下一步</button>
-        </div>
-        <div class="footerEdit" v-show="pageIndex == 6">
-            <button class="yk-btn yk-btn-def" @click="prevTap">上一步</button>
-            <button class="yk-btn" @click="submitTap">完成</button>
+        <div v-show="hideshow">
+            <div class="footerEdit" v-show="pageIndex == 1">
+                <button class="yk-btn" @click="nextTap">下一步</button>
+            </div>
+            <div class="footerEdit" v-show="pageIndex > 1">
+                <button class="yk-btn yk-btn-def" @click="prevTap">
+                    上一步
+                </button>
+                <button class="yk-btn" @click="nextTap">下一步</button>
+            </div>
+            <div class="footerEdit" v-show="pageIndex == 6">
+                <button class="yk-btn yk-btn-def" @click="prevTap">
+                    上一步
+                </button>
+                <button class="yk-btn" v-button @click="submitTap">完成</button>
+            </div>
         </div>
         <!-- 底部弹窗  -->
         <!-- 体重刻度尺 -->
@@ -928,6 +935,13 @@ export default {
     components: { drawerFoot, ruler, checkbox, InsertTemplate },
     data() {
         return {
+            docmHeight:
+                document.documentElement.clientHeight ||
+                document.body.clientHeight,
+            showHeight:
+                document.documentElement.clientHeight ||
+                document.body.clientHeight,
+            hideshow: true, //显示或者隐藏footer
             planId: '', //减重方案id
             templateName: '', //模板名称
             templatesList: [], //模板列表
@@ -1022,6 +1036,18 @@ export default {
             FollowUpVisitPlan: '' //随访周期计划 = ['0', '7', '14', '30', '90', '180', '360', '-1'],
         }
     },
+    watch: {
+        //监听显示高度
+        showHeight: function() {
+            if (this.docmHeight > this.showHeight) {
+                //隐藏
+                this.hideshow = false
+            } else {
+                //显示
+                this.hideshow = true
+            }
+        }
+    },
     created() {
         console.log(this.$router)
         let AccountId = storage.getItem('AccountId')
@@ -1043,23 +1069,33 @@ export default {
             this.activeVal = data.activeVal
             this.LBW = data.LBW
         }*/
-				//渲染填写过的方案信息 end
-				// this.outputSize()
+        //渲染填写过的方案信息 end
+        // this.outputSize()
+    },
+    mounted() {
+        //监听事件
+        window.onresize = () => {
+            return (() => {
+                this.showHeight =
+                    document.documentElement.clientHeight ||
+                    document.body.clientHeight
+            })()
+        }
     },
     methods: {
         outputSize: function() {
             var result1 = window.matchMedia('(min-width:1200px)')
             var result2 = window.matchMedia('(min-width:992px)')
             var result3 = window.matchMedia('(min-width:768px)')
-            console.log(window.innerWidth);
-            console.log(result3.matches);
+            console.log(window.innerWidth)
+            console.log(result3.matches)
             if (result1.matches) {
                 console.log('>=1200 大型设备 大台式电脑')
             } else if (result2.matches) {
                 console.log('992=< <=1200 中型设备 台式电脑')
             } else if (result3.matches) {
-								console.log('768<= <=992 小型设备 平板电脑')
-								this.drawerHeight = '300px'
+                console.log('768<= <=992 小型设备 平板电脑')
+                this.drawerHeight = '300px'
             } else {
                 console.log('<=768 超小设备 手机')
             }
@@ -1252,13 +1288,14 @@ export default {
             console.log(data)
             this.$fetchPost(url, data, 4332).then(response => {
                 let result = response.data.data //请求返回数据
-                if (result.State == 0) {
-                    //保存成功
+                if (result.State != 0) {
                     yktoast(result.Msg)
-                    this.$refs.drawertemplate.closeByButton()
-                } else {
-                    yktoast(result.Msg)
+                    return
                 }
+                //保存成功
+                yktoast(result.Msg)
+                this.$refs.drawertemplate.closeByButton()
+                _this.GetPatientWeightLossPlanTemplates()
             })
         },
         // 频率与时长控制数字键盘，仅能输入整数，且不超过3位数
@@ -1320,7 +1357,8 @@ export default {
                             questionnaires.QuestionGroups[index].Questions[
                                 questionIndex
                             ].QuestionAnswerInfo[type]
-                        if (!value || !parseFloat(value)) {
+                        // if (!value || !parseFloat(value)) {
+												if (!value) {
                             isValid = false
                         }
                     }
@@ -1353,6 +1391,11 @@ export default {
                       value.split('.')[1]
                     : value.substring(0, 4)
             return value
+        },
+        onfocus(e) {
+            if (e.currentTarget.value == 0.0) {
+                this.targetNum = ''
+            }
         },
         oninput(e) {
             this.targetNum = this.dealInputVal(this.targetNum)
@@ -1448,11 +1491,13 @@ export default {
                         ) / 10
                     let energy = this.planSupply.energy
                     this.planSupply.fat =
-                        Math.round(math.format(energy * 0.3, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((energy * 0.3) / 9, precision) * 10
+                        ) / 10
                     this.planSupply.CHO =
-                        Math.round(math.format(energy * 0.4, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((energy * 0.4) / 4, precision) * 10
+                        ) / 10
                 } else {
                     //无瘦体重
                     let _basicW =
@@ -1464,14 +1509,17 @@ export default {
                         10
                     let enery = this.planSupply.energy
                     this.planSupply.protein =
-                        Math.round(math.format(enery * 0.3, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.3) / 4, precision) * 10
+                        ) / 10
                     this.planSupply.fat =
-                        Math.round(math.format(enery * 0.3, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.3) / 9, precision) * 10
+                        ) / 10
                     this.planSupply.CHO =
-                        Math.round(math.format(enery * 0.4, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.4) / 4, precision) * 10
+                        ) / 10
                 }
 
                 /**
@@ -1500,14 +1548,17 @@ export default {
                         ) / 10
                     let enery = this.planSupply.energy
                     this.planSupply.protein =
-                        Math.round(math.format(enery * 0.2, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.2) / 4, precision) * 10
+                        ) / 10
                     this.planSupply.fat =
-                        Math.round(math.format(enery * 0.2, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.2) / 9, precision) * 10
+                        ) / 10
                     this.planSupply.CHO =
-                        Math.round(math.format(enery * 0.6, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.6) / 4, precision) * 10
+                        ) / 10
                 } else {
                     //无瘦体重
                     let _basicW =
@@ -1519,14 +1570,17 @@ export default {
                         10
                     let enery = this.planSupply.energy
                     this.planSupply.protein =
-                        Math.round(math.format(enery * 0.2, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.2) / 4, precision) * 10
+                        ) / 10
                     this.planSupply.fat =
-                        Math.round(math.format(enery * 0.2, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.2) / 9, precision) * 10
+                        ) / 10
                     this.planSupply.CHO =
-                        Math.round(math.format(enery * 0.6, precision) * 10) /
-                        10
+                        Math.round(
+                            math.format((enery * 0.6) / 4, precision) * 10
+                        ) / 10
                 }
             }
         },
@@ -1619,6 +1673,7 @@ export default {
             return name
         },
         validQuestionnairesCommon(questionnaires) {
+            // debugger
             let isValid = true
             //筛选必填项
             let requireQuestionGroup = questionnaires
@@ -1653,7 +1708,8 @@ export default {
                             .QuestionAnswerInfo[type]
 
                     //校验
-                    if (!value || !parseFloat(value)) {
+                    // if (!value || !parseFloat(value)) {
+                    if (!value) {
                         this.$set(
                             requireQuestionGroup[index],
                             'TargetNumError',
@@ -1699,8 +1755,10 @@ export default {
         nextTap() {
             console.log(`当前页码：${this.pageIndex}`)
             // debugger
+            window.scrollTo(0, 0)
             if (this.pageIndex == 1) {
-                if (!this.targetNum || !parseFloat(this.targetNum)) {
+								// if (!this.targetNum || !parseFloat(this.targetNum))
+								if (!this.targetNum) {
                     this.targetNumError = true
                     yktoast('有未填写项')
                     return
@@ -1731,7 +1789,8 @@ export default {
                         value = item.QuestionAnswerInfo.IntValue
                     }
 
-                    if (!value || !parseFloat(value)) {
+                    // if (!value || !parseFloat(value)) {
+										if (!value) {
                         adviseSportsValid = false
                         break
                     }
@@ -1751,7 +1810,8 @@ export default {
                         value = item.QuestionAnswerInfo.IntValue
                     }
 
-                    if (!value || !parseFloat(value)) {
+                    // if (!value || !parseFloat(value)) {
+										if (!value) {
                         ZmotionValid = false
                         break
                     }
@@ -1845,7 +1905,7 @@ export default {
             let data = {
                 planId: this.$route.query.planId
             }
-            this.$fetchGet(url, data, 4112).then(response => {
+            this.$fetchGet(url, data, 4107).then(response => {
                 let result = response.data.data //请求返回数据
                 if (!result) {
                     yktoast(result)
@@ -1909,7 +1969,7 @@ export default {
             let data = {
                 typeCode: this.activeVal
             }
-            this.$fetchGet(url, data, 4112).then(response => {
+            this.$fetchGet(url, data, 4107).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result) {
                     _this.planInfo = result
@@ -1932,7 +1992,6 @@ export default {
         //完成
         submitTap() {
             console.log('点击完成提交')
-
             //复诊与随访 校验必填项
             //1、下次复诊
             let isCheck = this.$refs.validIsCheckR.validIsCheck()

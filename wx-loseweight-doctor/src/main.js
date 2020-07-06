@@ -16,6 +16,7 @@ import md5 from 'js-md5';
 import api from './request/api'
 import { fetchPost, fetchPut, fetchGet, fetchDelete } from './request/http'
 import qs from 'qs'
+import './common/js/directive'
 
 import vConsole from 'vconsole'
 // Vue.prototype.$vConsole = new vConsole()

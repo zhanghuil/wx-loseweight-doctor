@@ -4,16 +4,31 @@
             <div class="doctorPanel rel">
                 <div class="doctorPanelCon">
                     <div class="panelTop">
-                        <img class="txImg" src="../assets/tx1.png" />
-                        <div class="txt">
+                        <!-- <img class="txImg" src="../assets/tx1.png" /> -->
+												<img
+														v-if="doctorInfo.DoctorAvatarUrl"
+														class="txImg"
+														:src="doctorInfo.DoctorAvatarUrl"
+														@error="imgError()"
+												/>
+												<!-- 0-男 1-女 -->
+												<template v-if="!doctorInfo.DoctorAvatarUrl">
+														<template v-if="doctorInfo.Sex == 0">
+																<img src="../assets/tx1.png" class="txImg" />
+														</template>
+														<template v-else>
+																<img src="../assets/tx2.png" class="txImg" />
+														</template>
+												</template>
+                        <div class="txtBox">
                             <div class="">
                                 <span class="f18 mr10">{{
-                                    doctorInfo.Name
+                                    doctorInfo.DoctorName
                                 }}</span
                                 >医生
                             </div>
                             <div class="mt10">
-                                {{ doctorInfo.HosName }}
+                                {{ doctorInfo.HospName }}
                             </div>
                         </div>
                     </div>
@@ -439,7 +454,7 @@
 
             <div
                 class="wrapper p15"
-                v-if="WeightLossPlan.FollowUpVisitPlan != 0"
+                v-if="WeightLossPlan.FollowUpVisitPlan >= 0"
             >
                 <div class="f16 c-3a b">随访计划</div>
                 <div class="c-6d f14 mt15 lh21">
@@ -465,6 +480,8 @@ export default {
     name: 'lookPlan',
     data() {
         return {
+					  errorImg0: require('@/assets/tx1.png'),
+            errorImg1: require('@/assets/tx2.png'),
             doctorInfo: {},
             planInfo: {},
             WeightLossPlan: {},
@@ -498,9 +515,14 @@ export default {
             storage.setItem('Token', token)
         }
         this.getPatientWeightLossPlan()
-        this.getDoctorInfoNew()
     },
     methods: {
+			 imgError() {
+            let img = event.srcElement
+            if (this.doctorInfo.Sex == 0) img.src = this.errorImg0
+            else img.src = this.errorImg1
+            img.onerror = null //防止闪图
+        },
         //获取食谱克数 todo
         /**
          * typeCode：类型num(Precision>0?'DecimalValue':'IntValue')
@@ -528,7 +550,7 @@ export default {
             let data = {
                 planId: this.$route.query.id
             }
-            this.$fetchGet(url, data, 4112).then(response => {
+            this.$fetchGet(url, data, 4107).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result) {
                     _this.planInfo = result
@@ -537,25 +559,9 @@ export default {
                         result.DietEkadeshQuestionnaire //断食日
 
                     _this.SportsQuestionnaire = result.SportsQuestionnaire
-                    _this.WeightLossPlan = result.WeightLossPlan
-                } else {
-                    yktoast(result)
-                }
-            })
-        },
-        //获取医生信息
-        getDoctorInfoNew() {
-            let AccountId = storage.getItem('AccountId')
-            var _this = this
-            let url = this.api.userApi.GetDoctorInfoNew
-            let data = {
-                AccountId: AccountId
-            }
-            this.$fetchPost(url, data, 150).then(response => {
-                let result = response.data.data //请求返回数据
-                if (result.status == 0) {
-                    // console.log(result.data)
-                    _this.doctorInfo = result.data
+										_this.WeightLossPlan = result.WeightLossPlan
+										
+										_this.doctorInfo = result.DoctorInfo
                 } else {
                     yktoast(result)
                 }
@@ -614,7 +620,7 @@ export default {
     border: 2px solid #fff;
 }
 
-.panelTop .txt {
+.panelTop .txtBox {
     color: #ffffff;
     font-size: 14px;
     padding-left: 10px;
@@ -743,6 +749,7 @@ export default {
 }
 
 .notifyDes .txt {
+  	padding-top: 0;
     line-height: 21px;
     display: -webkit-box;
     -webkit-box-orient: vertical;

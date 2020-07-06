@@ -24,6 +24,11 @@ export default new Router({
 			}
 		},
 		{
+			path: '/searchList',
+			name: 'searchList',
+			component: resolve => require(['@/components/searchList'], resolve)
+		},
+		{
 			path: '/patientGroup',
 			name: 'patientGroup',
 			component: resolve => require(['@/components/patientGroup'], resolve),
