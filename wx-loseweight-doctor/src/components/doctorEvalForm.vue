@@ -29,10 +29,72 @@
                         :key="index"
                         class="list-item"
                     >
-                        {{ item }}
+                        <div
+                            class="navbar__item"
+                            :class="activeVal == item ? 'on' : ''"
+                            @click="tabClick(item)"
+                        >
+                            {{ item }}
+                        </div>
                     </li>
                 </ul>
             </cube-scroll>
+        </div>
+        <!-- 评估表 start -->
+        <div>
+            <div class="formTitle">体格检查</div>
+            <div class="formCon">
+                <ol>
+                    <li>
+                        <div class="wrap">
+                            <div class="f16 c-3a">目前身高</div>
+                            <div class="pr10">
+                                <input
+                                    @input="checkInput()"
+                                    type="tel"
+                                    placeholder="请输入"
+                                />
+                                <span class="f16 c-6d">cm</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="wrap">
+                            <div class="f16 c-3a">BMI</div>
+                            <div class="pr10">
+                                <span class="f16 c-6d">-</span>
+                                <span class="f16 c-fb">42</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="wrap">
+                            <div class="f16 c-3a">下肢水肿</div>
+                            <div class="cell_ft pr10">
+                                <span
+                                    class="mr10 f16"
+                                    :class="planDate == '请选择' ? 'c-a' : ''"
+                                    >{{ planDate }}</span
+                                >
+                                <i class="icon cubeic-arrow f16"></i>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="wrap">
+                            <div class="f16 c-3a">BMI</div>
+                            <div class="pr10">
+                                <span class="f16 c-6d">-</span>
+                                <span class="f16 c-fb">42</span>
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <!-- 评估表 end -->
+        <div class="footerEdit">
+            <button class="yk-btn">保存</button>
         </div>
     </div>
 </template>
@@ -45,7 +107,15 @@ export default {
     data() {
         return {
             planDate: '请选择', //评估日期
-            items: ['体格', '实验室检查', '胰岛功能', 'RMR', '影像学', '体成分']
+            items: [
+                '体格',
+                '实验室检查',
+                '胰岛功能',
+                'RMR',
+                '影像学',
+                '体成分'
+            ],
+            activeVal: '体格'
         }
     },
     created() {},
@@ -64,11 +134,18 @@ export default {
         },
         selectHandle(date, selectedVal, selectedText) {
             this.planDate = selectedText.join('-')
+        },
+        tabClick(e) {
+            this.activeVal = e
         }
     }
 }
 </script>
 <style lang="less">
+input::placeholder {
+    color: #aaaaaa;
+    font-size: 16px;
+}
 .c-a {
     color: #aaaaaa;
 }
@@ -87,10 +164,63 @@ export default {
         }
         .list-item {
             padding: 0 30px 0 0;
-						display: inline-block;
-						&:last-child{
-							padding-right: 0;
-						}
+            display: inline-block;
+
+            &:last-child {
+                padding-right: 0;
+            }
+            .navbar__item {
+                position: relative;
+                &.on:after {
+                    content: '';
+                    position: absolute;
+                    bottom: -9px;
+                    left: 50%;
+                    margin-left: -7px;
+                    background: #6049f5;
+                    border-radius: 2.5px;
+                    width: 15px;
+                    height: 4px;
+                }
+            }
+        }
+    }
+}
+.formTitle {
+    font-family: PingFangSC-Regular;
+    font-size: 12px;
+    color: #aaaaaa;
+    line-height: 12px;
+    padding: 6px 15px 7px;
+}
+.formCon {
+    background: #ffffff;
+    padding-left: 15px;
+    ol {
+        li {
+            border-bottom: 1px solid #f2f2f2;
+            padding: 16px 0;
+            &:last-child {
+                border: none;
+            }
+            .wrap {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                input {
+                    background: none;
+                    width: 80px;
+                    font-size: 16px;
+                    color: #3a3a3a;
+                    text-align: right;
+                    margin-right: 7px;
+                }
+            }
+            .desc {
+                font-size: 12px;
+                color: #aaaaaa;
+                margin-top: 10px;
+            }
         }
     }
 }

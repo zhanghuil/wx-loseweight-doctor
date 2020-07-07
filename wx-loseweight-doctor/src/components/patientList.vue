@@ -440,10 +440,10 @@ export default {
         },
         //医生评估表
         doctorForm() {
-            // yktoast('努力开发中...')
-            this.$router.push({
-                path: '/doctorEvalForm'
-            })
+            yktoast('努力开发中...')
+            // this.$router.push({
+            //     path: '/doctorEvalForm'
+            // })
         },
         //操作按钮
         editBtn(id) {

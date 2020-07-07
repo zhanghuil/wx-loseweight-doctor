@@ -1,5 +1,5 @@
 <template>
-    <div class="pb70">
+    <div>
         <div v-show="pageIndex == 1">
             <div class="yk_wx_cell" @click="showDatePicker">
                 <div class="cell_bd flex-center">
@@ -844,14 +844,16 @@
         </div>
 
         <div v-show="hideshow">
-            <div class="footerEdit" v-show="pageIndex == 1">
+            <div class="footerEdit abs" v-show="pageIndex == 1">
                 <button class="yk-btn" @click="nextTap">下一步</button>
             </div>
-            <div class="footerEdit" v-show="pageIndex > 1">
+            <div class="footerEdit rel" v-show="pageIndex > 1 && pageIndex < 6">
                 <button class="yk-btn yk-btn-def" @click="prevTap">
                     上一步
                 </button>
-                <button class="yk-btn" @click="nextTap">下一步</button>
+                <button class="yk-btn" @click="nextTap">
+                    下一步
+                </button>
             </div>
             <div class="footerEdit" v-show="pageIndex == 6">
                 <button class="yk-btn yk-btn-def" @click="prevTap">
@@ -1038,15 +1040,15 @@ export default {
     },
     watch: {
         //监听显示高度
-        showHeight: function() {
-            if (this.docmHeight > this.showHeight) {
-                //隐藏
-                this.hideshow = false
-            } else {
-                //显示
-                this.hideshow = true
-            }
-        }
+        // showHeight: function() {
+        //     if (this.docmHeight > this.showHeight) {
+        //         //隐藏
+        //         this.hideshow = false
+        //     } else {
+        //         //显示
+        //         this.hideshow = true
+        //     }
+        // }
     },
     created() {
         console.log(this.$router)
@@ -1358,7 +1360,7 @@ export default {
                                 questionIndex
                             ].QuestionAnswerInfo[type]
                         // if (!value || !parseFloat(value)) {
-												if (!value) {
+                        if (!value) {
                             isValid = false
                         }
                     }
@@ -1753,12 +1755,13 @@ export default {
         },
         //下一步
         nextTap() {
-            console.log(`当前页码：${this.pageIndex}`)
+            debugger
+
             // debugger
             window.scrollTo(0, 0)
             if (this.pageIndex == 1) {
-								// if (!this.targetNum || !parseFloat(this.targetNum))
-								if (!this.targetNum) {
+                // if (!this.targetNum || !parseFloat(this.targetNum))
+                if (!this.targetNum) {
                     this.targetNumError = true
                     yktoast('有未填写项')
                     return
@@ -1790,7 +1793,7 @@ export default {
                     }
 
                     // if (!value || !parseFloat(value)) {
-										if (!value) {
+                    if (!value) {
                         adviseSportsValid = false
                         break
                     }
@@ -1811,7 +1814,7 @@ export default {
                     }
 
                     // if (!value || !parseFloat(value)) {
-										if (!value) {
+                    if (!value) {
                         ZmotionValid = false
                         break
                     }
@@ -1830,6 +1833,7 @@ export default {
             }
 
             this.pageIndex++
+            console.log(`当前页码：${this.pageIndex}`)
             this.setPageTit()
         },
         //获取方案模板列表
@@ -2419,5 +2423,11 @@ export default {
 }
 .mealDesImg {
     width: 100%;
+}
+.rel {
+    position: relative !important;
+}
+.abs {
+    position: absolute;
 }
 </style>
