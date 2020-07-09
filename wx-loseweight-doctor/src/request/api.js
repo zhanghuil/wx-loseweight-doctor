@@ -43,6 +43,12 @@ const userApi = {
 	GetPatientEmptyWeightLossPlanTemplate: webApi + '/api/System/WeightLossPlanTemplate/GetPatientEmptyWeightLossPlanTemplate',  //获取空白减重方案模板
 	SaveWeightLossPlanTemplate: webApi + '/api/System/WeightLossPlanTemplate/SaveWeightLossPlanTemplate',  //保存减重方案模板
 	DeleteTemplate: webApi + '/api/System/WeightLossPlanTemplate/DeleteTemplate',  //删除减重方案模板
+
+	GetEmptyDoctorAssess: webApi + '/api/System/MedicalRecord/GetEmptyDoctorAssess',  //获取空白评估表
+	GetDoctorAssess: webApi + '/api/System/MedicalRecord/GetDoctorAssess',  //获取评估表
+	SaveDoctorAssess: webApi + '/api/System/MedicalRecord/SaveDoctorAssess',  //保存评估表
+	DeleteDoctorAssess: webApi + '/api/System/MedicalRecord/DeleteDoctorAssess',  //删除评估表
+
 }
 export default {
 	userApi

@@ -101,7 +101,7 @@
                     <cube-scroll
                         ref="scroll"
                         :data="weightData"
-												:options="options"
+                        :options="options"
                         direction="horizontal"
                         class="horizontal-scroll-list-wrap"
                     >
@@ -178,7 +178,7 @@
                         </div>
                     </div>
                     <!-- 首诊登记 -->
-                    <div v-if="item.TypeCode == 'SZDJ'">
+                    <div v-else-if="item.TypeCode == 'SZDJ'">
                         <div
                             class="info"
                             @click="lookInfo('first', $route.query.userId)"
@@ -186,29 +186,58 @@
                             {{ item.RecordDate | formatDateStr }} 首诊登记(患者)
                         </div>
                     </div>
-                </div>
-                <!-- 医生评估表 -->
-                <div class="rel dn">
-                    <div class="info">
-                        <span>03/20 评估表(医生)</span>
-                        <i class="icon iconfont icon-gengduomore10"></i>
-                    </div>
-                    <div class="editBoxwrap">
-                        <div class="editBox">
-                            <div class="arrow">
-                                <i></i>
-                                <span></span>
+                    <!-- 医生评估表 -->
+                    <div class="rel" v-else-if="item.TypeCode == 'PGB'">
+                        <div class="info">
+                            <span
+                                >{{
+                                    item.RecordDate | formatDateStr
+                                }}
+                                评估表(医生)</span
+                            >
+                            <i
+                                class="icon iconfont icon-gengduomore10"
+                                @click="assessEditBtn(item.DoctorAssess.ID)"
+                            ></i>
+                        </div>
+                        <div
+                            class="editBoxwrap"
+                            v-show="assessId == item.DoctorAssess.ID"
+                        >
+                            <div class="editBox">
+                                <div class="arrow">
+                                    <i></i>
+                                    <span></span>
+                                </div>
+                                <ul class="w-100">
+                                    <li
+                                        class="editImg"
+                                        @click="
+                                            editAssessTap(item.DoctorAssess.ID)
+                                        "
+                                    >
+                                        <img
+                                            src="../assets/edit1@2x.png"
+                                            alt=""
+                                        />
+                                        编辑
+                                    </li>
+                                    <li
+                                        class="editImg"
+                                        @click="
+                                            deleteAssessTap(
+                                                item.DoctorAssess.ID
+                                            )
+                                        "
+                                    >
+                                        <img
+                                            src="../assets/edit4@2x.png"
+                                            alt=""
+                                        />
+                                        删除
+                                    </li>
+                                </ul>
                             </div>
-                            <ul class="w-100">
-                                <li class="editImg">
-                                    <img src="../assets/edit1@2x.png" alt="" />
-                                    编辑
-                                </li>
-                                <li class="editImg">
-                                    <img src="../assets/edit4@2x.png" alt="" />
-                                    删除
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
@@ -356,9 +385,9 @@ export default {
             empty: true,
             tabs: ['评估表', '减重方案'],
             activeIndex: 0,
-						startX: 0,
-						scrollToTime: 700,
-      			scrollToEasing: 'bounce',
+            startX: 0,
+            scrollToTime: 700,
+            scrollToEasing: 'bounce',
             tagTab: [
                 {
                     name: '日',
@@ -378,7 +407,8 @@ export default {
             weightData: [], //体重记录
             infoList: [], //评估表
             planList: [], //减重方案
-            planId: ''
+            planId: '',
+            assessId: ''
         }
     },
     filters: {
@@ -404,13 +434,12 @@ export default {
         if (typeIndex) {
             this.activeIndex = typeIndex
             storage.setItem('index', '')
-				}
-				let planType = storage.getItem('planType')
-				//todo
-				if(planType){
-					this.activeIndex = planType
-					storage.setItem('planType', '')
-				}
+        }
+        let planType = storage.getItem('planType')
+        if (planType) {
+            this.activeIndex = planType
+            storage.setItem('planType', '')
+        }
 
         document.title = this.$route.query.userName
         this.getParams()
@@ -426,12 +455,12 @@ export default {
                 startX: this.startX
             }
         }
-		},
-		watch:{
-			startX() {
-				this.rebuildScroll()
-			}
-		},
+    },
+    watch: {
+        startX() {
+            this.rebuildScroll()
+        }
+    },
     methods: {
         imgError() {
             let img = event.srcElement
@@ -440,12 +469,72 @@ export default {
         },
         //医生评估表
         doctorForm() {
-            yktoast('努力开发中...')
-            // this.$router.push({
-            //     path: '/doctorEvalForm'
-            // })
+            // yktoast('努力开发中...')
+            this.$router.push({
+                path: '/doctorEvalForm',
+                query: { userId: this.$route.query.userId }
+            })
         },
-        //操作按钮
+        //医生评估表操作按钮
+        assessEditBtn(id) {
+            if (id == this.assessId) {
+                this.assessId = ''
+            } else {
+                this.assessId = id
+            }
+        },
+        //编辑医生评估表
+        editAssessTap(id) {
+            this.$router.push({
+                path: '/doctorEvalForm',
+                query: { userId: this.$route.query.userId, doctorAssessId: id }
+            })
+        },
+        //删除医生评估表提示框
+        deleteAssessTap(id) {
+            this.$createDialog({
+                type: 'confirm',
+                content: '是否确定删除',
+                confirmBtn: {
+                    text: '确定',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    this.deleteAssess(id)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
+        // 删除医生评估表
+        deleteAssess(id) {
+            var _this = this
+            let url = this.api.userApi.DeleteDoctorAssess
+            let data = {
+                assessId: id
+            }
+            this.$fetchDelete(url, data, 4112).then(response => {
+                let result = response.data.data //请求返回数据
+                if (result.State != 0) {
+										yktoast(result.Msg)
+										_this.assessId = ''
+                    return
+                }
+                yktoast(result.Msg)
+                _this.assessId = ''
+                _this.getRecordedRegistrations()
+            })
+        },
+        //减重方案操作按钮
         editBtn(id) {
             if (id == this.planId) {
                 this.planId = ''
@@ -549,7 +638,7 @@ export default {
                 _this.patientGroup = result.PatientGroup
                 _this.patientGroupDoctorID = result.DoctorID
             })
-				},
+        },
         //获取患者体重记录
         getWeightRecordByType() {
             var _this = this
@@ -567,32 +656,29 @@ export default {
                 result.forEach(element => {
                     element.heightClass = element.CurrentWeight / 2
                 })
-                
-								_this.weightData = result
+
+                _this.weightData = result
                 this.$nextTick(() => {
                     //todo  横向滑动到最右侧
                     // _this.setWeightStartX(result)
-								})
+                })
             })
-				},
-				scrollTo() {
-					this.$refs.scroll.scrollTo(
-						this.startX,
-						0
-					)
-				},
-				rebuildScroll() {
-					this.$nextTick(() => {
-						this.$refs.scroll.destroy()
-						this.$refs.scroll.initScroll()
-						// this.scrollTo()
-						this.$refs.scroll.refresh()
-					})
-				},
+        },
+        scrollTo() {
+            this.$refs.scroll.scrollTo(this.startX, 0)
+        },
+        rebuildScroll() {
+            this.$nextTick(() => {
+                this.$refs.scroll.destroy()
+                this.$refs.scroll.initScroll()
+                // this.scrollTo()
+                this.$refs.scroll.refresh()
+            })
+        },
         setWeightStartX() {
             var container = this.$el.querySelector('#weightScroll')
-						console.log(container.scrollWidth)
-						this.startX = -parseFloat(container.scrollWidth+15)
+            console.log(container.scrollWidth)
+            this.startX = -parseFloat(container.scrollWidth + 15)
             console.log(`获取的值：${this.startX}`)
             // this.$refs.scroll.destroy()
             // this.$refs.scroll.initScroll()

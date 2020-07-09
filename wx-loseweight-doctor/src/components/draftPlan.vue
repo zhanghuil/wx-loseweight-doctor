@@ -1755,8 +1755,6 @@ export default {
         },
         //下一步
         nextTap() {
-            debugger
-
             // debugger
             window.scrollTo(0, 0)
             if (this.pageIndex == 1) {

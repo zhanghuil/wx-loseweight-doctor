@@ -19,107 +19,161 @@
         <div class="horizontalMenu">
             <cube-scroll
                 ref="scroll"
-                :data="items"
+                :data="questionnaires"
                 direction="horizontal"
                 class="horizontal-scroll-list-wrap"
             >
                 <ul class="list-wrapper">
                     <li
-                        v-for="(item, index) in items"
+                        v-for="(item, index) in questionnaires"
                         :key="index"
                         class="list-item"
                     >
                         <div
                             class="navbar__item"
-                            :class="activeVal == item ? 'on' : ''"
-                            @click="tabClick(item)"
+                            :class="activeVal === item.Code ? 'on' : ''"
+                            @click="tabClick(item.Code)"
                         >
-                            {{ item }}
+                            {{ item.Name }}
                         </div>
                     </li>
                 </ul>
             </cube-scroll>
         </div>
         <!-- 评估表 start -->
-        <div>
-            <div class="formTitle">体格检查</div>
-            <div class="formCon">
-                <ol>
-                    <li>
-                        <div class="wrap">
-                            <div class="f16 c-3a">目前身高</div>
-                            <div class="pr10">
-                                <input
-                                    @input="checkInput()"
-                                    type="tel"
-                                    placeholder="请输入"
-                                />
-                                <span class="f16 c-6d">cm</span>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="wrap">
-                            <div class="f16 c-3a">BMI</div>
-                            <div class="pr10">
-                                <span class="f16 c-6d">-</span>
-                                <span class="f16 c-fb">42</span>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="wrap">
-                            <div class="f16 c-3a">下肢水肿</div>
-                            <div class="cell_ft pr10">
-                                <span
-                                    class="mr10 f16"
-                                    :class="planDate == '请选择' ? 'c-a' : ''"
-                                    >{{ planDate }}</span
-                                >
-                                <i class="icon cubeic-arrow f16"></i>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="wrap">
-                            <div class="f16 c-3a">BMI</div>
-                            <div class="pr10">
-                                <span class="f16 c-6d">-</span>
-                                <span class="f16 c-fb">42</span>
-                            </div>
-                        </div>
-                    </li>
-                </ol>
+        <div
+            v-for="(item, index) in questionnaires"
+            :key="index"
+            v-show="item.Code == activeVal"
+        >
+            <div
+                v-for="(list, idx) in item.Questionnaire.QuestionGroups"
+                :key="idx"
+            >
+                <div class="formTitle" v-show="list.Name">{{ list.Name }}</div>
+                <div class="formCon">
+                    <ol>
+                        <li v-for="(n, qi) in list.Questions" :key="qi">
+                            <!-- 输入框 -->
+                            <template v-if="n.TypeCode == 'Num'">
+                                <div class="wrap">
+                                    <div class="f16 c-3a">
+                                        {{ n.Name }}
+                                    </div>
+                                    <div class="pr10">
+                                        <!-- 不可输入 -->
+                                        <template v-if="n.IsFixed">
+                                            <span class="f16 c-6d">-</span>
+                                            <span class="f16 c-fb">42</span>
+                                        </template>
+                                        <template v-else>
+                                            <input
+                                                maxlength="20"
+                                                type="tel"
+                                                v-model="
+                                                    n.QuestionAnswerInfo
+                                                        .DecimalValue
+                                                "
+                                                :disabled="n.IsFixed"
+                                                :placeholder="n.Placeholder"
+                                            />
+                                            <span class="f16 c-6d">{{
+                                                n.Suffix
+                                            }}</span>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                            <!-- 单选 -->
+                            <template v-else-if="n.TypeCode == 'SingleSelect'">
+                                <singlePicker
+                                    @selectValChild="selectValChild"
+                                    :option="n"
+                                ></singlePicker>
+                            </template>
+                            <!-- 多选 -->
+                            <template
+                                v-else-if="n.TypeCode == 'MultipleSelect'"
+                            >
+                                <multipleChoice :option="n"></multipleChoice>
+                            </template>
+                            <!-- 上传图片 -->
+                            <template v-else-if="n.TypeCode == 'Image'">
+                                <div>
+                                    <div class="f16 c-3a">
+                                        {{ n.Name }}
+                                    </div>
+                                    <imgUpload></imgUpload>
+                                </div>
+                            </template>
+                        </li>
+                    </ol>
+                </div>
             </div>
         </div>
         <!-- 评估表 end -->
-        <div class="footerEdit">
-            <button class="yk-btn">保存</button>
+        <div class="footerEdit evalFormFoot">
+            <button class="yk-btn" @click="submitForm">保存</button>
         </div>
     </div>
 </template>
 <script>
+import singlePicker from '@/components/public/singlePicker'
+import multipleChoice from '@/components/public/multipleChoice'
+import imgUpload from '@/components/public/imgUpload'
 import { yktoast, convertKey } from '../common/js/util'
 import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
 export default {
     name: 'doctorEvalForm',
+    components: { singlePicker, multipleChoice, imgUpload },
     data() {
         return {
+            assessID: '', //评估ID
+            doctorAssessId: '', //传入的评估表id
             planDate: '请选择', //评估日期
-            items: [
-                '体格',
-                '实验室检查',
-                '胰岛功能',
-                'RMR',
-                '影像学',
-                '体成分'
-            ],
-            activeVal: '体格'
+            questionnaires: null,
+            activeVal: 'Assess_TG',
+            questionGroups: []
         }
     },
-    created() {},
+    created() {
+        //不存在医生评估表id  调用空白模板
+        let doctorAssessId = this.$route.query.doctorAssessId
+        this.doctorAssessId = doctorAssessId
+        if (!doctorAssessId) this.init()
+        else this.getDoctorAssess()
+    },
     methods: {
+        // 获取评估表
+        getDoctorAssess() {
+            var _this = this
+            let url = this.api.userApi.GetDoctorAssess
+            let data = {
+                assessId: this.doctorAssessId
+            }
+            this.$fetchGet(url, data, 4110).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast('加载失败')
+                    return
+                }
+                _this.questionnaires = result.Questionnaires
+            })
+        },
+        // 空白评估表
+        init() {
+            var _this = this
+            let url = this.api.userApi.GetEmptyDoctorAssess
+            this.$fetchGet(url, '', 4110).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast('加载失败')
+                    return
+                }
+                _this.questionnaires = result.Questionnaires
+            })
+        },
         //评估日期
         showDatePicker() {
             if (!this.datePicker) {
@@ -137,6 +191,64 @@ export default {
         },
         tabClick(e) {
             this.activeVal = e
+        },
+        //单选的值
+        selectValChild(childValue) {
+            // childValue就是子组件传过来的值
+            console.log(childValue)
+            let currMenuArr = this.questionnaires.find(
+                n => n.Code == this.activeVal
+            )
+            let currQuestionArr = currMenuArr.Questionnaire.QuestionGroups
+            //找到对应data中数据 赋值
+            let question = currQuestionArr
+                .map(n => n.Questions.find(m => m.ID === childValue.QuestionID))
+                .find(item => item)
+            if (question) {
+								question.QuestionAnswerInfo.StrValue = childValue.StrValue
+            }
+        },
+        //保存
+        submitForm() {
+            // 过滤当前点击菜单下的所有题目
+            let currMenuArr = this.questionnaires.find(
+                n => n.Code == this.activeVal
+            )
+            let currQuestionArr = currMenuArr.Questionnaire.QuestionGroups
+            //拼装保存数据
+            let allQuesAnswerInfoGroup = currQuestionArr.map(n =>
+                n.Questions.map(m => m.QuestionAnswerInfo)
+            )
+            var allQuestionAnswerInfo = []
+            allQuesAnswerInfoGroup.forEach(n => {
+                var tempArray = allQuestionAnswerInfo
+                allQuestionAnswerInfo = tempArray.concat(n)
+            })
+            console.log(JSON.stringify(allQuestionAnswerInfo))
+            // 保存评估表
+            var _this = this
+            let AccountId = storage.getItem('AccountId')
+            let url = this.api.userApi.SaveDoctorAssess
+            let data = {
+                AssessID: this.assessID, //评估ID
+                PatientID: this.$route.query.userId, //患者ID
+                DoctorID: AccountId, //评估医生ID
+                AssessDate: this.planDate, //评估日期
+                QuestionnaireCode: this.activeVal, //菜单code
+                AssessAnswerInfoStr: JSON.stringify(allQuestionAnswerInfo)
+            }
+            console.log(data)
+            this.$fetchPost(url, data, 4111).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast(result)
+                    return
+                }
+                //保存成功   result.Msg
+                yktoast('保存成功')
+                _this.assessID = result.ID
+                // this.$router.go(0)
+            })
         }
     }
 }
@@ -151,6 +263,7 @@ input::placeholder {
 }
 .horizontalMenu {
     background: #ffffff;
+    border-bottom: 1px solid #f7f7f7;
     margin-top: 10px;
     .horizontal-scroll-list-wrap {
         .cube-scroll-content {
@@ -222,6 +335,11 @@ input::placeholder {
                 margin-top: 10px;
             }
         }
+    }
+}
+.footerEdit {
+    &.evalFormFoot {
+        position: relative;
     }
 }
 </style>
