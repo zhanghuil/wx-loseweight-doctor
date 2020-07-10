@@ -1,7 +1,11 @@
 <template>
     <div>
         <!-- 评估日期 -->
-        <div class="yk_wx_cell" @click="showDatePicker">
+        <div class="yk_wx_cell rel" @click="showDatePicker">
+            <i
+                v-show="dateError"
+                class="icon iconfont icon-wuuiconsuotanhao tipsIcon"
+            ></i>
             <div class="cell_bd flex-center">
                 <div>
                     <img src="../assets/time@2x.png" class="img" alt="" />
@@ -95,7 +99,12 @@
                             <template
                                 v-else-if="n.TypeCode == 'MultipleSelect'"
                             >
-                                <multipleChoice :option="n"></multipleChoice>
+                                <multipleChoice
+                                    @selectValMultipleChild="
+                                        selectValMultipleChild
+                                    "
+                                    :option="n"
+                                ></multipleChoice>
                             </template>
                             <!-- 上传图片 -->
                             <template v-else-if="n.TypeCode == 'Image'">
@@ -103,7 +112,12 @@
                                     <div class="f16 c-3a">
                                         {{ n.Name }}
                                     </div>
-                                    <imgUpload></imgUpload>
+                                    <imgUpload
+                                        :ans="n.QuestionAnswerInfo"
+                                        :uploadNum="n.Max"
+                                        title="上传图片"
+                                        @input="imgChildByValue"
+                                    ></imgUpload>
                                 </div>
                             </template>
                         </li>
@@ -112,6 +126,7 @@
             </div>
         </div>
         <!-- 评估表 end -->
+        <div class="bg_h15"></div>
         <div class="footerEdit evalFormFoot">
             <button class="yk-btn" @click="submitForm">保存</button>
         </div>
@@ -129,6 +144,7 @@ export default {
     components: { singlePicker, multipleChoice, imgUpload },
     data() {
         return {
+            dateError: false, //评估日期警示
             assessID: '', //评估ID
             doctorAssessId: '', //传入的评估表id
             planDate: '请选择', //评估日期
@@ -188,14 +204,18 @@ export default {
         },
         selectHandle(date, selectedVal, selectedText) {
             this.planDate = selectedText.join('-')
+            this.dateError = false
         },
         tabClick(e) {
             this.activeVal = e
         },
-        //单选的值
-        selectValChild(childValue) {
-            // childValue就是子组件传过来的值
+        //获取上传图片的值
+        imgChildByValue(childValue) {
             console.log(childValue)
+            this.setAnswerInfo(childValue)
+        },
+        //给当前菜单题目答案赋值
+        setAnswerInfo(childValue) {
             let currMenuArr = this.questionnaires.find(
                 n => n.Code == this.activeVal
             )
@@ -205,11 +225,28 @@ export default {
                 .map(n => n.Questions.find(m => m.ID === childValue.QuestionID))
                 .find(item => item)
             if (question) {
-								question.QuestionAnswerInfo.StrValue = childValue.StrValue
+                question.QuestionAnswerInfo.StrValue = childValue.StrValue
             }
+            this.questionnaires = this.questionnaires
+        },
+        //单选的值
+        selectValChild(childValue) {
+            // childValue就是子组件传过来的值
+            console.log(childValue)
+            this.setAnswerInfo(childValue)
+        },
+        //多选的值
+        selectValMultipleChild(childValue) {
+            console.log(childValue)
+            this.setAnswerInfo(childValue)
         },
         //保存
         submitForm() {
+            if (this.planDate == '' || this.planDate == '请选择') {
+                yktoast('请填写评估日期')
+                this.dateError = true
+                return
+            }
             // 过滤当前点击菜单下的所有题目
             let currMenuArr = this.questionnaires.find(
                 n => n.Code == this.activeVal
@@ -237,6 +274,7 @@ export default {
                 QuestionnaireCode: this.activeVal, //菜单code
                 AssessAnswerInfoStr: JSON.stringify(allQuestionAnswerInfo)
             }
+            debugger
             console.log(data)
             this.$fetchPost(url, data, 4111).then(response => {
                 let result = response.data.data //请求返回数据
@@ -254,6 +292,13 @@ export default {
 }
 </script>
 <style lang="less">
+.tipsIcon {
+    color: #fc7a56;
+    position: absolute;
+    font-size: 12px;
+    left: 3px;
+    top: 20px;
+}
 input::placeholder {
     color: #aaaaaa;
     font-size: 16px;
@@ -341,5 +386,9 @@ input::placeholder {
     &.evalFormFoot {
         position: relative;
     }
+}
+.bg_h15 {
+    height: 15px;
+    background: #f7f7f7;
 }
 </style>

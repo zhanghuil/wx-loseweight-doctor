@@ -12,9 +12,9 @@ axios.defaults.timeout = 30000;
 //POST传参序列化(添加请求拦截器)
 axios.interceptors.request.use((config) => {
 	//在发送请求之前做某件事
-	if (config.method === 'post') {
-		config.data = qs.stringify(config.data);
-	}
+	// if (config.method === 'post') {
+	// 	config.data = qs.stringify(config.data);
+	// }
 	return config;
 }, (error) => {
 	console.log('错误的传参')
@@ -80,7 +80,7 @@ export function fetchPost(url, params, authCode) {
 	const tokenValue = storage.getItem('Token') || ''
 	toast.show()
 	return new Promise((resolve, reject) => {
-		axios.post(url, params, {
+		axios.post(url, qs.stringify(params), {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded',
 				token: tokenValue,
@@ -193,9 +193,40 @@ export function fetchDelete(url, param, authCode) {
 			})
 	})
 }
+//(发送post请求  ，文件上传)
+export function fetchPostFile(url, params, authCode) {
+	const toast = v.$createToast({
+		txt: 'Loading...',
+		mask: true
+	})
+	const tokenValue = storage.getItem('Token') || ''
+	toast.show()
+	return new Promise((resolve, reject) => {
+		axios.post(url, params, {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+				token: tokenValue,
+				wincomeflag: encryption(authCode, timestamp),
+				wincometimestamp: timestamp
+			}
+		})
+			.then(response => {
+				resolve(response);
+				toast.hide()
+			}, err => {
+				reject(err);
+				toast.hide()
+			})
+			.catch((error) => {
+				reject(error)
+				toast.hide()
+			})
+	})
+}
 export default {
 	fetchPost,
 	fetchPut,
 	fetchGet,
-	fetchDelete
+	fetchDelete,
+	fetchPostFile
 }

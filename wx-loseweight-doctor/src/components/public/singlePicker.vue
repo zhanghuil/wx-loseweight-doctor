@@ -49,7 +49,7 @@ export default {
             this.$emit('selectValChild', this.option.QuestionAnswerInfo)
         },
         cancelHandle() {
-            yktoast('点击了取消')
+            console.log('点击了取消')
         }
     }
 }

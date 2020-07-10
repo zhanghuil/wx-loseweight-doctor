@@ -48,6 +48,7 @@ const userApi = {
 	GetDoctorAssess: webApi + '/api/System/MedicalRecord/GetDoctorAssess',  //获取评估表
 	SaveDoctorAssess: webApi + '/api/System/MedicalRecord/SaveDoctorAssess',  //保存评估表
 	DeleteDoctorAssess: webApi + '/api/System/MedicalRecord/DeleteDoctorAssess',  //删除评估表
+	UploadDoctorAssessImg: webApi + '/api/System/File/UploadDoctorAssessImg', //上传文件
 
 }
 export default {

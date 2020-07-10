@@ -42,6 +42,7 @@ export default {
     },
     data() {
         return {
+            childValueArr: [],
             selectPatientGroup: [],
             showFlag: false //显示
         }
@@ -63,16 +64,16 @@ export default {
             this.showFlag = false
         },
         childByValue(childValue) {
-            // childValue就是子组件传过来的值 radioVal
+            // childValue就是子组件传过来的值
             console.log(childValue)
-            this.selectPatientGroup = childValue
-            this.$emit('selGroup', childValue)
+            this.childValueArr = childValue
         },
         cancelTap() {
             this.$emit('cancle')
             this.hide()
         },
         submitTap() {
+            this.$emit('selGroup', this.childValueArr)
             this.hide()
         }
     }

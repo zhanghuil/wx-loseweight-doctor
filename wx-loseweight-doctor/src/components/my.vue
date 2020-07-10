@@ -64,7 +64,7 @@
                         <div><i class="icon cubeic-arrow"></i></div>
                     </li>
                 </router-link>
-                <!-- <router-link to="/templateMag">
+                <router-link to="/templateMag">
                     <li>
                         <div class="L">
                             <div>
@@ -78,7 +78,7 @@
                         </div>
                         <div><i class="icon cubeic-arrow"></i></div>
                     </li>
-                </router-link> -->
+                </router-link>
             </ul>
         </div>
         <div class="exitBox" @click="exitTap">退出</div>

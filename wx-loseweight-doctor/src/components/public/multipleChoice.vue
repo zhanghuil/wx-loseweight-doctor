@@ -4,9 +4,9 @@
             <div class="f16 c-3a">
                 {{ option.Name }}
             </div>
-            <div class="cell_ft pr10">
+            <div class="cell_ftM pr10 w-60 ellipsis tr">
                 <span
-                    class="mr10 f16"
+                    class="mr10 f16 dib ellipsis"
                     :class="selectValue == '请选择' ? 'c-a' : ''"
                     >{{ selectValue }}</span
                 >
@@ -17,8 +17,6 @@
             ref="choiceList"
             :list="list"
             @selGroup="selGroup"
-            @cancle="cancle"
-            @confirm="confirm"
         ></choiceList>
     </div>
 </template>
@@ -33,8 +31,7 @@ export default {
     data() {
         return {
             selectValue: '请选择',
-						list: [],
-						selGroup:[]
+            list: []
         }
     },
     created() {},
@@ -49,8 +46,26 @@ export default {
             this.list = newSelectList
             this.$refs.choiceList.show()
         },
+        selGroup(childValue) {
+            console.log(childValue)
+            let selMapName = childValue.map(item => item.GroupName)
+            this.selectValue = selMapName.join('/')
+            this.option.QuestionAnswerInfo.StrValue = childValue.join(',')
+            this.$emit('selectValMultipleChild', this.option.QuestionAnswerInfo)
+        },
         cancle() {},
         confirm() {}
     }
 }
 </script>
+<style lang="less">
+.cell_ftM {
+    display: flex;
+    span {
+        flex: 1;
+    }
+    i {
+        width: 16px;
+    }
+}
+</style>
