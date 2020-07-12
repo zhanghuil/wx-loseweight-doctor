@@ -38,19 +38,29 @@ export default {
     props: {
         list: {
             type: Array
-        }
+				},
+				topID:{
+					type:String
+				},
+				selectPatientGroupByParent:{
+					type:Array,
+					default:[]
+				}
     },
     data() {
         return {
             childValueArr: [],
-            selectPatientGroup: [],
+						selectPatientGroup: this.initTest(),//this.selectPatientGroupByParent,
             showFlag: false //显示
         }
     },
     created() {
-        console.log(this.list)
-    },
+				console.log(this.list)
+		},
     methods: {
+			initTest(){
+				return this.selectPatientGroupByParent
+			},
         refreshCard() {
             this.$refs.scrollSearch.refresh()
         },
@@ -65,7 +75,15 @@ export default {
         },
         childByValue(childValue) {
             // childValue就是子组件传过来的值
-            console.log(childValue)
+						console.log(childValue)
+						// debugger
+						
+						if(childValue.length>0&&childValue[childValue.length-1].GroupID==this.topID){
+							childValue=childValue.filter(n=>n.GroupID==this.topID)
+						}else{
+							childValue=childValue.filter(n=>n.GroupID!=this.topID)
+						}
+						this.selectPatientGroup=childValue
             this.childValueArr = childValue
         },
         cancelTap() {

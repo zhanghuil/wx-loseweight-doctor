@@ -17,14 +17,16 @@
 import { yktoast, convertKey } from '../../common/js/util'
 export default {
     props: {
-        option: Object
+				option: Object,
+				answerInfoStr: String
     },
     data() {
         return {
-            selectValue: '请选择'
+						selectValue: this.initSelectValue(), //'请选择',
+						selectIndex:0,
         }
     },
-    created() {},
+		created() {},
     methods: {
         showPicker() {
             //重新组装数组符合组件
@@ -36,7 +38,8 @@ export default {
             if (!this.picker) {
                 this.picker = this.$createPicker({
                     title: `${this.option.Name}`,
-                    data: [newSelectList],
+										data: [newSelectList],
+										selectedIndex: [this.selectIndex],
                     onSelect: this.selectHandle,
                     onCancel: this.cancelHandle
                 })
@@ -45,12 +48,17 @@ export default {
         },
         selectHandle(selectedVal, selectedIndex, selectedText) {
             this.selectValue = selectedText.join(' ')
-            this.option.QuestionAnswerInfo.StrValue = selectedVal.join(', ')
-            this.$emit('selectValChild', this.option.QuestionAnswerInfo)
+						this.option.QuestionAnswerInfo.StrValue = selectedVal.join(', ')
+            this.$emit('selectValChild', this.option.QuestionAnswerInfo,this.option.QuestionGroupID)
         },
         cancelHandle() {
             console.log('点击了取消')
-        }
+				},
+				initSelectValue(){
+					let option = this.option.QuestionOptions.find(n=>this.answerInfoStr&&n.ID==this.answerInfoStr)
+					if(option) return option.Name
+					else return '请选择'
+				}
     }
 }
 </script>

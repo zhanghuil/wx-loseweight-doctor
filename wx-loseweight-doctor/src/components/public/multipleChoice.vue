@@ -16,6 +16,8 @@
         <choiceList
             ref="choiceList"
             :list="list"
+						:topID="topID"
+						:selectPatientGroupByParent="selectPatientGroup"
             @selGroup="selGroup"
         ></choiceList>
     </div>
@@ -25,34 +27,76 @@ import choiceList from '@/components/choiceList'
 import { yktoast, convertKey } from '../../common/js/util'
 export default {
     props: {
-        option: Object
+				option: Object,
+				answerInfoStr: String
     },
     components: { choiceList },
     data() {
         return {
-            selectValue: '请选择',
-            list: []
+						topID:'',//“无”的ID by zhl2
+            selectValue:this.initSelectValue(),// '请选择',
+						list: [],
+						selectPatientGroup:this.initSelectPatientGroup()//[]
         }
     },
     created() {},
     methods: {
         showPicker() {
+						let topQuestionOption = this.option.QuestionOptions.find(n=>n.RejectOptionID);
+						if(topQuestionOption) this.topID=topQuestionOption.ID
             //重新组装数组符合组件
             let listNew = this.option.QuestionOptions.map(item => {
                 let { ID, Name } = item
                 return { ID, Name }
-            })
+						})
+						if(this.option.QuestionAnswerInfo.StrValue){
+							let selectIDArr =  this.option.QuestionAnswerInfo.StrValue.split(',')
+							let selectCheckboxList = this.option.QuestionOptions.filter(n=>selectIDArr.indexOf(n.ID)>-1).map(n=>{
+								 let { ID, Name } = n
+                return { ID, Name }
+							})
+							debugger
+							this.selectPatientGroup = convertKey(selectCheckboxList, ['GroupID', 'GroupName'])
+							}
+						
             let newSelectList = convertKey(listNew, ['GroupID', 'GroupName'])
             this.list = newSelectList
             this.$refs.choiceList.show()
         },
         selGroup(childValue) {
-            console.log(childValue)
+						console.log(childValue)
+						this.selectPatientGroup=childValue
             let selMapName = childValue.map(item => item.GroupName)
-            this.selectValue = selMapName.join('/')
-            this.option.QuestionAnswerInfo.StrValue = childValue.join(',')
+						this.selectValue = selMapName.join('/')
+            this.option.QuestionAnswerInfo.StrValue = childValue.map(n=>n.GroupID).join(',')
             this.$emit('selectValMultipleChild', this.option.QuestionAnswerInfo)
-        },
+				},
+				initSelectValue(){
+					if(!this.answerInfoStr) return '请选择'   
+
+					let selectOptionArr=this.answerInfoStr.split(',')
+					if(selectOptionArr.length<=0) return '请选择' 
+
+					let selectCheckboxList = this.option.QuestionOptions.filter
+					(n=>selectOptionArr.indexOf(n.ID)>-1)
+					let selectValueArr=[]
+					selectCheckboxList.forEach(element => {
+						selectValueArr.push(element.Name)
+					});
+					 this.selectPatientGroup = convertKey(selectCheckboxList, ['GroupID', 'GroupName'])
+					// debugger
+					return  selectValueArr.join('/')
+				},
+				initSelectPatientGroup(){
+					if(!this.answerInfoStr) return []   
+
+					let selectOptionArr=this.answerInfoStr.split(',')
+					if(selectOptionArr.length<=0) return []
+
+					let selectCheckboxList = this.option.QuestionOptions.filter
+					(n=>selectOptionArr.indexOf(n.ID)>-1)
+					return convertKey(selectCheckboxList, ['GroupID', 'GroupName'])
+				},
         cancle() {},
         confirm() {}
     }

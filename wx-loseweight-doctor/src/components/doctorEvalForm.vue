@@ -59,7 +59,7 @@
                     <ol>
                         <li v-for="(n, qi) in list.Questions" :key="qi">
                             <!-- 输入框 -->
-                            <template v-if="n.TypeCode == 'Num'">
+                            <template v-if="n.TypeCode == 'Num'&&(n.IsHidden==null||!n.IsHidden)">
                                 <div class="wrap">
                                     <div class="f16 c-3a">
                                         {{ n.Name }}
@@ -67,8 +67,10 @@
                                     <div class="pr10">
                                         <!-- 不可输入 -->
                                         <template v-if="n.IsFixed">
-                                            <span class="f16 c-6d">-</span>
-                                            <span class="f16 c-fb">42</span>
+                                            <span class="f16 c-6d">{{n.QuestionAnswerInfo
+                                                        .DecimalValue?n.QuestionAnswerInfo
+                                                        .DecimalValue:'-'}}</span>
+                                            <!-- <span class="f16 c-fb">42</span> -->
                                         </template>
                                         <template v-else>
                                             <input
@@ -80,6 +82,7 @@
                                                 "
                                                 :disabled="n.IsFixed"
                                                 :placeholder="n.Placeholder"
+																								@blur="changeInput(n.SignCode)"
                                             />
                                             <span class="f16 c-6d">{{
                                                 n.Suffix
@@ -93,16 +96,18 @@
                                 <singlePicker
                                     @selectValChild="selectValChild"
                                     :option="n"
+																		:answerInfoStr="n.QuestionAnswerInfo.StrValue"
                                 ></singlePicker>
                             </template>
                             <!-- 多选 -->
                             <template
-                                v-else-if="n.TypeCode == 'MultipleSelect'"
+                                v-else-if="n.TypeCode == 'MultipleSelect'&&(n.IsHidden==null||!n.IsHidden)"
                             >
                                 <multipleChoice
                                     @selectValMultipleChild="
                                         selectValMultipleChild
                                     "
+																		:answerInfoStr="n.QuestionAnswerInfo.StrValue"
                                     :option="n"
                                 ></multipleChoice>
                             </template>
@@ -161,6 +166,57 @@ export default {
         else this.getDoctorAssess()
     },
     methods: {
+				changeInput(signCode){
+					//todo 参数校验
+					var bmiRelationSignCodeArr=['CurrentWeight','CurrentHeight'];
+					var WHRRelationSignCodeArr=['CurrentWaistline','CurrentHipline']
+					if(this.activeVal == 'Assess_TG' && bmiRelationSignCodeArr.indexOf(signCode)>=0){
+						this.calcBMI();
+					}else if(this.activeVal == 'Assess_TG' && WHRRelationSignCodeArr.indexOf(signCode)>=0){	
+						this.calcWHR();
+					}
+				},
+				calcBMI(){
+					let currMenuArr = this.questionnaires.find(
+                n => n.Code == 'Assess_TG'
+						)
+					let currQuestionArr = currMenuArr.Questionnaire.QuestionGroups.find(n=>n.Code=='TGJC')
+					if(!currQuestionArr) return
+
+					let currentHeight =  currQuestionArr.Questions.find(m => m.SignCode === 'CurrentHeight').QuestionAnswerInfo.DecimalValue
+					let currentWeight =  currQuestionArr.Questions.find(m => m.SignCode === 'CurrentWeight').QuestionAnswerInfo.DecimalValue
+					let currentBMIQuestionAnswerInfo = currQuestionArr.Questions.find(m => m.SignCode === 'CurrentBMI').QuestionAnswerInfo
+					if(currentHeight&&currentWeight){
+						/*
+						计算BMI
+						BMI：身高、体重缺任一值，显示“—”，两项齐全，自动计算并显示结果值，保留1位小数。
+						计算公式：体重kg÷身高m÷身高m
+						 */
+						currentBMIQuestionAnswerInfo.DecimalValue =  (currentWeight/currentHeight/currentHeight*10000).toFixed(1);
+					}else{
+						currentBMIQuestionAnswerInfo.DecimalValue = '-';
+					}
+				},
+				calcWHR(){
+					let currMenuArr = this.questionnaires.find(
+                n => n.Code == 'Assess_TG'
+						)
+					let currQuestionArr = currMenuArr.Questionnaire.QuestionGroups.find(n=>n.Code=='TGJC')
+					if(!currQuestionArr) return
+
+					let currentWaistline =  currQuestionArr.Questions.find(m => m.SignCode === 'CurrentWaistline').QuestionAnswerInfo.DecimalValue
+					let currentHipline =  currQuestionArr.Questions.find(m => m.SignCode === 'CurrentHipline').QuestionAnswerInfo.DecimalValue
+					let currentWHRQuestionAnswerInfo = currQuestionArr.Questions.find(m => m.SignCode === 'CurrentWHR').QuestionAnswerInfo
+					if(currentWaistline&&currentHipline){
+						/*
+						腰臀比：腰围、臀围缺任一值，显示“—”，两项齐全，自动计算并显示结果值，保留2位小数。
+						计算公式：腰围÷臀围
+						 */
+						currentWHRQuestionAnswerInfo.DecimalValue =  (currentWaistline/currentHipline).toFixed(2);
+					}else{
+						currentWHRQuestionAnswerInfo.DecimalValue = '-';
+					}
+				},
         // 获取评估表
         getDoctorAssess() {
             var _this = this
@@ -174,7 +230,7 @@ export default {
                     yktoast('加载失败')
                     return
                 }
-                _this.questionnaires = result.Questionnaires
+								_this.questionnaires = result.Questionnaires
             })
         },
         // 空白评估表
@@ -186,8 +242,12 @@ export default {
                 if (!result) {
                     yktoast('加载失败')
                     return
-                }
-                _this.questionnaires = result.Questionnaires
+								}
+								result.Questionnaires.forEach(n=>{n.Questionnaire.QuestionGroups.forEach(n=>{n.Questions.forEach(n=>{
+									n.IsHidden=false
+								})})})
+								_this.questionnaires = result.Questionnaires
+								_this.tabClick(_this.activeVal)
             })
         },
         //评估日期
@@ -205,9 +265,51 @@ export default {
         selectHandle(date, selectedVal, selectedText) {
             this.planDate = selectedText.join('-')
             this.dateError = false
-        },
+				},
+				combine() {
+					let arr = [].concat.apply([], arguments); //没有去重复的新数组 
+					return Array.from(new Set(arr));
+				},
         tabClick(e) {
-            this.activeVal = e
+					var _this=this
+					this.activeVal = e
+					let currMenuArr = this.questionnaires.find(n => n.Code == this.activeVal)
+							currMenuArr.Questionnaire.QuestionGroups.forEach(e => {
+								let currentGroupCode = e.Code //eg:体格检查对应groupCode
+								let arrQuestionIDs=[]//['553946F363BD4ECCA67D098CACEA2EF0','FF260D80E96341F78C2CE13BD2D26356','FC319D9595D44F51A393CA6A5C477A14','F5C5753A77E7499BAD27B193603E19AB'];//'4FEEC803A9474FE19A3A9272B715345A'
+								e.Questions.forEach(question => {
+									if(question.QuestionOptions&&question.QuestionOptions.length>0){
+										let rejectQuestionIDs = question.QuestionOptions.filter(n=>n.RejectQuestionID!=null).map(n=>n.RejectQuestionID);
+										if(rejectQuestionIDs&&rejectQuestionIDs.length>0){
+											//找到要显示的关联题目
+											let currentSelectRejectQuestionIDArr=[]; 
+											if(question.QuestionAnswerInfo.StrValue){
+												let currentSelectRejectQuestionID =  question.QuestionOptions.find(n=>n.ID==question.QuestionAnswerInfo.StrValue).RejectQuestionID
+												if(currentSelectRejectQuestionID&&currentSelectRejectQuestionID!='null'){
+													currentSelectRejectQuestionIDArr=currentSelectRejectQuestionID.split(',')
+												}
+											}
+											rejectQuestionIDs.forEach(element => {
+												arrQuestionIDs = _this.combine(arrQuestionIDs,element.split(','))
+											});
+
+											if(currentSelectRejectQuestionIDArr&&currentSelectRejectQuestionIDArr.length>0){
+												currentSelectRejectQuestionIDArr.forEach(e => {
+													if(arrQuestionIDs.indexOf(e)>=0){
+															arrQuestionIDs.splice(arrQuestionIDs.indexOf(e),1)
+														}
+												});
+											}
+										}
+									}
+								});
+								//隐藏对应关联题目
+								if(arrQuestionIDs.length>0){
+									e.Questions.filter(n=>arrQuestionIDs.indexOf(n.ID)>=0).forEach(n=>{
+										n.IsHidden=true
+									})
+								}
+							});
         },
         //获取上传图片的值
         imgChildByValue(childValue) {
@@ -227,14 +329,55 @@ export default {
             if (question) {
                 question.QuestionAnswerInfo.StrValue = childValue.StrValue
             }
-            this.questionnaires = this.questionnaires
-        },
+            //this.questionnaires = this.questionnaires
+				},
+				//初始化关联题目状态
+				initRejectQuestionState(questionID,questionGroupID,optionID){
+					var _this = this
+					let currMenuArr = this.questionnaires.find(n => n.Code == this.activeVal)
+					currMenuArr.Questionnaire.QuestionGroups.forEach(e => {
+						if(e.ID!=questionGroupID) return
+						let currentGroupCode = e.Code //eg:体格检查对应groupCode
+						let arrQuestionIDs=[];//所有关联题目
+						let currentSelectRejectQuestionIDArr=[]; //找到要显示的关联题目
+						e.Questions.forEach(question => {
+							if(question.QuestionOptions&&question.QuestionOptions.length>0){
+								let rejectQuestionIDs = question.QuestionOptions.filter(n=>n.RejectQuestionID!=null).map(n=>n.RejectQuestionID);
+								if(rejectQuestionIDs&&rejectQuestionIDs.length>0){
+									//找到要显示的关联题目
+									if(question.ID==questionID){
+										let currentRejectQuestionID = question.QuestionOptions.find(n=>n.ID==optionID).RejectQuestionID
+										// currentRejectQuestionID='4FEEC803A9474FE19A3A9272B715345A'
+										if(currentRejectQuestionID){
+											currentSelectRejectQuestionIDArr= currentRejectQuestionID.split(',')
+										}
+									}
+									//所有关联题目ID
+									rejectQuestionIDs.forEach(element => {
+										arrQuestionIDs = _this.combine(arrQuestionIDs,element.split(','))
+									});
+								}
+							}
+						});
+						//隐藏对应关联题目
+						if(arrQuestionIDs.length>0){
+							e.Questions.filter(n=>arrQuestionIDs.indexOf(n.ID)>=0).forEach(n=>{
+								n.IsHidden=true
+							})
+							e.Questions.filter(n=>currentSelectRejectQuestionIDArr.indexOf(n.ID)>=0).forEach(n=>{
+								n.IsHidden=false
+							})
+						}
+					});
+				},
         //单选的值
-        selectValChild(childValue) {
-            // childValue就是子组件传过来的值
+        selectValChild(childValue,questionGroupID) {
+						// childValue就是子组件传过来的值
+						debugger
             console.log(childValue)
-            this.setAnswerInfo(childValue)
-        },
+						this.setAnswerInfo(childValue)
+						this.initRejectQuestionState(childValue.QuestionID,questionGroupID,childValue.StrValue)
+				},
         //多选的值
         selectValMultipleChild(childValue) {
             console.log(childValue)
