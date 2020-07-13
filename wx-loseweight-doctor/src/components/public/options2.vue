@@ -67,7 +67,7 @@ export default {
     },
     data() {
         return {
-            currValArr: []
+            currValArr: this.getInitCurrValArr()//[]
         }
     },
     created() {
@@ -81,7 +81,8 @@ export default {
     // },
     watch: {
         selectPatientGroup: {
-            handler(newVal, oldVal) {
+            handler(newVal, oldVal) {		
+							// debugger					
                 this.currValArr = newVal //newVal即是chartData
             },
             deep: true,
@@ -90,6 +91,12 @@ export default {
     },
 
     methods: {
+			getInitCurrValArr(){
+				// debugger
+				if(this.selectPatientGroup&&this.selectPatientGroup.length>0)
+				return this.selectPatientGroup
+				else return [];
+			},
         optionsClick(item) {
             if (this.isMultiply === false) {
                 //单选
@@ -97,23 +104,24 @@ export default {
                     //不可移除自己
                     this.$set(this.currValArr, 0, item) // 将该值设为当前数组的第一项
                 } else {
-                    if (this.currValArr.indexOf(item) != -1) {
+                    if (this.currValArr.findIndex(n=>n.GroupID==item.GroupID) != -1) {
                         //当前数组中有该值，找到该值下标并删除
-                        this.currValArr.splice(this.currValArr.indexOf(item), 1)
+                        this.currValArr.splice(this.currValArr.findIndex(n=>n.GroupID==item.GroupID), 1)
                     } else {
                         this.$set(this.currValArr, 0, item) // 将该值设为当前数组的第一项
                     }
                 }
             } else {
-                //多选
-                if (this.currValArr.indexOf(item) === -1) {
+								//多选
+								if(this.currValArr.findIndex(n=>n.GroupID==item.GroupID)==-1){
+                // if (this.currValArr.indexOf(item) === -1) {
                     // 当前数组中没有该值则push到数组
                     this.currValArr.push(item)
                 } else {
                     //当前数组中有该值，找到该值下标并删除
-                    this.currValArr.splice(this.currValArr.indexOf(item), 1)
+                    this.currValArr.splice(this.currValArr.findIndex(n=>n.GroupID==item.GroupID), 1)
                 }
-            }
+						}
             this.$emit('toparents', this.currValArr)
         },
         checkActive(item) {
@@ -121,8 +129,10 @@ export default {
             if (this.isMultiply === false) {
                 //单选
                 this.currValArr.length = 1
-            }
-            return this.currValArr.indexOf(item) !== -1 //多选
+						}
+						// debugger
+						return this.currValArr.findIndex(n=>n.GroupID==item.GroupID)!=-1//多选
+            // return this.currValArr.indexOf(item) !== -1 
         }
     }
 }

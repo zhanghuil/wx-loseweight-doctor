@@ -113,12 +113,13 @@
                             </template>
                             <!-- 上传图片 -->
                             <template v-else-if="n.TypeCode == 'Image'">
-                                <div>
+                                <div class="py16">
                                     <div class="f16 c-3a">
                                         {{ n.Name }}
                                     </div>
                                     <imgUpload
                                         :ans="n.QuestionAnswerInfo"
+																				:answerInfoStr="n.QuestionAnswerInfo.StrValue"
                                         :uploadNum="n.Max"
                                         title="上传图片"
                                         @input="imgChildByValue"
@@ -231,6 +232,7 @@ export default {
                     return
                 }
 								_this.questionnaires = result.Questionnaires
+								_this.planDate = formatDate(new Date(result.DoctorAssess.AssessDate),'yyyy-MM-dd')
             })
         },
         // 空白评估表
@@ -276,7 +278,7 @@ export default {
 					let currMenuArr = this.questionnaires.find(n => n.Code == this.activeVal)
 							currMenuArr.Questionnaire.QuestionGroups.forEach(e => {
 								let currentGroupCode = e.Code //eg:体格检查对应groupCode
-								let arrQuestionIDs=[]//['553946F363BD4ECCA67D098CACEA2EF0','FF260D80E96341F78C2CE13BD2D26356','FC319D9595D44F51A393CA6A5C477A14','F5C5753A77E7499BAD27B193603E19AB'];//'4FEEC803A9474FE19A3A9272B715345A'
+								let arrQuestionIDs=[]
 								e.Questions.forEach(question => {
 									if(question.QuestionOptions&&question.QuestionOptions.length>0){
 										let rejectQuestionIDs = question.QuestionOptions.filter(n=>n.RejectQuestionID!=null).map(n=>n.RejectQuestionID);
@@ -373,7 +375,6 @@ export default {
         //单选的值
         selectValChild(childValue,questionGroupID) {
 						// childValue就是子组件传过来的值
-						debugger
             console.log(childValue)
 						this.setAnswerInfo(childValue)
 						this.initRejectQuestionState(childValue.QuestionID,questionGroupID,childValue.StrValue)
@@ -410,14 +411,13 @@ export default {
             let AccountId = storage.getItem('AccountId')
             let url = this.api.userApi.SaveDoctorAssess
             let data = {
-                AssessID: this.assessID, //评估ID
+                AssessID: this.doctorAssessId?this.doctorAssessId:this.assessID, //评估ID
                 PatientID: this.$route.query.userId, //患者ID
                 DoctorID: AccountId, //评估医生ID
                 AssessDate: this.planDate, //评估日期
                 QuestionnaireCode: this.activeVal, //菜单code
                 AssessAnswerInfoStr: JSON.stringify(allQuestionAnswerInfo)
             }
-            debugger
             console.log(data)
             this.$fetchPost(url, data, 4111).then(response => {
                 let result = response.data.data //请求返回数据
@@ -494,17 +494,22 @@ input::placeholder {
     line-height: 12px;
     padding: 6px 15px 7px;
 }
+.py16{
+	padding: 16px 0;
+}
 .formCon {
     background: #ffffff;
     padding-left: 15px;
     ol {
         li {
-            border-bottom: 1px solid #f2f2f2;
-            padding: 16px 0;
-            &:last-child {
-                border: none;
-            }
+            // border-bottom: 1px solid #f2f2f2;
+            // padding: 16px 0;
+            // &:last-child {
+            //     border: none;
+            // }
             .wrap {
+							  border-bottom: 1px solid #f2f2f2;
+                padding: 16px 0;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;

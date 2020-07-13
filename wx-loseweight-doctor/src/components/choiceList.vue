@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import Options from '@/components/public/options'
+import Options from '@/components/public/options2'
 export default {
     components: { Options },
     props: {

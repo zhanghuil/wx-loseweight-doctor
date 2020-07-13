@@ -36,12 +36,13 @@
 import { yktoast } from '../../common/js/util'
 import { webApi } from '../../request/env'
 export default {
-    props: ['uploadNum', 'title', 'upUrl', 'ans'],
+    props: ['uploadNum', 'title', 'upUrl', 'ans','answerInfoStr'],
     data() {
         return {
             initialIndex: 0,
             fileList: [],
-            imgList: [],
+						imgList: this.initSelectValue(),//[],
+						selectImgList: [],  //已经上传的图片
             upImgList: []
         }
     },
@@ -51,6 +52,16 @@ export default {
         }
     },
     methods: {
+				initSelectValue(){
+					if(!this.answerInfoStr) return []
+					let selectOptionArr=this.answerInfoStr.split(',')
+					if(selectOptionArr.length<=0) return []
+					let imgList=[]
+					selectOptionArr.forEach(e => {
+						imgList.push(webApi+e)
+					})
+					return imgList
+				},
         // 上传操作
         onUpload(e) {
             let photoFile = e.target
@@ -87,13 +98,22 @@ export default {
             var _this = this
             let url = this.api.userApi.UploadDoctorAssessImg
             this.$fetchPostFile(url, formFile, 700).then(response => {
-                let result = response.data.data
+								let result = response.data.data
+								// debugger
                 this.fileList.push(file) //添加进图片数组
                 let imgUrl = webApi + result //图片回显地址
-                let upImg = result //传给后台的图片地址
-                this.imgList.push(imgUrl)
-                this.upImgList.push(upImg)
-                let upImgAll = this.upImgList.join(',')
+								let upImg = result //传给后台的图片地址
+								console.log(this.imgList)
+								this.imgList.push(imgUrl)
+								console.log(this.imgList)
+								this.upImgList.push(upImg)
+								let upImgAll = ''
+								if(_this.answerInfoStr){
+									upImgAll = this.upImgList.join(',') + ',' + _this.answerInfoStr
+								}else{
+									upImgAll = this.upImgList.join(',')
+								}
+                console.log(upImgAll)
                 this.ans.StrValue = upImgAll
                 this.$emit('input', this.ans)
             })

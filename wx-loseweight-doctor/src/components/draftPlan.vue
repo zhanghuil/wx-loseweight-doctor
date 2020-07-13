@@ -25,6 +25,7 @@
                     </div>
                 </div>
                 <div class="tc targetBox">
+										<span class="f14">减掉</span>
                     <input
                         class="targetInput"
                         type="tel"
@@ -1472,11 +1473,8 @@ export default {
         filtersPlanSupply(result) {
             // Math.round(math.format(a*b,14)* 10) / 10
             const precision = 14 //num表示精度，最大为14，表示单一文本框最大的数字位数，包括小数点前后
-            if (
-                this.activeVal == 'HighProtein' ||
-                this.activeVal == 'FastDiet'
-            ) {
-                //高蛋白 轻断食
+            if (this.activeVal == 'HighProtein') {
+                //高蛋白 
                 if (this.LBW > 0) {
                     //有瘦体重
                     let BMR =
@@ -1523,6 +1521,54 @@ export default {
                             math.format((enery * 0.4) / 4, precision) * 10
                         ) / 10
                 }
+						} else if(this.activeVal == 'FastDiet'){
+							//轻断食
+							 if (this.LBW > 0) {
+                    //有瘦体重
+                    let BMR =
+                        Math.round(
+                            math.format(370 + 21.6 * this.LBW, precision) * 10
+                        ) / 10
+                    this.planSupply.energy =
+                        Math.round(
+                            math.format(BMR * 1.2 - 500, precision) * 10
+                        ) / 10
+                    this.planSupply.protein =
+                        Math.round(
+                            math.format(this.LBW * 2.2, precision) * 10
+                        ) / 10
+                    let energy = this.planSupply.energy
+                    this.planSupply.fat =
+                        Math.round(
+                            math.format((energy * 0.3) / 9, precision) * 10
+                        ) / 10
+                    this.planSupply.CHO =
+                        Math.round(
+                            math.format((energy * 0.4) / 4, precision) * 10
+                        ) / 10
+                } else {
+                    //无瘦体重
+                    let _basicW =
+                        Math.round(
+                            math.format(result.Height - 105, precision) * 10
+                        ) / 10 //标准体重
+                    this.planSupply.energy =
+                        Math.round(math.format(_basicW * 25, precision) * 10) /
+                        10
+                    let enery = this.planSupply.energy
+                    this.planSupply.protein =
+                        Math.round(
+                            math.format((enery * 0.2) / 4, precision) * 10
+                        ) / 10
+                    this.planSupply.fat =
+                        Math.round(
+                            math.format((enery * 0.25) / 9, precision) * 10
+                        ) / 10
+                    this.planSupply.CHO =
+                        Math.round(
+                            math.format((enery * 0.55) / 4, precision) * 10
+                        ) / 10
+                }
 
                 /**
 								 * 【轻断食】
@@ -1535,7 +1581,7 @@ export default {
                     this.planSupply.fastingSupply = 600
                 } else {
                     this.planSupply.fastingSupply = 500
-                }
+								}
             } else if (this.activeVal == 'LimitEnergy') {
                 //限能量
                 if (this.LBW > 0) {
@@ -1568,7 +1614,7 @@ export default {
                             math.format(result.Height - 105, precision) * 10
                         ) / 10 //标准体重
                     this.planSupply.energy =
-                        Math.round(math.format(_basicW * 20, precision) * 10) /
+                        Math.round(math.format(_basicW * 22, precision) * 10) /
                         10
                     let enery = this.planSupply.energy
                     this.planSupply.protein =
@@ -1577,11 +1623,11 @@ export default {
                         ) / 10
                     this.planSupply.fat =
                         Math.round(
-                            math.format((enery * 0.2) / 9, precision) * 10
+                            math.format((enery * 0.25) / 9, precision) * 10
                         ) / 10
                     this.planSupply.CHO =
                         Math.round(
-                            math.format((enery * 0.6) / 4, precision) * 10
+                            math.format((enery * 0.55) / 4, precision) * 10
                         ) / 10
                 }
             }

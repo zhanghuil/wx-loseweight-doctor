@@ -55,7 +55,7 @@ export default {
 								 let { ID, Name } = n
                 return { ID, Name }
 							})
-							debugger
+							// debugger
 							this.selectPatientGroup = convertKey(selectCheckboxList, ['GroupID', 'GroupName'])
 							}
 						

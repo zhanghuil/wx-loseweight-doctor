@@ -48,7 +48,7 @@ export default {
                 doctorId: AccountId,
                 typeCode: this.$route.query.id
             }
-            this.$fetchGet(url, data, 4121).then(response => {
+            this.$fetchGet(url, data, 4330).then(response => {
                 let result = response.data.data //请求返回数据
                 if (!result) {
                     yktoast(result)
