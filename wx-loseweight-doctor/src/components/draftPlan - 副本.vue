@@ -675,11 +675,40 @@
                                             {{ item.Name }}
                                         </div>
                                         <div class="pr10">
-																						<input
-																								type="text"
-																								placeholder="请输入"
-																								v-model="item.QuestionAnswerInfo.StrValue"
-																						/>
+                                            <template v-if="item.Precision > 0">
+                                                <input
+                                                    type="tel"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'DecimalValue',
+                                                            'adviseSports'
+                                                        )
+                                                    "
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .DecimalValue
+                                                    "
+                                                />
+                                            </template>
+                                            <template v-else>
+                                                <input
+                                                    type="tel"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'IntValue',
+                                                            'adviseSports'
+                                                        )
+                                                    "
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .IntValue
+                                                    "
+                                                />
+                                            </template>
                                             <span class="f14 c-6d">{{
                                                 item.Suffix
                                             }}</span>
@@ -720,11 +749,40 @@
                                             {{ item.Name }}
                                         </div>
                                         <div class="pr10">
-                                            <input
-																								type="text"
-																								placeholder="请输入"
-																								v-model="item.QuestionAnswerInfo.StrValue"
-																						/>
+                                            <template v-if="item.Precision > 0">
+                                                <input
+                                                    type="tel"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'DecimalValue',
+                                                            'Zmotion'
+                                                        )
+                                                    "
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .DecimalValue
+                                                    "
+                                                />
+                                            </template>
+                                            <template v-else>
+                                                <input
+                                                    type="tel"
+                                                    @input="
+                                                        checkNum(
+                                                            index,
+                                                            'IntValue',
+                                                            'Zmotion'
+                                                        )
+                                                    "
+                                                    placeholder="请输入"
+                                                    v-model="
+                                                        item.QuestionAnswerInfo
+                                                            .IntValue
+                                                    "
+                                                />
+                                            </template>
                                             <span class="f14 c-6d">{{
                                                 item.Suffix
                                             }}</span>
@@ -1179,13 +1237,8 @@ export default {
             let questionGroups = array
             for (let i = 0; i < questionGroups.length; i++) {
                 const element = questionGroups[i]
-								// 修改为文本型  2020/07/14
-								var items = {
-										StrValue: '',
-										QuestionID: ''
-								}
-								items.StrValue = element.QuestionAnswerInfo.StrValue
-                /*if (element.Precision > 0) {
+
+                if (element.Precision > 0) {
                     //小数值
                     var items = {
                         DecimalValue: '',
@@ -1199,7 +1252,7 @@ export default {
                         QuestionID: ''
                     }
                     items.IntValue = element.QuestionAnswerInfo.IntValue
-                }*/
+                }
 
                 items.QuestionID = element.QuestionAnswerInfo.QuestionID
                 questionInfoArr.push(items)
@@ -1769,7 +1822,7 @@ export default {
                     return
                 }
                 //todo 20200606 方法提出来
-                //2、建议运动频率与时长  
+                //2、建议运动频率与时长
                 //adviseSports
                 let adviseSportsValid = true
                 for (
@@ -1778,7 +1831,10 @@ export default {
                     adviseSportsIndex++
                 ) {
                     let item = this.adviseSports[adviseSportsIndex]
-                    let value = item.QuestionAnswerInfo.StrValue
+                    let value = item.QuestionAnswerInfo.DecimalValue
+                    if (item.Precision <= 0) {
+                        value = item.QuestionAnswerInfo.IntValue
+                    }
 
                     // if (!value || !parseFloat(value)) {
                     if (!value) {
@@ -1796,10 +1852,10 @@ export default {
                 let ZmotionValid = true
                 for (let index = 0; index < this.Zmotion.length; index++) {
                     let item = this.Zmotion[index]
-                    let value = item.QuestionAnswerInfo.StrValue
-                    // if (item.Precision <= 0) {
-                    //     value = item.QuestionAnswerInfo.IntValue
-                    // }
+                    let value = item.QuestionAnswerInfo.DecimalValue
+                    if (item.Precision <= 0) {
+                        value = item.QuestionAnswerInfo.IntValue
+                    }
 
                     // if (!value || !parseFloat(value)) {
                     if (!value) {

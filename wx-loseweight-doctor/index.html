@@ -4,18 +4,15 @@
 <head>
   <meta charset="utf-8">
   <title>医学减重医生平台</title>
-  <meta name="viewport"
-		content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
-	<meta name="x5-fullscreen" content="true">
+  <!-- <meta name="viewport"
+		content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no"> -->
+	<!-- <meta name="x5-fullscreen" content="true"> -->
 	<link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" /> 
 	<link rel="stylesheet" type="text/css" href="static/css/reset.css">
 	<script src="static/config.js"></script>
-</head>
-
-<body>
 	<script>
 		// 用于适配ipad以及ipad pro
-		;/(iPad)/i.test(navigator.userAgent) &&
+		;/(iPhone|iPad|iPhone OS|Phone|iPod|iOS)/i.test(navigator.userAgent) &&
 			((head = document.getElementsByTagName('head')),
 			(viewport = document.createElement('meta')),
 			(viewport.name = 'viewport'),
@@ -23,6 +20,9 @@
 				'target-densitydpi=device-dpi, width=480px, user-scalable=no'),
 			head.length > 0 && head[head.length - 1].appendChild(viewport))
 	</script>
+</head>
+
+<body>
   <script>
     // var vConsole = new VConsole();
     document.getElementsByTagName('html')[0].style.fontSize = (document.documentElement.clientWidth || document.body
@@ -31,33 +31,6 @@
       document.getElementsByTagName('html')[0].style.fontSize = (document.documentElement.clientWidth || document
         .body.clientWidth) / 10 + 'px';
 		});
-		
-    /* 禁止用户自定义设置字体大小 */
-    if (typeof WeixinJSBridge == "object" && typeof WeixinJSBridge.invoke == "function") {
-      handleFontSize();
-    } else {
-      if (document.addEventListener) {
-        document.addEventListener("WeixinJSBridgeReady", handleFontSize, false);
-      } else if (document.attachEvent) {
-        document.attachEvent("WeixinJSBridgeReady", handleFontSize);
-        document.attachEvent("onWeixinJSBridgeReady", handleFontSize);
-      }
-    }
-
-    function handleFontSize() {
-      // 设置网页字体为默认大小
-      WeixinJSBridge.invoke('setFontSizeCallback', {
-        'fontSize': 0
-      });
-      // 重写设置网页字体大小的事件
-      WeixinJSBridge.on('menu:setfont', function () {
-        WeixinJSBridge.invoke('setFontSizeCallback', {
-          'fontSize': 0
-        });
-      });
-    }
-    /* 禁止用户自定义设置字体大小 */
-
   </script>
   <div id="app"></div>
   <!-- built files will be auto injected -->

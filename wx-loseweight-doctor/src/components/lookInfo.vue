@@ -131,15 +131,12 @@
                                         </div>
                                     </div>
                                     <template
-                                        v-if="
-                                            item.QuestionAnswerInfo.StrValue ==
-                                                item.SingleTextID
-                                        "
+                                        v-if="item.QuestionAnswerInfo.TextValue"
                                     >
                                         <!-- 输入框 -->
                                         <textarea
                                             class="weui-textarea"
-                                            style="width:100%;height: 4.4em"
+                                            style="width:100%;"
                                             :value="
                                                 item.QuestionAnswerInfo
                                                     .TextValue
@@ -476,5 +473,17 @@ export default {
     font-size: 11px;
     color: #6d6d6d;
     margin-top: 11px;
+}
+.weui-textarea{
+	  margin-top: 10px;
+	  background: #FAFAFA;
+	  border: 1px solid #F2F2F2;
+	  border-radius: 2px;
+		padding: 10px;
+		box-sizing: border-box;
+		font-family: PingFangSC-Regular;
+		font-size: 14px;
+		color: #6D6D6D;
+		line-height: 21px;
 }
 </style>
