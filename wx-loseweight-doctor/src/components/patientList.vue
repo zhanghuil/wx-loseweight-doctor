@@ -112,10 +112,8 @@
                                 class="list-item"
                                 @click="showTap(index)"
                             >
-                                <div
-                                    class="tips"
-                                    v-show="index == showTipIndex"
-                                >
+																<!-- v-show="index == showTipIndex" -->
+                                <div class="tips">
                                     <div class="arrow2">
                                         <i></i>
                                         <span></span>
@@ -428,7 +426,12 @@ export default {
                 return ''
             }
         }
-    },
+		},
+		computed: {
+			reverseWeight(){
+				return this.weightData.reverse();            
+			}
+		},
     created() {
         let typeIndex = storage.getItem('index')
         if (typeIndex) {
@@ -657,7 +660,7 @@ export default {
                     element.heightClass = element.CurrentWeight / 2
                 })
 
-                _this.weightData = result
+                _this.weightData = result.reverse()
                 this.$nextTick(() => {
                     //todo  横向滑动到最右侧
                     // _this.setWeightStartX(result)
@@ -931,7 +934,7 @@ export default {
                 width: 15px;
                 height: 15px;
                 bottom: -15px;
-                right: 10px;
+                right: 7px;
             }
 
             .weightScroll .list-item .tips .arrow2 i {
@@ -964,16 +967,16 @@ export default {
             .weightScroll .list-item .img {
                 width: 8px;
                 background: #b4b5d9;
-                margin: 0 13px;
+                margin: 0 16px;
                 position: relative;
             }
 
             .weightScroll .list-item .img:before {
                 content: '';
                 position: absolute;
-                left: -13px;
+                left: -16px;
                 bottom: 0;
-                width: 13px;
+                width: 16px;
                 height: 1px;
                 background: #f2f2f2;
             }
@@ -981,9 +984,9 @@ export default {
             .weightScroll .list-item .img:after {
                 content: '';
                 position: absolute;
-                right: -13px;
+                right: -16px;
                 bottom: 0;
-                width: 13px;
+                width: 16px;
                 height: 1px;
                 background: #f2f2f2;
             }

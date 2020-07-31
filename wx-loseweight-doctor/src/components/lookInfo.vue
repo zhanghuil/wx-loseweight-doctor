@@ -60,19 +60,152 @@
                             <!-- BMI end -->
                         </div>
                         <div v-else>
-                            <div class="wrapper py15 px15">
+														<div class="wrapper py15 px15" v-if="item.SignCode == 'CurrentHeight'">
+																<div class="rel">
+                                    <div class="title b">{{ item.Name }}</div>
+                                    <div class="bg_img"></div>
+                                </div>
+																<div>
+                                    <div class="txt">
+                                        <span class="pr20">{{item.QuestionAnswerInfo.IntValue}}{{item.Suffix}}</span>
+                                    </div>
+                                </div>
+														</div>
+														<div class="wrapper py15 px15" v-else-if="item.SignCode == 'CurrentWeight' || item.SignCode == 'WishWeight'">
+																<div class="rel">
+                                    <div class="title b">{{ item.Name }}</div>
+                                    <div class="bg_img"></div>
+                                </div>
+																<div>
+                                    <div class="txt">
+                                        <span class="pr20">{{item.QuestionAnswerInfo.DecimalValue}}{{item.Suffix}}</span>
+                                    </div>
+                                </div>
+														</div>
+														<div v-else-if="item.TypeCode == 'SingleSelect' || item.TypeCode == 'MultipleSelect'">
+														<div class="wrapper py15 px15" v-if="item.QuestionAnswerInfo.StrValue">
+																<div class="rel">
+                                    <div class="title b">{{ item.Name }}</div>
+                                    <div class="bg_img"></div>
+                                </div>
+																<div>
+                                    <div class="txt">
+                                        <span
+                                            v-for="(n,
+                                            index) in item.QuestionOptions"
+                                            :key="index"
+                                        >
+                                            <template v-if="n.checked == true">
+                                                <span class="pr20">{{
+                                                    n.Name
+                                                }}</span>
+                                            </template>
+                                        </span>
+                                    </div>
+                                    <!-- tools.splitStr() -->
+                                </div>
+														</div>
+														</div>
+														<div class="wrapper py15 px15" v-else-if="item.TypeCode == 'SingleSelectText'">
+																<div class="rel">
+                                    <div class="title b">{{ item.Name }}</div>
+                                    <div class="bg_img"></div>
+                                </div>
+																<div>
+                                    <div class="txt">
+                                        <div
+                                            v-for="(n,
+                                            index) in item.QuestionOptions"
+                                            :key="index"
+                                        >
+                                            <template v-if="n.checked == true">
+                                                <span class="pr20">{{
+                                                    n.Name
+                                                }}</span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <template
+                                        v-if="item.QuestionAnswerInfo.TextValue"
+                                    >
+                                        <!-- 输入框 -->
+                                        <textarea
+                                            class="weui-textarea"
+                                            style="width:100%;"
+                                            :value="
+                                                item.QuestionAnswerInfo
+                                                    .TextValue
+                                            "
+                                            :disabled="true"
+                                        />
+                                    </template>
+                                </div>
+														</div>
+														 <!-- 饥饿感   饱腹感 -->
+														<div class="wrapper py15 px15" v-else-if="item.SignCode == 'Hunger'">
+																<div class="rel">
+                                    <div class="title b">{{ item.Name }}</div>
+                                    <div class="bg_img"></div>
+                                </div>
+																<div class="txt">
+																		<span class="pr20"
+																				>{{
+																						item.QuestionAnswerInfo.IntValue
+																				}}
+																				-
+																				<span
+																						v-if="
+																								item.QuestionAnswerInfo
+																										.IntValue < 4
+																						"
+																						>不饥饿</span
+																				><span
+																						v-else-if="
+																								item.QuestionAnswerInfo
+																										.IntValue < 8
+																						"
+																						>中等饥饿</span
+																				><span v-else>非常饥饿</span></span
+																		>
+																</div>
+														</div>
+														<div class="wrapper py15 px15" v-else-if="item.SignCode == 'Satiety'">
+																<div class="rel">
+                                    <div class="title b">{{ item.Name }}</div>
+                                    <div class="bg_img"></div>
+                                </div>
+																<div class="txt">
+																		<span class="pr20"
+																				>{{
+																						item.QuestionAnswerInfo.IntValue
+																				}}
+																				-
+																				<span
+																						v-if="
+																								item.QuestionAnswerInfo
+																										.IntValue < 4
+																						"
+																						>不饱腹</span
+																				><span
+																						v-else-if="
+																								item.QuestionAnswerInfo
+																										.IntValue < 8
+																						"
+																						>中度饱腹</span
+																				><span v-else>极度饱腹</span></span
+																		>
+																</div>
+														</div>
+
+
+                            <div class="wrapper py15 px15 dn">
                                 <div class="rel">
                                     <div class="title b">{{ item.Name }}</div>
                                     <div class="bg_img"></div>
                                 </div>
                                 <div v-if="item.SignCode == 'CurrentHeight'">
                                     <div class="txt">
-                                        <span class="pr20"
-                                            >{{
-                                                item.QuestionAnswerInfo.IntValue
-                                            }}
-                                            cm</span
-                                        >
+                                        <span class="pr20">{{item.QuestionAnswerInfo.IntValue}}{{item.Suffix}}</span>
                                     </div>
                                 </div>
                                 <div
