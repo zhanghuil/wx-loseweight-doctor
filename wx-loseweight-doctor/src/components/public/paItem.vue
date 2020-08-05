@@ -24,7 +24,7 @@
                     }}</span
                 >
             </p>
-            <p class="time">首诊：{{ item.DiagnoseDate | formatDateStr }}</p>
+            <p class="time" v-show="item.DiagnoseDate">首诊：{{ item.DiagnoseDate | formatDateStr }}</p>
             <p class="time" v-show="item.ReVisitingDate">
                 计划下次复诊：{{ item.ReVisitingDate | formatDateStr }}
             </p>
