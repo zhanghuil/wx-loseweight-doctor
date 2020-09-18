@@ -1,0 +1,191 @@
+{
+  "id": "1754204",
+  "name": "减重患者",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "14692400",
+      "name": "复制",
+      "font_class": "fuzhi2",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "9520735",
+      "name": "必填",
+      "font_class": "bitian-",
+      "unicode": "e6cf",
+      "unicode_decimal": 59087
+    },
+    {
+      "icon_id": "7030138",
+      "name": "插入",
+      "font_class": "charu",
+      "unicode": "eb06",
+      "unicode_decimal": 60166
+    },
+    {
+      "icon_id": "7235610",
+      "name": "meals",
+      "font_class": "meals",
+      "unicode": "e827",
+      "unicode_decimal": 59431
+    },
+    {
+      "icon_id": "8747339",
+      "name": "引号",
+      "font_class": "yinhao",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "13609806",
+      "name": "保存",
+      "font_class": "baocun",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "14026801",
+      "name": "引号",
+      "font_class": "quote-right",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "14154337",
+      "name": "消息",
+      "font_class": "xiaoxi-01",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "14595923",
+      "name": "meal",
+      "font_class": "meal",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "11713014",
+      "name": "search close",
+      "font_class": "searchclose",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "363117",
+      "name": "忘记密码",
+      "font_class": "icon12",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "1228395",
+      "name": "筛选",
+      "font_class": "shaixuan",
+      "unicode": "ea0d",
+      "unicode_decimal": 59917
+    },
+    {
+      "icon_id": "6033797",
+      "name": "撤回",
+      "font_class": "chehui",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "7738694",
+      "name": "二维码",
+      "font_class": "qrcode",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "14127791",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "9727354",
+      "name": "不可见",
+      "font_class": "bukejian",
+      "unicode": "e699",
+      "unicode_decimal": 59033
+    },
+    {
+      "icon_id": "14230542",
+      "name": "可见",
+      "font_class": "kejian",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "6895836",
+      "name": "警告",
+      "font_class": "wuuiconsuotanhao",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "606303",
+      "name": "更多",
+      "font_class": "gengduomore10",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "11056521",
+      "name": "编辑",
+      "font_class": "bianji1",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "5651474",
+      "name": "三角箭头上",
+      "font_class": "sanjiaojiantoushang",
+      "unicode": "e66b",
+      "unicode_decimal": 58987
+    },
+    {
+      "icon_id": "77403",
+      "name": "链接",
+      "font_class": "lianjie",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "703461",
+      "name": "radiobox-blank",
+      "font_class": "radioboxblank",
+      "unicode": "ea2a",
+      "unicode_decimal": 59946
+    },
+    {
+      "icon_id": "1026835",
+      "name": "radio-fill",
+      "font_class": "radiofill",
+      "unicode": "e632",
+      "unicode_decimal": 58930
+    },
+    {
+      "icon_id": "6500419",
+      "name": "close",
+      "font_class": "close1",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
+      "icon_id": "12433252",
+      "name": "三角_fill-02",
+      "font_class": "sanjiao_fill-",
+      "unicode": "e6a0",
+      "unicode_decimal": 59040
+    }
+  ]
+}
