@@ -10,6 +10,7 @@ export default new Router({
 			name: 'index',
 			component: resolve => require(['@/components/index'], resolve),
 			meta: {
+				keepAlive: true,
 				title: '患者',
 				requiresAuth: true  // 添加表示需要验证
 			}

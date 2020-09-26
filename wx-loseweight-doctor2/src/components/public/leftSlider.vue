@@ -48,7 +48,7 @@ export default {
             if (ev.touches.length == 1) {
                 // 记录开始位置
                 this.startX = ev.touches[0].clientX
-                this.startY = ev.touches[0].clientY
+                // this.startY = ev.touches[0].clientY
             }
         },
         touchMove(ev) {

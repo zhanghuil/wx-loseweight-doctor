@@ -1,8 +1,8 @@
 <template>
     <div
         class="paItem"
-        :class="item.ReVisitingDate ? 'flstart' : 'flcenter'"
-        @click="lookDetails(item.PatientID, item.Name)"
+        :class="item.ReVisitingDate ? 'flstart' : 'flcenter'" @touchstart.prevent="touchin(item.PatientID)"
+        @touchend="lookDetails(item.PatientID, item.Name)" @touchmove="gotouchmove"
     >
         <div>
             <img v-if="item.AvatarUrl" class="txImg" :src="item.AvatarUrl" @error="imgError()" />
@@ -59,10 +59,18 @@ export default {
             let img = event.srcElement
             img.src = this.errorImg0
             img.onerror = null //防止闪图
-        },
+				},
+				//模拟点击事件
         lookDetails(id, name) {
             this.$emit('lookTap', { id: id, name: name })
-        }
+				},
+				//长按操作
+				touchin(id) {
+						this.$emit('touchin', { id: id })
+				},
+				gotouchmove(){
+						this.$emit('gotouchmove', event.target)
+				}
     }
 }
 </script>

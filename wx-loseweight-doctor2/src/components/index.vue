@@ -244,30 +244,9 @@ export default {
         this.getSubDoctor() //获取下属医生
         this.getPatientGroups() //患者组
     },
-    activated() {
-        // debugger
-        //让BSscroll滚动到之前存的scrollY位置
-        if (storage.getItem('scrollTop')) {
-            let scrollTop = Number(storage.getItem('scrollTop'))
-            if (this.scroll) this.scroll.scrollTo(0, scrollTop)
-            this.scroll.refresh()
-        }
-    },
-    // beforeRouteLeave(to, from, next) {
-    //     if (to.path == '/') {
-    //         if (!from.meta.keepAlive) {
-    //             from.meta.keepAlive = true
-    //         }
-    //         next()
-    //     } else {
-    //         from.meta.keepAlive = false
-    //         to.meta.keepAlive = true
-    //         next()
-    //     }
-    // },
+    activated() {},
     mounted() {
-				// this.loadMore()
-			this.$refs.listPanelBox.refresh()
+        this.loadMore()
     },
     methods: {
         //加载更多start  tabClick
