@@ -45,18 +45,17 @@
                             </div>
                         </div>
                     </div>
-										<!-- v-show="patientInfo.DiagnoseWeight" -->
-                    <div class="item">
+                    <div class="item" v-show="patientInfo.DiagnoseWeight">
                         <div class="tip">首诊</div>
                         <div class="flex-between">
                             <div>
                                 <p class="num">
-                                    {{ patientInfo.DiagnoseWeight || '-' }}
+                                    {{ patientInfo.DiagnoseWeight }}
                                 </p>
                                 <p>体重（kg）</p>
                             </div>
                             <div>
-                                <p class="num">{{ patientInfo.DiagnoseBMI || '-' }}</p>
+                                <p class="num">{{ patientInfo.DiagnoseBMI }}</p>
                                 <p>BMI指标</p>
                             </div>
                         </div>

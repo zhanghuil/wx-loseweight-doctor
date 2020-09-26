@@ -1,5 +1,5 @@
 <template>
-    <div class="p15 pb70">
+    <div class="p15">
         <div class="groupList">
             <Options
                 :options="checkedList"

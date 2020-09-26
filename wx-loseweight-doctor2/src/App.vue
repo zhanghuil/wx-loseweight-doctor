@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <!-- <router-view /> -->
-        <loading v-if="showLoading"></loading>
+        <!-- <loading v-if="showLoading"></loading> -->
         <!-- //这里需要缓存，使用keep-alive标签包裹 -->
         <keep-alive>
             <router-view v-if="$route.meta.keepAlive"></router-view>
@@ -12,18 +12,8 @@
 </template>
 
 <script>
-import store from './store'
-import loading from '@/components/public/loading'
 export default {
-		name: 'app',
-    components: {
-        loading
-    },
-    computed: {
-        showLoading() {
-            return this.$store.state.showLoading
-        }
-    }
+    name: 'app'
 }
 </script>
 

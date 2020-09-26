@@ -795,8 +795,7 @@
             @confirm="confirm"
             ref="drawerWeight"
         >
-						<!-- 刻度尺选择 -->
-            <!-- <div>
+            <div>
                 <div class="weightRuler">
                     <span class="f24 c-3a pl10">{{ NumValue }}</span>
                     <span class="f14 c-6d">kg</span>
@@ -808,11 +807,7 @@
                     :minNum="100"
                     :ispoint="true"
                 ></ruler>
-            </div> -->
-						<div class="sWeightNumBox">
-							<input v-model="NumValue2" type="number" class="sWeightNum"/>
-							<span class="f12 c-6d">kg</span>
-						</div> 
+            </div>
         </drawerFoot>
         <!-- 保存模板 saveTemplate -->
         <drawerFoot
@@ -928,8 +923,7 @@ export default {
             ], //方案类型
             activeVal: 'HighProtein',
             NumValue: 100, //瘦体重默认值
-						LBW: '', //瘦体重
-						NumValue2: '',  //瘦体重输入框值
+            LBW: '', //瘦体重
 
             imgUrl: '',
 
@@ -1072,13 +1066,9 @@ export default {
             this.$refs.drawerWeight.closeByButton()
         },
         confirm() {
-						if(!this.NumValue2){
-							yktoast('请输入瘦体重')
-							return
-						}
             console.log(`点击了确定刻度尺选择--${this.NumValue}`)
             this.$refs.drawerWeight.closeByButton()
-            this.LBW = this.NumValue2
+            this.LBW = this.NumValue
             this.filtersPlanSupply(this.patientInfo)
         },
         getAnswerArr(array) {
@@ -2113,25 +2103,6 @@ export default {
     color: #3a3a3a;
     text-align: center;
     line-height: 26px;
-    &::placeholder {
-        font-size: 26px;
-        color: #3a3a3a;
-    }
-}
-.sWeightNumBox{
-	text-align: center;
-	padding-top: 45px;
-}
-.sWeightNum {
-    width: 100px;
-    border-bottom: 1px solid #d8d8e4;
-    font-size: 26px;
-    color: #3a3a3a;
-    text-align: center;
-		line-height: 26px;
-		&:focus{
-			border-bottom: 1px solid #6049f5;
-		}
     &::placeholder {
         font-size: 26px;
         color: #3a3a3a;

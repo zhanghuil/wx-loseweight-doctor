@@ -1,13 +1,12 @@
 import axios from 'axios'
 import qs from 'qs'
-import store from '../store'
 import storage from '../common/js/storage'
 import { encryption } from '../common/js/util'
 import Vue from 'vue';  //1.引入vue
 let v = new Vue();  //2.新创建一个vue实例
 
 // 通过axios.defaults.timeout设置默认的请求超时时间。例如超过了10s，就会告知用户当前请求超时，请刷新等。
-axios.defaults.timeout = 10000;
+axios.defaults.timeout = 30000;
 // let currentDate = formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
 
 //POST传参序列化(添加请求拦截器)
@@ -16,7 +15,6 @@ axios.interceptors.request.use((config) => {
 	// if (config.method === 'post') {
 	// 	config.data = qs.stringify(config.data);
 	// }
-	store.commit('changeLoadingType', true)
 	return config;
 }, (error) => {
 	console.log('错误的传参')
@@ -37,18 +35,15 @@ axios.interceptors.request.use((config) => {
 
 axios.interceptors.response.use(
 	response => {
-		store.commit('changeLoadingType', false)
 		console.log(response.data.code)
 		if (response.data.code === 4003) {
-			v.$createToast({
-        txt: '您没有权限操作！',
-        time: 1500,
-        $events: {
-          timeout: () => {
-            router.go(-1);
-          }
-        }
-      }).show()
+			Toast({
+				mes: '您没有权限操作！',
+				timeout: 1500,
+				callback: () => {
+					router.go(-1);
+				}
+			});
 
 			return false;
 		}
@@ -63,11 +58,10 @@ axios.interceptors.response.use(
 	},
 	err => {
 		if (err.code === 'ECONNABORTED' && err.message.indexOf('timeout') !== -1) {
-			v.$createToast({
-				txt: '网络异常，连接超时...',
-				type: 'txt',
-				time: 1500
-			}).show()
+			Toast({
+				mes: '网络异常，连接超时...',
+				timeout: 1500
+			});
 		}
 		return Promise.reject(err)
 	}
@@ -79,12 +73,12 @@ timestamp = (timestamp / 1000).toString()
 
 
 export function fetchPost(url, params, authCode) {
-	// const toast = v.$createToast({
-	// 	txt: 'Loading...',
-	// 	mask: true
-	// })
+	const toast = v.$createToast({
+		txt: 'Loading...',
+		mask: true
+	})
 	const tokenValue = storage.getItem('Token') || ''
-	// toast.show()
+	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.post(url, qs.stringify(params), {
 			headers: {
@@ -96,25 +90,25 @@ export function fetchPost(url, params, authCode) {
 		})
 			.then(response => {
 				resolve(response);
-				// toast.hide()
+				toast.hide()
 			}, err => {
 				reject(err);
-				// toast.hide()
+				toast.hide()
 			})
 			.catch((error) => {
 				reject(error)
-				// toast.hide()
+				toast.hide()
 			})
 	})
 }
 //返回一个Promise(发送put请求)
 export function fetchPut(url, params, authCode) {
-	// const toast = v.$createToast({
-	// 	txt: 'Loading...',
-	// 	mask: true
-	// })
+	const toast = v.$createToast({
+		txt: 'Loading...',
+		mask: true
+	})
 	const tokenValue = storage.getItem('Token') || ''
-	// toast.show()
+	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.put(url, params, {
 			headers: {
@@ -126,14 +120,14 @@ export function fetchPut(url, params, authCode) {
 		})
 			.then(response => {
 				resolve(response);
-				// toast.hide()
+				toast.hide()
 			}, err => {
 				reject(err);
-				// toast.hide()
+				toast.hide()
 			})
 			.catch((error) => {
 				reject(error)
-				// toast.hide()
+				toast.hide()
 			})
 	})
 }
@@ -144,7 +138,7 @@ export function fetchGet(url, param, authCode) {
 		mask: true
 	})
 	const tokenValue = storage.getItem('Token') || ''
-	// toast.show()
+	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.get(url, {
 			params: param,
@@ -157,14 +151,14 @@ export function fetchGet(url, param, authCode) {
 		})
 			.then(response => {
 				resolve(response)
-				// toast.hide()
+				toast.hide()
 			}, err => {
 				reject(err)
-				// toast.hide()
+				toast.hide()
 			})
 			.catch((error) => {
 				reject(error)
-				// toast.hide()
+				toast.hide()
 			})
 	})
 }
@@ -175,7 +169,7 @@ export function fetchDelete(url, param, authCode) {
 		mask: true
 	})
 	const tokenValue = storage.getItem('Token') || ''
-	// toast.show()
+	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.delete(url, {
 			params: param,
@@ -188,14 +182,14 @@ export function fetchDelete(url, param, authCode) {
 		})
 			.then(response => {
 				resolve(response)
-				// toast.hide()
+				toast.hide()
 			}, err => {
 				reject(err)
-				// toast.hide()
+				toast.hide()
 			})
 			.catch((error) => {
 				reject(error)
-				// toast.hide()
+				toast.hide()
 			})
 	})
 }
@@ -206,7 +200,7 @@ export function fetchPostFile(url, params, authCode) {
 		mask: true
 	})
 	const tokenValue = storage.getItem('Token') || ''
-	// toast.show()
+	toast.show()
 	return new Promise((resolve, reject) => {
 		axios.post(url, params, {
 			headers: {
@@ -218,14 +212,14 @@ export function fetchPostFile(url, params, authCode) {
 		})
 			.then(response => {
 				resolve(response);
-				// toast.hide()
+				toast.hide()
 			}, err => {
 				reject(err);
-				// toast.hide()
+				toast.hide()
 			})
 			.catch((error) => {
 				reject(error)
-				// toast.hide()
+				toast.hide()
 			})
 	})
 }

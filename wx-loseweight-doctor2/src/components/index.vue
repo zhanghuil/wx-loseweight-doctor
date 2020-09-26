@@ -44,7 +44,7 @@
                 v-show="patientsList && patientsList.length > 0"
             >
                 <div class="content">
-                    <div class="listPanel" ref="scrollul">
+                    <div class="listPanel">
                         <div v-for="(item, index) in patientsList" :key="index">
                             <leftSlider
                                 :index="index"
@@ -244,7 +244,6 @@ export default {
         this.getSubDoctor() //获取下属医生
         this.getPatientGroups() //患者组
     },
-    activated() {},
     mounted() {
         this.loadMore()
     },
@@ -274,10 +273,6 @@ export default {
                         bindToWrapper: true,
                         HWCompositing: true
                     })
-                    //监听scroll的滚动，获取它滚动的高度
-                    this.scroll.on('scroll', obj => {
-                        this.scrollTop = obj.y
-                    })
                     this.scroll.maxScrollY = -300
                     this.scroll.on('scrollEnd', pos => {
                         this.loading = true
@@ -285,6 +280,7 @@ export default {
                             this.scroll.maxScrollY = -300
                         }
                         _this.isClickTab = false
+                        // debugger
                         if (_this.page == _this.totalPage) {
                             if (_this.TotalCount >= 10)
                                 _this.loadingTXT = '---到底了---'
@@ -292,18 +288,14 @@ export default {
                             _this.loading = true
                             return
                         }
-                        // debugger
                         if (
-                            pos.y &&
-                            pos.y <= this.scroll.maxScrollY + 50 &&
+                            this.scroll.y <= this.scroll.maxScrollY + 50 &&
                             this.loading
                         ) {
                             console.log('滚动加载数据')
                             _this.page++
                             _this.getJZMZPatients()
                             _this.loading = false
-                        } else {
-                            console.log('不加载数据')
                         }
                     })
                 } else {
@@ -501,30 +493,24 @@ export default {
             let DoctorId = filterInfo.doctorId
                 ? filterInfo.doctorId
                 : this.doctorId
-            let UpdateTimeDay = filterInfo.timeIndex
-                ? filterInfo.timeIndex
-                : this.timeIndex
-            let GroupId = filterInfo.checkedVal
-                ? filterInfo.checkedVal
-                : this.checkedVal
             let url = this.api.userApi.GetJZMZPatients
             let data = {
                 PageIndex: this.page,
                 PageSize: 10,
                 Keyword: this.searchValue, //搜索关键词
                 DoctorId: DoctorId,
-                UpdateTimeDay: UpdateTimeDay, //更新时间天数 7,15,30
-                GroupId: GroupId, // 分组
+                UpdateTimeDay: this.timeIndex, //更新时间天数 7,15,30
+                GroupId: this.checkedVal, // 分组
                 QueryType: this.queryType //查询类型 0 全部 1今日患者 2明日患者
-            }
-
-            if (_this.page == 1) {
-                _this.patientsList = []
-            }
+						}
+					
+						if (_this.page == 1) {
+								_this.patientsList = []
+						} 
             this.$fetchPost(url, data, 4111).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.Data) {
-                    _this.patientsList = _this.patientsList.concat(result.Data)
+										_this.patientsList = _this.patientsList.concat(result.Data)
                     // debugger
                     _this.totalPage = result.Page.TotalPage
                     _this.TotalCount = result.Page.TotalCount
@@ -571,9 +557,6 @@ export default {
         },
         // 查看患者详情
         lookDetails(val) {
-            //  缓存scroll滚动的高度
-            this.top = this.$refs['scrollul'].getBoundingClientRect().top
-            storage.setItem('scrollTop', this.scrollTop)
             storage.setItem('queryType', this.queryType)
             this.$router.push({
                 path: '/patientList',

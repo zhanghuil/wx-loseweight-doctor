@@ -75,7 +75,7 @@
                                         <template v-else>
                                             <input
                                                 maxlength="20"
-                                                type="number"
+                                                type="tel"
                                                 v-model="
                                                     n.QuestionAnswerInfo
                                                         .DecimalValue

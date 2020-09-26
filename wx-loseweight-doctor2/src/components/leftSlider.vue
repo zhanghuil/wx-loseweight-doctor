@@ -8,12 +8,12 @@
                 @touchend="touchEnd"
                 :style="deleteSlider"
             >
-                <!-- 插槽中放具体项目中需要内容 -->
+                <!-- 插槽中放具体项目中需要内容         -->
                 <slot></slot>
             </div>
-            <div class="remove" ref="remove" @click.prevent="deleteItem(id)">
+            <div class="remove" ref="remove" @click.prevent="deleteItem(index)">
                 <!-- <img src="../../img/qxsc.png" /> -->
-                <span>删除</span>
+                <span>取消收藏</span>
             </div>
         </div>
     </div>
@@ -21,8 +21,7 @@
 <script type="text/ecmascript-6">
 export default {
     props: {
-        index: Number,
-        id: String
+        index: Number
     },
     data() {
         return {
@@ -118,8 +117,8 @@ export default {
                     'transform:translateX(0' + 'rem)'
             }
         },
-        deleteItem: function(id) {
-            this.$emit('deleteItem', id)
+        deleteItem: function(index) {
+            this.$emit('deleteItem', index)
             this.deleteSlider = 'transform:translateX(0' + 'rem)'
         }
     }
@@ -148,22 +147,21 @@ export default {
         position: absolute;
         width: 1rem;
         height: 100%;
-        background: #f1f1f1;
-        border-radius: 0 4px 4px 0;
+        background: #f5f5f5;
         right: 0;
         top: 0;
         color: #fff;
         text-align: center;
-        font-size: 16px;
+        font-size: 0.16rem;
         img {
-            width: 28px;
-            height: 28px;
+            width: 0.28rem;
+            height: 0.28rem;
         }
         span {
             display: block;
-            // margin-top: 0.08rem;
+            margin-top: 0.08rem;
             color: #999;
-            font-size: 12px;
+            font-size: 0.14rem;
         }
     }
 }
