@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="tc targetBox">
-										<span class="f14">减掉</span>
+                    <span class="f14">减掉</span>
                     <input
                         class="targetInput"
                         type="tel"
@@ -277,7 +277,8 @@
                         </div>
                         <ol class="mt15">
                             <li v-for="(n, idx) in item.Questions" :key="idx">
-                                <div class="wrap">
+                                <!-- 文本框 -->
+                                <div class="wrap" v-if="n.TypeCode == 'Text'">
                                     <div class="f14 c-3a">{{ n.Name }}</div>
                                     <div class="pr10">
                                         <template v-if="n.TypeCode == 'Num'">
@@ -319,7 +320,7 @@
                                         <template
                                             v-else-if="n.TypeCode == 'Text'"
                                         >
-																				 		<!-- @input="checkInput(index,idx,'StrValue')" -->
+                                            <!-- @input="checkInput(index,idx,'StrValue')" -->
                                             <input
                                                 :placeholder="n.Placeholder"
                                                 type="text"
@@ -332,6 +333,21 @@
                                         <span class="f14 c-6d">{{
                                             n.Suffix
                                         }}</span>
+                                    </div>
+                                </div>
+                                <!-- 多行文本框 -->
+                                <div class="" v-else>
+                                    <div class="f14 c-3a">{{ n.Name }}</div>
+                                    <div class="my-textarea">
+                                        <myTextarea
+                                            :placeholder="n.Placeholder"
+                                            :parentValue="
+                                                n.QuestionAnswerInfo.StrValue
+                                            "
+                                            @parentValue="
+                                                n.QuestionAnswerInfo.StrValue = $event
+                                            "
+                                        ></myTextarea>
                                     </div>
                                 </div>
                                 <p class="desc" v-show="n.Description">
@@ -375,7 +391,10 @@
                                         v-for="(n, idx) in item.Questions"
                                         :key="idx"
                                     >
-                                        <div class="wrap">
+                                        <div
+                                            class="wrap"
+                                            v-if="n.TypeCode == 'Text'"
+                                        >
                                             <div class="f14 c-3a">
                                                 {{ n.Name }}
                                             </div>
@@ -447,6 +466,24 @@
                                                 }}</span>
                                             </div>
                                         </div>
+                                        <!-- 多行文本框 -->
+                                        <div class="" v-else>
+                                            <div class="f14 c-3a">
+                                                {{ n.Name }}
+                                            </div>
+                                            <div class="my-textarea">
+                                                <myTextarea
+                                                    :placeholder="n.Placeholder"
+                                                    :parentValue="
+                                                        n.QuestionAnswerInfo
+                                                            .StrValue
+                                                    "
+                                                    @parentValue="
+                                                        n.QuestionAnswerInfo.StrValue = $event
+                                                    "
+                                                ></myTextarea>
+                                            </div>
+                                        </div>
                                         <p class="desc" v-show="n.Description">
                                             {{ n.Description }}
                                         </p>
@@ -487,7 +524,10 @@
                                         v-for="(n, idx) in item.Questions"
                                         :key="idx"
                                     >
-                                        <div class="wrap">
+                                        <div
+                                            class="wrap"
+                                            v-if="n.TypeCode == 'Text'"
+                                        >
                                             <div class="f14 c-3a">
                                                 {{ n.Name }}
                                             </div>
@@ -566,6 +606,24 @@
                                                 <span class="f14 c-6d">{{
                                                     n.Suffix
                                                 }}</span>
+                                            </div>
+                                        </div>
+                                        <!-- 多行文本框 -->
+                                        <div class="" v-else>
+                                            <div class="f14 c-3a">
+                                                {{ n.Name }}
+                                            </div>
+                                            <div class="my-textarea">
+                                                <myTextarea
+                                                    :placeholder="n.Placeholder"
+                                                    :parentValue="
+                                                        n.QuestionAnswerInfo
+                                                            .StrValue
+                                                    "
+                                                    @parentValue="
+                                                        n.QuestionAnswerInfo.StrValue = $event
+                                                    "
+                                                ></myTextarea>
                                             </div>
                                         </div>
                                         <p class="desc" v-show="n.Description">
@@ -654,11 +712,14 @@
                                             {{ item.Name }}
                                         </div>
                                         <div class="pr10">
-																						<input
-																								type="text"
-																								placeholder="请输入"
-																								v-model="item.QuestionAnswerInfo.StrValue"
-																						/>
+                                            <input
+                                                type="text"
+                                                placeholder="请输入"
+                                                v-model="
+                                                    item.QuestionAnswerInfo
+                                                        .StrValue
+                                                "
+                                            />
                                             <span class="f14 c-6d">{{
                                                 item.Suffix
                                             }}</span>
@@ -700,10 +761,13 @@
                                         </div>
                                         <div class="pr10">
                                             <input
-																								type="text"
-																								placeholder="请输入"
-																								v-model="item.QuestionAnswerInfo.StrValue"
-																						/>
+                                                type="text"
+                                                placeholder="请输入"
+                                                v-model="
+                                                    item.QuestionAnswerInfo
+                                                        .StrValue
+                                                "
+                                            />
                                             <span class="f14 c-6d">{{
                                                 item.Suffix
                                             }}</span>
@@ -795,7 +859,7 @@
             @confirm="confirm"
             ref="drawerWeight"
         >
-						<!-- 刻度尺选择 -->
+            <!-- 刻度尺选择 -->
             <!-- <div>
                 <div class="weightRuler">
                     <span class="f24 c-3a pl10">{{ NumValue }}</span>
@@ -809,10 +873,10 @@
                     :ispoint="true"
                 ></ruler>
             </div> -->
-						<div class="sWeightNumBox">
-							<input v-model="NumValue2" type="number" class="sWeightNum"/>
-							<span class="f12 c-6d">kg</span>
-						</div> 
+            <div class="sWeightNumBox">
+                <input v-model="NumValue2" type="number" class="sWeightNum" />
+                <span class="f12 c-6d">kg</span>
+            </div>
         </drawerFoot>
         <!-- 保存模板 saveTemplate -->
         <drawerFoot
@@ -854,6 +918,7 @@ import { webApi } from '../request/env'
 import ruler from '@/components/public/ruler'
 import drawerFoot from '@/components/public/drawerFoot'
 import checkbox from '@/components/public/checkbox'
+import myTextarea from '@/components/public/myTextarea'
 import { yktoast, convertKey } from '../common/js/util'
 import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
@@ -861,7 +926,7 @@ import InsertTemplate from '@/components/InsertTemplate'
 const math = require('mathjs')
 export default {
     name: 'draftPlan',
-    components: { drawerFoot, ruler, checkbox, InsertTemplate },
+    components: { drawerFoot, ruler, checkbox, InsertTemplate, myTextarea },
     data() {
         return {
             docmHeight:
@@ -928,8 +993,8 @@ export default {
             ], //方案类型
             activeVal: 'HighProtein',
             NumValue: 100, //瘦体重默认值
-						LBW: '', //瘦体重
-						NumValue2: '',  //瘦体重输入框值
+            LBW: '', //瘦体重
+            NumValue2: '', //瘦体重输入框值
 
             imgUrl: '',
 
@@ -1072,10 +1137,10 @@ export default {
             this.$refs.drawerWeight.closeByButton()
         },
         confirm() {
-						if(!this.NumValue2){
-							yktoast('请输入瘦体重')
-							return
-						}
+            if (!this.NumValue2) {
+                yktoast('请输入瘦体重')
+                return
+            }
             console.log(`点击了确定刻度尺选择--${this.NumValue}`)
             this.$refs.drawerWeight.closeByButton()
             this.LBW = this.NumValue2
@@ -1107,7 +1172,10 @@ export default {
                             }
                             items.IntValue = element.QuestionAnswerInfo.IntValue
                         }
-                    } else if (element.TypeCode == 'Text') {
+                    } else if (
+                        element.TypeCode == 'Text' ||
+                        element.TypeCode == 'Textarea'
+                    ) {
                         //字符串
                         var items = {
                             StrValue: '',
@@ -1168,12 +1236,12 @@ export default {
             let questionGroups = array
             for (let i = 0; i < questionGroups.length; i++) {
                 const element = questionGroups[i]
-								// 修改为文本型  2020/07/14
-								var items = {
-										StrValue: '',
-										QuestionID: ''
-								}
-								items.StrValue = element.QuestionAnswerInfo.StrValue
+                // 修改为文本型  2020/07/14
+                var items = {
+                    StrValue: '',
+                    QuestionID: ''
+                }
+                items.StrValue = element.QuestionAnswerInfo.StrValue
                 /*if (element.Precision > 0) {
                     //小数值
                     var items = {
@@ -1410,7 +1478,7 @@ export default {
             // Math.round(math.format(a*b,14)* 10) / 10
             const precision = 14 //num表示精度，最大为14，表示单一文本框最大的数字位数，包括小数点前后
             if (this.activeVal == 'HighProtein') {
-                //高蛋白 
+                //高蛋白
                 if (this.LBW > 0) {
                     //有瘦体重
                     let BMR =
@@ -1457,9 +1525,9 @@ export default {
                             math.format((enery * 0.4) / 4, precision) * 10
                         ) / 10
                 }
-						} else if(this.activeVal == 'FastDiet'){
-							//轻断食
-							 if (this.LBW > 0) {
+            } else if (this.activeVal == 'FastDiet') {
+                //轻断食
+                if (this.LBW > 0) {
                     //有瘦体重
                     let BMR =
                         Math.round(
@@ -1517,7 +1585,7 @@ export default {
                     this.planSupply.fastingSupply = 600
                 } else {
                     this.planSupply.fastingSupply = 500
-								}
+                }
             } else if (this.activeVal == 'LimitEnergy') {
                 //限能量
                 if (this.LBW > 0) {
@@ -1657,7 +1725,6 @@ export default {
             return name
         },
         validQuestionnairesCommon(questionnaires) {
-            // debugger
             let isValid = true
             //筛选必填项
             let requireQuestionGroup = questionnaires
@@ -1737,7 +1804,8 @@ export default {
         },
         //下一步
         nextTap() {
-            // debugger
+						// debugger
+						var _this = this;
             window.scrollTo(0, 0)
             if (this.pageIndex == 1) {
                 // if (!this.targetNum || !parseFloat(this.targetNum))
@@ -1750,6 +1818,35 @@ export default {
                 this.getAnswerStr(this.activeVal)
                 let isValid = this.validYinShi2()
                 if (!isValid) return
+                if (isValid) {
+                    this.$createDialog({
+                        type: 'confirm',
+                        title: '提示',
+                        content: '您的食谱单是空的，确定要下一步吗？',
+                        confirmBtn: {
+                            text: '确定',
+                            active: true,
+                            disabled: false,
+                            href: 'javascript:;'
+                        },
+                        cancelBtn: {
+                            text: '取消',
+                            active: false,
+                            disabled: false,
+                            href: 'javascript:;'
+                        },
+                        onConfirm: () => {
+                            console.log('点击确认按钮')
+                            _this.pageIndex++
+                            console.log(`当前页码：${_this.pageIndex}`)
+                            _this.setPageTit()
+                        },
+                        onCancel: () => {
+                            console.log('点击取消按钮')
+                        }
+                    }).show()
+                    return
+                }
             } else if (this.pageIndex == 5) {
                 //1、建议有氧运动项目
                 let isCheck = this.$refs.validIsCheck.validIsCheck()
@@ -1758,7 +1855,7 @@ export default {
                     return
                 }
                 //todo 20200606 方法提出来
-                //2、建议运动频率与时长  
+                //2、建议运动频率与时长
                 //adviseSports
                 let adviseSportsValid = true
                 for (
@@ -2118,9 +2215,9 @@ export default {
         color: #3a3a3a;
     }
 }
-.sWeightNumBox{
-	text-align: center;
-	padding-top: 45px;
+.sWeightNumBox {
+    text-align: center;
+    padding-top: 45px;
 }
 .sWeightNum {
     width: 100px;
@@ -2128,10 +2225,10 @@ export default {
     font-size: 26px;
     color: #3a3a3a;
     text-align: center;
-		line-height: 26px;
-		&:focus{
-			border-bottom: 1px solid #6049f5;
-		}
+    line-height: 26px;
+    &:focus {
+        border-bottom: 1px solid #6049f5;
+    }
     &::placeholder {
         font-size: 26px;
         color: #3a3a3a;

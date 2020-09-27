@@ -244,7 +244,15 @@
                                                 index) in item.Questions"
                                                 :key="index"
                                             >
-                                                <div class="df ju-between pt15">
+																								<!-- 多行文本框 -->
+                                                <div class="pt15" v-if="meal.TypeCode == 'Textarea'">
+                                                    <div>{{ meal.Name }}</div>
+                                                    <div class="textAreaBox">
+                                                        {{ meal.QuestionAnswerInfo.StrValue }}
+                                                    </div>
+                                                </div>
+																								<!-- 文本框 -->
+																								<div class="df ju-between pt15" v-else>
                                                     <div>{{ meal.Name }}</div>
                                                     <div>
                                                         {{
@@ -319,7 +327,15 @@
                                                 index) in item.Questions"
                                                 :key="index"
                                             >
-                                                <div class="df ju-between pt15">
+																								<!-- 多行文本框 -->
+                                                <div class="pt15" v-if="meal.TypeCode == 'Textarea'">
+                                                    <div>{{ meal.Name }}</div>
+                                                    <div class="textAreaBox">
+                                                        {{ meal.QuestionAnswerInfo.StrValue }}
+                                                    </div>
+                                                </div>
+																								<!-- 文本框 -->
+                                                <div class="df ju-between pt15" v-else>
                                                     <div>{{ meal.Name }}</div>
                                                     <div>
                                                         {{
@@ -389,7 +405,15 @@
                                         v-for="(meal, index) in item.Questions"
                                         :key="index"
                                     >
-                                        <div class="df ju-between pt15">
+																				<!-- 多行文本框 -->
+																				<div class="pt15" v-if="meal.TypeCode == 'Textarea'">
+																						<div>{{ meal.Name }}</div>
+																						<div class="textAreaBox">
+																								{{ meal.QuestionAnswerInfo.StrValue }}
+																						</div>
+																				</div>
+																				<!-- 文本框 -->
+                                        <div class="df ju-between pt15" v-else>
                                             <div>{{ meal.Name }}</div>
                                             <div>
                                                 {{
@@ -931,5 +955,12 @@ export default {
     background: #7362f5;
     border: 16px 0 0 16px;
     width: 60px;
+}
+
+.textAreaBox{
+		margin-top: 10px;
+		font-size: 14px;
+		color: #3A3A3A;
+		line-height: 21px;
 }
 </style>
