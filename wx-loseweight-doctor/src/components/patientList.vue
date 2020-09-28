@@ -45,7 +45,7 @@
                             </div>
                         </div>
                     </div>
-										<!-- v-show="patientInfo.DiagnoseWeight" -->
+                    <!-- v-show="patientInfo.DiagnoseWeight" -->
                     <div class="item">
                         <div class="tip">首诊</div>
                         <div class="flex-between">
@@ -56,9 +56,46 @@
                                 <p>体重（kg）</p>
                             </div>
                             <div>
-                                <p class="num">{{ patientInfo.DiagnoseBMI || '-' }}</p>
+                                <p class="num">
+                                    {{ patientInfo.DiagnoseBMI || '-' }}
+                                </p>
                                 <p>BMI指标</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 复诊随访日期设置 -->
+                <div class="infoPanel datePanel">
+                    <div class="item currentPanel">
+                        <div class="tip">下次复诊</div>
+                        <div class="flex-center" v-if="!nextReVisitingDate">
+                            <span class="setUpBtn" @click="setTimeTap('FZ')"
+                                >设置</span
+                            >
+                        </div>
+                        <div
+                            class="editDateBox"
+                            v-else
+                            @click="setTimeTap('FZ')"
+                        >
+                            <span class="f16">{{ nextReVisitingDate }}</span>
+                            <span class="iconfont icon-bianji1"></span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="tip">下次随访</div>
+                        <div class="flex-center" v-if="!nextFollowUpVisitDate">
+                            <span class="setUpBtn" @click="setTimeTap('SF')"
+                                >设置</span
+                            >
+                        </div>
+                        <div
+                            class="editDateBox"
+                            v-else
+                            @click="setTimeTap('SF')"
+                        >
+                            <span class="f16">{{ nextFollowUpVisitDate }}</span>
+                            <span class="iconfont icon-bianji1"></span>
                         </div>
                     </div>
                 </div>
@@ -113,7 +150,7 @@
                                 class="list-item"
                                 @click="showTap(index)"
                             >
-																<!-- v-show="index == showTipIndex" -->
+                                <!-- v-show="index == showTipIndex" -->
                                 <div class="tips">
                                     <div class="arrow2">
                                         <i></i>
@@ -407,7 +444,10 @@ export default {
             infoList: [], //评估表
             planList: [], //减重方案
             planId: '',
-            assessId: ''
+            assessId: '',
+            nextFollowUpVisitDate: '', //下次随访日期
+            nextReVisitingDate: '', //下次复诊日期
+            followUpVisitPlan: '' // 随诊周期
         }
     },
     filters: {
@@ -427,12 +467,12 @@ export default {
                 return ''
             }
         }
-		},
-		computed: {
-			reverseWeight(){
-				return this.weightData.reverse();            
-			}
-		},
+    },
+    computed: {
+        reverseWeight() {
+            return this.weightData.reverse()
+        }
+    },
     created() {
         let typeIndex = storage.getItem('index')
         if (typeIndex) {
@@ -451,6 +491,7 @@ export default {
         this.getWeightRecordByType()
         this.getRecordedRegistrations()
         this.getWeightLossPlans()
+        this.getWeightLossSchedule()
     },
     computed: {
         options() {
@@ -529,8 +570,8 @@ export default {
             this.$fetchDelete(url, data, 4112).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.State != 0) {
-										yktoast(result.Msg)
-										_this.assessId = ''
+                    yktoast(result.Msg)
+                    _this.assessId = ''
                     return
                 }
                 yktoast(result.Msg)
@@ -575,6 +616,48 @@ export default {
             this.$router.push({
                 path: '/draftPlan',
                 query: { userId: this.$route.query.userId, planId: id }
+            })
+        },
+        //获取患者减重计划
+        getWeightLossSchedule() {
+            var _this = this
+            let url = this.api.userApi.GetWeightLossSchedule
+            let data = {
+                patientId: this.$route.query.userId
+            }
+            this.$fetchGet(url, data, 4114).then(response => {
+                let result = response.data.data //请求返回数据
+                //下次随访日期
+                if (!result.NextFollowUpVisitDate)
+                    _this.nextFollowUpVisitDate = ''
+                else
+                    _this.nextFollowUpVisitDate = formatDate(
+                        new Date(result.NextFollowUpVisitDate),
+                        'yyyy-MM-dd'
+                    )
+                _this.followUpVisitPlan = result.FollowUpVisitPlan //随诊周期
+                //下次复诊日期
+                if (!result.NextReVisitingDate) _this.nextReVisitingDate = ''
+                else
+                    _this.nextReVisitingDate = formatDate(
+                        new Date(result.NextReVisitingDate),
+                        'yyyy-MM-dd'
+                    )
+            })
+        },
+        //设置复诊随访时间
+        setTimeTap(type) {
+            let fxdata = {
+                followUpVisitPlan: this.followUpVisitPlan,
+                nextReVisitingDate: this.nextReVisitingDate,
+                userId: this.$route.query.userId
+            }
+            this.$router.push({
+                path: '/setTime',
+                query: {
+                    type: type,
+                    fxdata: JSON.stringify(fxdata)
+                }
             })
         },
         //撤回操作提示框
@@ -838,6 +921,39 @@ export default {
                 }
                 &:last-child {
                     margin-right: 0;
+                }
+            }
+        }
+        .datePanel {
+            .item {
+                margin-bottom: 0;
+                padding: 33px 10px 10px;
+                .tip {
+                    width: auto;
+                    padding: 0 6px;
+                }
+                .flex-center {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .setUpBtn {
+                    background: #b4b5d9;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    color: #ffffff;
+                    padding: 5px 10px;
+                }
+                .editDateBox {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .iconfont {
+                        font-size: 18px;
+                        margin-left: 6px;
+                    }
                 }
             }
         }

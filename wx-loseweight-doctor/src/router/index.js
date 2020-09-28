@@ -170,5 +170,14 @@ export default new Router({
 				requiresAuth: true  // 添加表示需要验证
 			}
 		},
+		{
+			path: '/setTime',
+			name: 'setTime',
+			component: resolve => require(['@/components/setTime'], resolve),
+			meta: {
+				title: '复诊',
+				requiresAuth: true  // 添加表示需要验证
+			}
+		},
 	]
 })

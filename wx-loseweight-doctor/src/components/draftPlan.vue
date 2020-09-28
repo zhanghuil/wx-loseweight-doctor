@@ -874,7 +874,7 @@
                 ></ruler>
             </div> -->
             <div class="sWeightNumBox">
-                <input v-model="NumValue2" type="number" class="sWeightNum" />
+                <input v-model.number="NumValue2" type="number" class="sWeightNum" @input="sWeightInputVal" />
                 <span class="f12 c-6d">kg</span>
             </div>
         </drawerFoot>
@@ -1398,7 +1398,15 @@ export default {
                       value.split('.')[1]
                     : value.substring(0, 4)
             return value
-        },
+				},
+				//瘦体重校验  只能输入小数点后一位
+				sWeightInputVal(e) {
+						var that = this
+						// 通过正则过滤小数点后两位
+						e.target.value = (e.target.value.match(/^\d*(\.?\d{0,1})/g)[0]) || null
+						that.NumValue2 = e.target.value;
+						console.log('瘦体重', e.target.value)
+				},
         onfocus(e) {
             if (e.currentTarget.value == 0.0) {
                 this.targetNum = ''

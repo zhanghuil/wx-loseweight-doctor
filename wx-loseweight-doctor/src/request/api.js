@@ -21,6 +21,9 @@ const userApi = {
 	GetPatientEmptyWeightLossPlan: webApi + '/api/System/MedicalRecord/GetPatientEmptyWeightLossPlan',  //获取空白减重方案--制定方案
 	SavePatientWeightLossPlan: webApi + '/api/System/MedicalRecord/SavePatientWeightLossPlan',  //保存减重方案
 	RecallPatientWeightLossPlan: webApi + '/api/System/MedicalRecord/RecallPatientWeightLossPlan',  //撤回减重方案 
+	GetWeightLossSchedule: webApi + '/api/System/MedicalRecord/GetWeightLossSchedule',  //获取患者减重计划
+	SetReVisitingDate: webApi + '/api/System/MedicalRecord/SetReVisitingDate',  //设置下次复诊时间
+	SetFollowUpVisitDate: webApi + '/api/System/MedicalRecord/SetFollowUpVisitDate',  //设置随访周期
 
 	GetPatientMedical: webApi + '/api/System/Patient/GetPatientMedical',  //获取病人医生信息
 	GetJZMZDoctorQRCode: webApi + '/api/System/Doctor/GetJZMZDoctorQRCode', //获取减重门诊公众号医生二维码
