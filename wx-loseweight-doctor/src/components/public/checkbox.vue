@@ -7,6 +7,18 @@
             ></i>
             <div class="tit">{{ name }}</div>
         </div>
+        <!-- 全选按钮 -->
+        <div v-show="isSelectAll" class="selectAllBox">
+            <div class="flexBox" @click="checkAll">
+                <div v-if="checkedAll">
+                    <i class="icon iconfont icon-radiofill"></i>
+                </div>
+                <div v-else>
+                    <i class="icon iconfont icon-radioboxblank "></i>
+                </div>
+                <div>全选</div>
+            </div>
+        </div>
         <ul>
             <li
                 v-for="(item, index) in options"
@@ -44,30 +56,57 @@ export default {
             value: false
         },
         currArr: Array,
-				options: Array, //传入的数组
-				selectArr: Array, //传入的选中数组
+        options: Array, //传入的数组
+        selectArr: Array, //传入的选中数组
         isMultiply: {
             //是否是多选。默认为false：单选；true：多选
+            type: Boolean,
+            default: false
+        },
+        isSelectAll: {
+            //是否有全选按钮。默认false-没有；true-有
             type: Boolean,
             default: false
         }
     },
     data() {
         return {
+            checkedAll: false, //是否全选
             currValArr: [],
             targetCheckBoxError: false //是否显示error图标
         }
-		},
-		watch: {
+    },
+    watch: {
         selectArr: {
             handler(newVal, oldVal) {
                 this.currValArr = newVal //newVal即是chartData
             },
             deep: true,
             immediate: true
+        },
+        currValArr() {
+            if (this.currValArr.length == this.options.length) {
+                this.checkedAll = true
+            } else {
+                this.checkedAll = false
+            }
         }
     },
     methods: {
+        //全选
+        checkAll() {
+            if (this.checkedAll) {
+                this.currValArr = []
+            } else {
+                this.options.forEach(item => {
+                    if (this.currValArr.indexOf(item) == -1) {
+                        this.currValArr.push(item)
+                    }
+                })
+						}
+						this.validIsCheck()
+            this.$emit('toparents', this.currValArr)
+        },
         optionsClick(item) {
             if (this.isMultiply === false) {
                 //单选
@@ -139,6 +178,25 @@ export default {
         .icon-radioboxblank {
             color: #d8d8e4;
         }
+    }
+}
+.selectAllBox {
+    padding: 15px 0 0;
+    color: #6d6d6d;
+    // border-bottom: 1px dashed #F2F2F2;
+    .flexBox {
+        align-items: center;
+        display: flex;
+    }
+    .icon {
+        font-size: 18px;
+        margin-right: 6px;
+    }
+    .icon-radiofill {
+        color: #9198f7;
+    }
+    .icon-radioboxblank {
+        color: #d8d8e4;
     }
 }
 </style>

@@ -11,9 +11,15 @@
                         />
                     </div>
                     <div>
-                        <p class="pb8">
-                            <strong>{{ patientInfo.Name }}</strong>
-                            <span
+                        <p class="pb8 infoBox">
+                            <strong @click="editNameTap(patientInfo.Name)">{{
+                                patientInfo.Name
+                            }}</strong>
+                            <!-- <span
+                                @click="editNameTap(patientInfo.Name)"
+                                class="iconfont icon-bianji1"
+                            ></span> -->
+                            <span class="pl5"
                                 >{{ patientInfo.Weight }}kg，{{
                                     patientInfo.Sex == 0 ? '男' : '女'
                                 }}，{{ patientInfo.Age }}</span
@@ -68,10 +74,12 @@
                 <div class="infoPanel datePanel">
                     <div class="item currentPanel">
                         <div class="tip">下次复诊</div>
-                        <div class="flex-center" v-if="!nextReVisitingDate">
-                            <span class="setUpBtn" @click="setTimeTap('FZ')"
-                                >设置</span
-                            >
+                        <div
+                            class="flex-center"
+                            v-if="!nextReVisitingDate"
+                            @click="setTimeTap('FZ')"
+                        >
+                            <span class="setUpBtn">设置</span>
                         </div>
                         <div
                             class="editDateBox"
@@ -84,10 +92,12 @@
                     </div>
                     <div class="item">
                         <div class="tip">下次随访</div>
-                        <div class="flex-center" v-if="!nextFollowUpVisitDate">
-                            <span class="setUpBtn" @click="setTimeTap('SF')"
-                                >设置</span
-                            >
+                        <div
+                            class="flex-center"
+                            v-if="!nextFollowUpVisitDate"
+                            @click="setTimeTap('SF')"
+                        >
+                            <span class="setUpBtn">设置</span>
                         </div>
                         <div
                             class="editDateBox"
@@ -507,6 +517,21 @@ export default {
         }
     },
     methods: {
+        //修改患者姓名 todo
+        editNameTap(val) {
+            return
+            this.$createDialog({
+                type: 'prompt',
+                title: '修改患者称呼',
+                prompt: {
+                    value: val,
+                    placeholder: '请输入'
+                },
+                onConfirm: (e, promptValue) => {
+                    console.log(`患者名称：${promptValue}`)
+                }
+            }).show()
+        },
         imgError() {
             let img = event.srcElement
             img.src = this.errorImg0
@@ -1338,7 +1363,6 @@ export default {
     width: 100%;
     height: 100%;
 }
-
 .noPlan {
     display: table-cell;
     text-align: center;
@@ -1346,9 +1370,17 @@ export default {
     width: 138px;
     height: 127px;
 }
-
 .noPlan .img {
     width: 128px;
     height: 100px;
+}
+.pl5 {
+    padding-left: 5px;
+}
+.infoBox {
+    .iconfont {
+        font-size: 17px;
+        vertical-align: middle;
+    }
 }
 </style>

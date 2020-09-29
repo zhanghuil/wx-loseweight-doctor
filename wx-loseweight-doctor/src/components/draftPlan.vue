@@ -680,6 +680,7 @@
                     <div class="con">
                         <div class="p15 rel">
                             <checkbox
+                                :isSelectAll="true"
                                 :isMultiply="true"
                                 :options="sportEvent"
                                 :selectArr="selectSportEvent"
@@ -874,7 +875,12 @@
                 ></ruler>
             </div> -->
             <div class="sWeightNumBox">
-                <input v-model.number="NumValue2" type="number" class="sWeightNum" @input="sWeightInputVal" />
+                <input
+                    v-model.number="NumValue2"
+                    type="number"
+                    class="sWeightNum"
+                    @input="sWeightInputVal"
+                />
                 <span class="f12 c-6d">kg</span>
             </div>
         </drawerFoot>
@@ -1398,15 +1404,16 @@ export default {
                       value.split('.')[1]
                     : value.substring(0, 4)
             return value
-				},
-				//瘦体重校验  只能输入小数点后一位
-				sWeightInputVal(e) {
-						var that = this
-						// 通过正则过滤小数点后两位
-						e.target.value = (e.target.value.match(/^\d*(\.?\d{0,1})/g)[0]) || null
-						that.NumValue2 = e.target.value;
-						console.log('瘦体重', e.target.value)
-				},
+        },
+        //瘦体重校验  只能输入小数点后一位
+        sWeightInputVal(e) {
+            var that = this
+            // 通过正则过滤小数点后两位
+            e.target.value =
+                e.target.value.match(/^\d*(\.?\d{0,1})/g)[0] || null
+            that.NumValue2 = e.target.value
+            console.log('瘦体重', e.target.value)
+        },
         onfocus(e) {
             if (e.currentTarget.value == 0.0) {
                 this.targetNum = ''
@@ -1810,10 +1817,59 @@ export default {
             }
             return isValid
         },
+        validYinShi3() {
+            let isValid = true
+            //高蛋白、限能量饮食方案
+            if (
+                this.activeVal == 'HighProtein' ||
+                this.activeVal == 'LimitEnergy'
+            ) {
+                //DietQuestionnaire
+                isValid = this.validQuestionnairesCommon3(
+                    this.DietQuestionnaire.QuestionGroups
+                )
+            } else if (this.activeVal == 'FastDiet') {
+                //轻断食
+                isValid = this.validQuestionnairesCommon3(
+                    this.DietQuestionnaire.QuestionGroups
+                )
+                if (!isValid) return isValid
+                isValid = this.validQuestionnairesCommon3(
+                    this.DietEkadeshQuestionnaire.QuestionGroups
+                )
+            }
+            return isValid
+        },
+        validQuestionnairesCommon3(questionnaires) {
+            let isValid = true
+            //筛选所有答案项
+            let requireQuestionGroup = questionnaires
+            if (!requireQuestionGroup || requireQuestionGroup.length <= 0)
+                return true
+            let allArr = []
+            requireQuestionGroup
+                .map(g => {
+                    return g.Questions
+                })
+                .forEach(item => {
+                    item.map(n => {
+                        allArr.push(n)
+                    })
+                })
+            let allStrValue = allArr
+                .map(m => {
+                    return m.QuestionAnswerInfo.StrValue
+                })
+                .filter(item => item)
+            console.log(allStrValue.length)
+            if (allStrValue.length == 0) isValid = true
+            else isValid = false
+            return isValid
+        },
         //下一步
         nextTap() {
-						// debugger
-						var _this = this;
+            // debugger
+            var _this = this
             window.scrollTo(0, 0)
             if (this.pageIndex == 1) {
                 // if (!this.targetNum || !parseFloat(this.targetNum))
@@ -1826,7 +1882,9 @@ export default {
                 this.getAnswerStr(this.activeVal)
                 let isValid = this.validYinShi2()
                 if (!isValid) return
-                if (isValid) {
+                let isValidEmpty = this.validYinShi3()
+                //所有题目不是必填项&&答案都为空
+                if (isValid && isValidEmpty) {
                     this.$createDialog({
                         type: 'confirm',
                         title: '提示',
