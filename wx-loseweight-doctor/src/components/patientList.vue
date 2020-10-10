@@ -15,10 +15,10 @@
                             <strong @click="editNameTap(patientInfo.Name)">{{
                                 patientInfo.Name
                             }}</strong>
-                            <!-- <span
+                            <span
                                 @click="editNameTap(patientInfo.Name)"
                                 class="iconfont icon-bianji1"
-                            ></span> -->
+                            ></span>
                             <span class="pl5"
                                 >{{ patientInfo.Weight }}kg，{{
                                     patientInfo.Sex == 0 ? '男' : '女'
@@ -411,17 +411,40 @@
                 <div class="f14 c-6d mt10">您已无权查看该患者信息</div>
             </div>
         </div>
+        <selfModal
+            v-model="showModal"
+            type="prompt"
+            title="患者称呼"
+            @cancel="clickCancel()"
+            @confirm="clickConfirm()"
+        >
+            <div class="content">
+                <div class="cu-input">
+                    <input
+                        v-model="nameVal"
+                        type="text"
+                        placeholder="请输入"
+                        class="cube-input-field"
+                    />
+                </div>
+            </div>
+        </selfModal>
     </div>
 </template>
 
 <script>
+import selfModal from '@/components/public/selfModal'
 import { yktoast } from '../common/js/util'
 import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
+import qs from 'qs'
 export default {
     name: 'patientList',
+    components: { selfModal },
     data() {
         return {
+            nameVal: '', //患者姓名
+            showModal: false, //模态框
             errorImg0: require('@/assets/tx1.png'),
             errorImg1: require('@/assets/tx2.png'),
             patientInfo: {}, //患者信息
@@ -517,9 +540,26 @@ export default {
         }
     },
     methods: {
-        //修改患者姓名 todo
+        clickCancel() {
+            console.log('点击了取消')
+        },
+        clickConfirm() {
+            console.log('点击了confirm')
+            if (!this.nameVal) {
+                this.$createToast({
+                    txt: '姓名不能为空',
+                    type: 'txt'
+                }).show()
+                return
+            }
+            this.updateInfoByDoctor(this.nameVal)
+        },
+        //修改患者姓名弹框
         editNameTap(val) {
+            this.showModal = true
+            this.nameVal = val
             return
+            var _this = this
             this.$createDialog({
                 type: 'prompt',
                 title: '修改患者称呼',
@@ -529,8 +569,43 @@ export default {
                 },
                 onConfirm: (e, promptValue) => {
                     console.log(`患者名称：${promptValue}`)
+                    if (!promptValue) {
+                        _this
+                            .$createToast({
+                                txt: '姓名不能为空',
+                                type: 'txt'
+                            })
+                            .show()
+                        return
+                    }
+                    _this.updateInfoByDoctor(promptValue)
+                },
+                onCancel: (e, promptValue) => {
+                    console.log('点击了取消按钮')
                 }
             }).show()
+        },
+        //修改患者姓名
+        updateInfoByDoctor(name) {
+            var _this = this
+            let url = this.api.userApi.UpdateInfoByDoctor
+            let patientId = this.$route.query.userId
+            let data = {
+                Name: name
+            }
+            this.$fetchPut(
+                `${url}?patientId=${patientId}`,
+                qs.stringify(data),
+                4114
+            ).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast('修改失败')
+                    return
+                }
+                yktoast('修改成功')
+                _this.getJZMZPatient()
+            })
         },
         imgError() {
             let img = event.srcElement

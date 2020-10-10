@@ -39,6 +39,7 @@ const userApi = {
 
 	GetPatientFollowUpVisit: webApi + '/api/System/MedicalRecord/GetPatientFollowUpVisit',  //获取患者随访信息
 	GetPatientDiagnose: webApi + '/api/System/MedicalRecord/GetPatientDiagnose',  //获取患者首诊信息
+	UpdateInfoByDoctor: webApi + '/api/System/JZMZPatient/UpdateInfoByDoctor',  //修改患者信息（姓名）
 
 	GetPatientWeightLossPlanTypes: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTypes', //获取减重方案模板分类列表
 	GetPatientWeightLossPlanTemplates: webApi + '/api/System/WeightLossPlanTemplate/GetPatientWeightLossPlanTemplates',  //获取减重方案模板列表 

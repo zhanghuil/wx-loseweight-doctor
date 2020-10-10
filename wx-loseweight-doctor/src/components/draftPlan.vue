@@ -1873,7 +1873,7 @@ export default {
             window.scrollTo(0, 0)
             if (this.pageIndex == 1) {
                 // if (!this.targetNum || !parseFloat(this.targetNum))
-                if (!this.targetNum) {
+                if (this.targetNum === '') {
                     this.targetNumError = true
                     yktoast('有未填写项')
                     return
