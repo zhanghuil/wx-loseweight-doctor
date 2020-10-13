@@ -235,31 +235,47 @@ export default {
         }
     },
     created() {
-        let _queryType = storage.getItem('queryType')
-        console.log(`获取缓存查询类型：${_queryType}`)
-        if (_queryType) {
-            this.queryType = _queryType
-        }
-        if (!storage.getItem('Token') || !storage.getItem('AccountId')) {
-            this.$router.replace({
-                path: '/login'
-            })
-            return
-        }
-        let AccountId = storage.getItem('AccountId')
-        this.accountId = AccountId
-        this.doctorId = AccountId
-        console.log(`AccountId：${AccountId}`)
-
-        this.getJZMZPatients() //获取减重病人
-        this.getSubDoctor() //获取下属医生
-        this.getPatientGroups() //患者组
+        this.isFirstEnter = true
+        // 只有第一次进入或者刷新页面后才会执行此钩子函数，使用keep-alive后（2+次）进入不会再执行此钩子函数
     },
-    activated() {},
+
+    activated() {
+        if (!this.$route.meta.isBack || this.isFirstEnter) {
+            // 如果isBack是false，表明需要获取新数据，否则就不再请求，直接使用缓存的数据
+            // 如果isFirstEnter是true，表明是第一次进入此页面或用户刷新了页面，需获取新数据
+            // 执行自己写的页面的初始化
+            this.init()
+        }
+        // 恢复成默认的false，避免isBack一直是true，导致下次无法获取数据
+        this.$route.meta.isBack = false
+        // 恢复成默认的false，避免isBack一直是true，导致每次都获取新数据
+        this.isFirstEnter = false
+    },
     mounted() {
         this.loadMore()
     },
     methods: {
+        init() {
+            let _queryType = storage.getItem('queryType')
+            console.log(`获取缓存查询类型：${_queryType}`)
+            if (_queryType) {
+                this.queryType = _queryType
+            }
+            if (!storage.getItem('Token') || !storage.getItem('AccountId')) {
+                this.$router.replace({
+                    path: '/login'
+                })
+                return
+            }
+            let AccountId = storage.getItem('AccountId')
+            this.accountId = AccountId
+            this.doctorId = AccountId
+            console.log(`AccountId：${AccountId}`)
+
+            this.getJZMZPatients() //获取减重病人
+            this.getSubDoctor() //获取下属医生
+            this.getPatientGroups() //患者组
+        },
         //加载更多start  tabClick
         async handleChange(id, index) {
             this.isClickTab = true
@@ -527,8 +543,9 @@ export default {
             // debugger
             var _this = this
             if (pageIndex && pageIndex == 1) {
-                _this.patientsList = []
-                _this.totalPage = 0
+                this.patientsList = []
+                this.totalPage = 0
+                this.page = pageIndex
             }
             let filterInfo = storage.getObjItem('filterResultsGroup')
             let DoctorId = filterInfo.doctorId
@@ -685,6 +702,7 @@ export default {
     top: 0;
     left: 0;
     width: 100%;
+    height: 68px;
     .wrapperH {
         display: flex;
         align-items: center;
@@ -759,6 +777,7 @@ export default {
         line-height: 40px;
         text-align: center;
         color: #555;
+        font-size: 14px;
     }
     .listPanel {
         padding: 132px 15px 52px;

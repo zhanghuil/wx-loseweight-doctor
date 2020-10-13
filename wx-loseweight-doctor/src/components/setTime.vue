@@ -90,6 +90,14 @@ export default {
                 {
                     Name: '每月',
                     value: '30'
+                },
+                {
+                    Name: '每两月',
+                    value: '60'
+                },
+                {
+                    Name: '每季度',
+                    value: '90'
                 }
             ],
             followSelectArr: [], //选中的
@@ -237,11 +245,15 @@ export default {
         showDateFollow() {
             // debugger
             if (!this.datePickerFollow) {
+                var _value
+                if (this.followDate == '' || this.followDate == '请选择')
+                    _value = new Date()
+                else _value = new Date(this.followDate.replace(/-/g,"/"))
                 this.datePickerFollow = this.$createDatePicker({
                     title: '选择复诊时间',
                     // min: new Date(2008, 7, 8),
                     // max: new Date(2020, 9, 20),
-                    value: new Date(),
+                    value: _value,
                     onSelect: this.selectHandleF,
                     onCancel: this.cancelHandleF
                 })

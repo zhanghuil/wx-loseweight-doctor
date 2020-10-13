@@ -205,16 +205,10 @@
                                             <template
                                                 v-else-if="n.TypeCode == 'Text'"
                                             >
+																								<!-- @input="checkInput(index,idx,'StrValue')" -->
                                                 <input
-                                                    @input="
-                                                        checkInput(
-                                                            index,
-                                                            idx,
-                                                            'StrValue'
-                                                        )
-                                                    "
                                                     :placeholder="n.Placeholder"
-                                                    type="tel"
+                                                    type="text"
                                                     v-model="
                                                         n.QuestionAnswerInfo
                                                             .StrValue
@@ -337,18 +331,11 @@
                                             <template
                                                 v-else-if="n.TypeCode == 'Text'"
                                             >
+																								<!-- @input="checkInput(index,idx,'StrValue',1)" -->
                                                 <input
-                                                    @input="
-                                                        checkInput(
-                                                            index,
-                                                            idx,
-                                                            'StrValue',
-                                                            1
-                                                        )
-                                                    "
                                                     :disabled="n.IsFixed"
                                                     :placeholder="n.Placeholder"
-                                                    type="tel"
+                                                    type="text"
                                                     v-model="
                                                         n.QuestionAnswerInfo
                                                             .StrValue

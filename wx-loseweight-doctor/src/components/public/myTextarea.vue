@@ -38,7 +38,10 @@ export default {
     watch: {
         value() {
             this.getHeight()
-        }
+				},
+				parentValue(newVal, oldVal) {
+            this.value = newVal
+        },
     },
     methods: {
         getHeight() {

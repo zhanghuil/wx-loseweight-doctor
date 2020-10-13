@@ -8,7 +8,7 @@
                 class="panelWrp p15 mb10"
                 @click="editGroup(item.ID, 'edit', item.Name)"
             >
-                <div class="f16 c-3a ellipsis">{{ item.Name }}</div>
+                <div class="f16 c-3a ellipsis lh18">{{ item.Name }}</div>
             </div>
         </div>
         <div class="noPlanWrapper" v-else>
@@ -73,6 +73,9 @@ export default {
 </script>
 
 <style lang="less">
+.lh18 {
+		line-height: 18px;
+}
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;

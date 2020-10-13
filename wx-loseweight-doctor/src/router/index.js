@@ -11,6 +11,7 @@ export default new Router({
 			component: resolve => require(['@/components/index'], resolve),
 			meta: {
 				keepAlive: true,
+				isBack: false, //用于判断上一个页面是哪个
 				title: '患者',
 				requiresAuth: true  // 添加表示需要验证
 			}

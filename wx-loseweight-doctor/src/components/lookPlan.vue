@@ -837,7 +837,8 @@ export default {
 
 .navbar__item {
     position: relative;
-    font-size: 14px;
+		font-size: 14px;
+		line-height: 14px;
     color: #6d6d6d;
     margin-right: 30px;
     padding: 0px 0 10px;

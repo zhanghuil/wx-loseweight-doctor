@@ -1031,6 +1031,14 @@ export default {
                 {
                     Name: '每月',
                     value: '30'
+                },
+								{
+                    Name: '每两月',
+                    value: '60'
+								},
+								{
+                    Name: '每季度',
+                    value: '90'
                 }
             ],
             followSelectArr: [], //选中的

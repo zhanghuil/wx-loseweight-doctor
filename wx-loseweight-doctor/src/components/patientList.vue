@@ -10,7 +10,33 @@
                             @error="imgError()"
                         />
                     </div>
-                    <div>
+                    <div class="flex1 rel">
+                        <div class="editPBox">
+                            <div @click="moreTap">
+                                <i class="icon iconfont icon-gengduomore10"></i>
+                            </div>
+                            <div class="editPTxt" v-show="stopIconState">
+                                <div class="arrow">
+                                    <i></i>
+                                    <span></span>
+                                </div>
+                                <!-- 0 服务中 10取消服务 -->
+                                <div
+                                    class="px12 py8"
+                                    @click="
+                                        serverStateTap(
+                                            patientInfo.JZServerState
+                                        )
+                                    "
+                                >
+                                    <template
+                                        v-if="patientInfo.JZServerState == 0"
+                                        >终止门诊</template
+                                    >
+                                    <template v-else>取消终止</template>
+                                </div>
+                            </div>
+                        </div>
                         <p class="pb8 infoBox">
                             <strong @click="editNameTap(patientInfo.Name)">{{
                                 patientInfo.Name
@@ -70,7 +96,35 @@
                         </div>
                     </div>
                 </div>
-                <!-- 复诊随访日期设置 -->
+            </div>
+            <!-- 患者组 -->
+            <div
+                class="groupPanel"
+                @click="lookPaGroup(patientInfo.PatientGroup)"
+            >
+                <div class="L">
+                    <div>
+                        <img
+                            class="cell_icon"
+                            src="../assets/group@2x.png"
+                            alt=""
+                        />
+                    </div>
+                    <div v-if="patientGroup && patientGroup.length == 0">
+                        暂无所属患者组
+                    </div>
+                    <div v-else class="groupPanelTxt">
+                        <span
+                            v-for="(g, idx) in patientInfo.PatientGroup"
+                            :key="idx"
+                            >{{ g.Name }}</span
+                        >
+                    </div>
+                </div>
+                <div><i class="icon cubeic-arrow"></i></div>
+            </div>
+            <!-- 复诊随访日期设置 -->
+            <div class="patientPanel mb10">
                 <div class="infoPanel datePanel">
                     <div class="item currentPanel">
                         <div class="tip">下次复诊</div>
@@ -109,32 +163,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- 患者组 -->
-            <div
-                class="groupPanel"
-                @click="lookPaGroup(patientInfo.PatientGroup)"
-            >
-                <div class="L">
-                    <div>
-                        <img
-                            class="cell_icon"
-                            src="../assets/group@2x.png"
-                            alt=""
-                        />
-                    </div>
-                    <div v-if="patientGroup && patientGroup.length == 0">
-                        暂无所属患者组
-                    </div>
-                    <div v-else class="groupPanelTxt">
-                        <span
-                            v-for="(g, idx) in patientInfo.PatientGroup"
-                            :key="idx"
-                            >{{ g.Name }}</span
-                        >
-                    </div>
-                </div>
-                <div><i class="icon cubeic-arrow"></i></div>
             </div>
             <!-- 体重柱状图 start-->
             <div class="weightChart" v-if="weightData">
@@ -443,6 +471,7 @@ export default {
     components: { selfModal },
     data() {
         return {
+            stopIconState: false, //终止门诊框
             nameVal: '', //患者姓名
             showModal: false, //模态框
             errorImg0: require('@/assets/tx1.png'),
@@ -539,7 +568,100 @@ export default {
             this.rebuildScroll()
         }
     },
+    beforeRouteLeave(to, from, next) {
+        if (from.name == 'patientList') {
+            to.meta.isBack = true
+        }
+        next()
+    },
     methods: {
+        //增加“终止门诊”功能
+        moreTap() {
+            this.stopIconState = !this.stopIconState
+        },
+        // 0 服务中 10取消服务
+        serverStateTap(e) {
+            if (e == 0) this.stopTap(e)
+            else this.cancelStopTap(e)
+        },
+        //设置减重服务状态
+        setJZServerState(e) {
+            var _this = this
+            let url = this.api.userApi.SetJZServerState
+            let patientId = this.$route.query.userId
+            let _value = e == 0 ? 10 : 0
+            let data = {
+                Value: _value
+            }
+            this.$fetchPut(
+                `${url}?patientId=${patientId}`,
+                qs.stringify(data),
+                4115
+            ).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast('设置失败')
+                    return
+                }
+                yktoast('设置成功')
+                _this.getJZMZPatient()
+            })
+        },
+        stopTap(e) {
+            this.moreTap()
+            this.$createDialog({
+                type: 'confirm',
+                title: '确定要终止门诊吗？',
+                content:
+                    '终止后系统将停止对该患者推送复诊、随诊、减重打卡等提醒！',
+                confirmBtn: {
+                    text: '确定',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    console.log('点击确认按钮')
+                    this.setJZServerState(e)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
+        //取消终止
+        cancelStopTap(e) {
+            this.moreTap()
+            this.$createDialog({
+                type: 'confirm',
+                content: '确定要取消终止吗？',
+                confirmBtn: {
+                    text: '确定',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    console.log('点击确认按钮')
+                    this.setJZServerState(e)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
         clickCancel() {
             console.log('点击了取消')
         },
@@ -969,6 +1091,61 @@ export default {
                 height: 60px;
                 border-radius: 50%;
                 margin-right: 15px;
+            }
+            .editPBox {
+                text-align: right;
+                position: absolute;
+                right: 5px;
+                .icon {
+                    font-size: 16px;
+                }
+                .editPTxt {
+                    top: 7px;
+                    margin-right: -3px;
+                    border: 1px solid #e7e7f1;
+                    box-shadow: 0 2px 6px 0 rgba(120, 122, 167, 0.21);
+                    border-radius: 2px;
+                    background: #fff;
+                    color: #3a3a3a;
+                    font-size: 14px;
+                    position: relative;
+                    .px12 {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                    }
+                    .py8 {
+                        padding-top: 8px;
+                        padding-bottom: 8px;
+                    }
+                    .arrow {
+                        position: absolute;
+                        width: 14px;
+                        height: 14px;
+                        top: -14px;
+                        right: 2px;
+                    }
+                    .arrow i {
+                        display: block;
+                        border-color: transparent transparent #e7e7f1
+                            transparent;
+                        border-width: 6px;
+                        position: absolute;
+                        border-style: dashed dashed solid dashed;
+                        font-size: 0;
+                        line-height: 0;
+                        bottom: 1px;
+                    }
+                    .arrow span {
+                        display: block;
+                        border-color: transparent transparent #fff transparent;
+                        top: 2px;
+                        border-width: 6px;
+                        position: absolute;
+                        border-style: dashed dashed solid dashed;
+                        font-size: 0;
+                        line-height: 0;
+                    }
+                }
             }
             strong {
                 font-size: 16px;
@@ -1421,6 +1598,7 @@ export default {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     overflow: hidden;
+    line-height: 14px;
     span {
         position: relative;
         &::after {
@@ -1457,5 +1635,8 @@ export default {
         font-size: 17px;
         vertical-align: middle;
     }
+}
+.flex1 {
+    flex: 1;
 }
 </style>
