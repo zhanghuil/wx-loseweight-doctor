@@ -56,12 +56,39 @@
                                 @deleteItem="deleteItem"
                             >
                             </leftSlider> -->
-                            <paItem
-                                :item="item"
-                                @lookTap="lookDetails"
-                                @touchin="touchin"
-                                @gotouchmove="gotouchmove"
-                            ></paItem>
+                            <paItem :item="item" @lookTap="lookDetails">
+                                <!-- 删除操作 -->
+                                <div class="editPBox">
+                                    <div
+                                        @click.stop.prevent="
+                                            moreTap(item.PatientID)
+                                        "
+                                        class="p15"
+                                    >
+                                        <i
+                                            class="icon iconfont icon-gengduomore10"
+                                        ></i>
+                                    </div>
+                                    <div
+                                        class="editPTxt"
+                                        v-show="pid == item.PatientID"
+                                    >
+                                        <div class="arrow">
+                                            <i></i>
+                                            <span></span>
+                                        </div>
+                                        <div
+                                            class="px15 py10"
+                                            @click.stop.prevent="
+                                                deleteItemTap(item.PatientID)
+                                            "
+                                        >
+                                            删除
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 删除操作 end -->
+                            </paItem>
                         </div>
                         <div class="loading" v-show="loading">
                             {{ loadingTXT }}
@@ -167,6 +194,9 @@ export default {
     components: { drawer, Options, leftSlider, paItem, search },
     data() {
         return {
+            pid: '',
+            pageX: null,
+            pageY: null,
             Loop: 0, //定时器
             pulldownMsg: '下拉刷新',
             alertHook: 'none',
@@ -255,6 +285,19 @@ export default {
         this.loadMore()
     },
     methods: {
+        //点点按钮
+        moreTap(id) {
+            if (id == this.pid) {
+                this.pid = ''
+            } else {
+                this.pid = id
+            }
+        },
+        //删除患者
+        deleteItemTap(id) {
+            this.pid = ''
+            this.deleteItem(id)
+        },
         init() {
             let _queryType = storage.getItem('queryType')
             console.log(`获取缓存查询类型：${_queryType}`)
@@ -622,36 +665,10 @@ export default {
         // 查看患者详情 手释放，如果在500毫秒内就释放，则取消长按事件，此时可以执行onclick应该执行的事件
         lookDetails(val) {
             storage.setItem('queryType', this.queryType)
-            // this.$router.push({
-            //     path: '/patientList',
-            //     query: { userId: val.id, userName: val.name }
-            // })
-            let that = this
-            clearTimeout(this.Loop)
-            if (that.Loop !== 0) {
-                console.log('点击事件')
-                that.$router.push({
-                    path: '/patientList',
-                    query: { userId: val.id, userName: val.name }
-                })
-            }
-            return false
-        },
-        //如果手指有移动，则取消所有事件，此时说明用户只是要移动而不是长按
-        gotouchmove() {
-            clearTimeout(this.Loop) //清除定时器
-            this.Loop = 0
-        },
-        // 长按事件，按住后等待指定事件触发
-        touchin(val) {
-            let that = this
-            clearTimeout(this.Loop) //清除定时器
-            this.Loop = setTimeout(function() {
-                that.Loop = 0
-                console.log('长按触发')
-                that.deleteItem(val.id)
-            }, 500)
-            return false
+            this.$router.push({
+                path: '/patientList',
+                query: { userId: val.id, userName: val.name }
+            })
         },
         //查看医生名片
         lookDoctorCard() {

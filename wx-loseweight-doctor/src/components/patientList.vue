@@ -124,7 +124,7 @@
                 <div><i class="icon cubeic-arrow"></i></div>
             </div>
             <!-- 复诊随访日期设置 -->
-            <div class="patientPanel mb10">
+            <div class="patientPanel mb10" v-if="patientInfo.JZServerState == 0">
                 <div class="infoPanel datePanel">
                     <div class="item currentPanel">
                         <div class="tip">下次复诊</div>
@@ -1100,8 +1100,8 @@ export default {
                     font-size: 16px;
                 }
                 .editPTxt {
-                    top: 7px;
-                    margin-right: -3px;
+										top: 7px;
+										right: -3px;
                     border: 1px solid #e7e7f1;
                     box-shadow: 0 2px 6px 0 rgba(120, 122, 167, 0.21);
                     border-radius: 2px;
@@ -1598,7 +1598,8 @@ export default {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     overflow: hidden;
-    line-height: 14px;
+		height: 24px;
+		line-height: 24px;
     span {
         position: relative;
         &::after {

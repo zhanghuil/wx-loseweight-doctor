@@ -248,11 +248,16 @@ export default {
                 var _value
                 if (this.followDate == '' || this.followDate == '请选择')
                     _value = new Date()
-                else _value = new Date(this.followDate.replace(/-/g,"/"))
+                else _value = new Date(this.followDate.replace(/-/g, '/'))
+                // 当前日期 + 3年
+                var curDate = new Date()
+                curDate.setFullYear(curDate.getFullYear() + 3)
+                curDate.setDate(curDate.getDate() - 1)
+                console.log(curDate)
                 this.datePickerFollow = this.$createDatePicker({
                     title: '选择复诊时间',
                     // min: new Date(2008, 7, 8),
-                    // max: new Date(2020, 9, 20),
+                    max: new Date(curDate),
                     value: _value,
                     onSelect: this.selectHandleF,
                     onCancel: this.cancelHandleF

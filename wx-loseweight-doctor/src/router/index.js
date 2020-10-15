@@ -99,6 +99,15 @@ export default new Router({
 			}
 		},
 		{
+			path: '/demo',
+			name: 'demo',
+			component: resolve => require(['@/components/demo'], resolve),
+			meta: {
+				title: '示例',
+				requiresAuth: true  // 添加表示需要验证
+			}
+		},
+		{
 			path: '/myInfo',
 			name: 'myInfo',
 			component: resolve => require(['@/components/myInfo'], resolve),
