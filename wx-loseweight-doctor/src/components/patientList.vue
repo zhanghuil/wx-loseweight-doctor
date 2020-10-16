@@ -1632,6 +1632,7 @@ export default {
     padding-left: 5px;
 }
 .infoBox {
+		width: 85%;
     .iconfont {
         font-size: 17px;
         vertical-align: middle;
