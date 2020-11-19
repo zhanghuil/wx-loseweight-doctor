@@ -148,10 +148,8 @@
                                     <div class="bg_img"></div>
                                 </div>
 																<div class="txt">
-																		<span class="pr20"
-																				>{{
-																						item.QuestionAnswerInfo.IntValue
-																				}}
+																		<span class="pr20">
+																			{{!item.QuestionAnswerInfo.IntValue ? 0 : item.QuestionAnswerInfo.IntValue}}
 																				-
 																				<span
 																						v-if="
@@ -175,10 +173,8 @@
                                     <div class="bg_img"></div>
                                 </div>
 																<div class="txt">
-																		<span class="pr20"
-																				>{{
-																						item.QuestionAnswerInfo.IntValue
-																				}}
+																		<span class="pr20">
+																			{{!item.QuestionAnswerInfo.IntValue ? 0 : item.QuestionAnswerInfo.IntValue}}
 																				-
 																				<span
 																						v-if="

@@ -44,18 +44,51 @@
                 v-show="patientsList && patientsList.length > 0"
             >
                 <div class="content">
+                    <!-- 刷新提示信息 -->
+                    <div class="top-tip">
+                        <span class="refresh-hook">{{ pulldownMsg }}</span>
+                    </div>
                     <div class="listPanel">
                         <div v-for="(item, index) in patientsList" :key="index">
-                            <leftSlider
+                            <!-- <leftSlider
                                 :index="index"
                                 :id="item.PatientID"
                                 @deleteItem="deleteItem"
                             >
-                                <paItem
-                                    :item="item"
-                                    @lookTap="lookDetails"
-                                ></paItem>
-                            </leftSlider>
+                            </leftSlider> -->
+                            <paItem :item="item" @lookTap="lookDetails">
+                                <!-- 删除操作 -->
+                                <div class="editPBox">
+                                    <div
+                                        @click.stop.prevent="
+                                            moreTap(item.PatientID)
+                                        "
+                                        class="p15"
+                                    >
+                                        <i
+                                            class="icon iconfont icon-gengduomore10"
+                                        ></i>
+                                    </div>
+                                    <div
+                                        class="editPTxt"
+                                        v-show="pid == item.PatientID"
+                                    >
+                                        <div class="arrow">
+                                            <i></i>
+                                            <span></span>
+                                        </div>
+                                        <div
+                                            class="px15 py10"
+                                            @click.stop.prevent="
+                                                deleteItemTap(item.PatientID)
+                                            "
+                                        >
+                                            删除
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 删除操作 end -->
+                            </paItem>
                         </div>
                         <div class="loading" v-show="loading">
                             {{ loadingTXT }}
@@ -140,6 +173,8 @@
             @searchVal="childSearchVal"
             @cancelBtn="cancelSearchTap"
         ></search> -->
+        <!-- alert提示刷新成功 -->
+        <div class="alert-hook" :style="{ display: alertHook }">刷新成功</div>
     </div>
 </template>
 
@@ -159,6 +194,12 @@ export default {
     components: { drawer, Options, leftSlider, paItem, search },
     data() {
         return {
+            pid: '',
+            pageX: null,
+            pageY: null,
+            Loop: 0, //定时器
+            pulldownMsg: '下拉刷新',
+            alertHook: 'none',
             errorImg0: require('@/assets/p1.png'),
             errorImg1: require('@/assets/p2.png'),
             patientsList: [], //患者列表
@@ -224,30 +265,60 @@ export default {
         }
     },
     created() {
-        let _queryType = storage.getItem('queryType')
-        console.log(`获取缓存查询类型：${_queryType}`)
-        if (_queryType) {
-            this.queryType = _queryType
-        }
-        if (!storage.getItem('Token') || !storage.getItem('AccountId')) {
-            this.$router.replace({
-                path: '/login'
-            })
-            return
-        }
-        let AccountId = storage.getItem('AccountId')
-        this.accountId = AccountId
-        this.doctorId = AccountId
-        console.log(`AccountId：${AccountId}`)
+        this.isFirstEnter = true
+        // 只有第一次进入或者刷新页面后才会执行此钩子函数，使用keep-alive后（2+次）进入不会再执行此钩子函数
+    },
 
-        this.getJZMZPatients() //获取减重病人
-        this.getSubDoctor() //获取下属医生
-        this.getPatientGroups() //患者组
+    activated() {
+        if (!this.$route.meta.isBack || this.isFirstEnter) {
+            // 如果isBack是false，表明需要获取新数据，否则就不再请求，直接使用缓存的数据
+            // 如果isFirstEnter是true，表明是第一次进入此页面或用户刷新了页面，需获取新数据
+            // 执行自己写的页面的初始化
+            this.init()
+        }
+        // 恢复成默认的false，避免isBack一直是true，导致下次无法获取数据
+        this.$route.meta.isBack = false
+        // 恢复成默认的false，避免isBack一直是true，导致每次都获取新数据
+        this.isFirstEnter = false
     },
     mounted() {
         this.loadMore()
     },
     methods: {
+        //点点按钮
+        moreTap(id) {
+            if (id == this.pid) {
+                this.pid = ''
+            } else {
+                this.pid = id
+            }
+        },
+        //删除患者
+        deleteItemTap(id) {
+            this.pid = ''
+            this.deleteItem(id)
+        },
+        init() {
+            let _queryType = storage.getItem('queryType')
+            console.log(`获取缓存查询类型：${_queryType}`)
+            if (_queryType) {
+                this.queryType = _queryType
+            }
+            if (!storage.getItem('Token') || !storage.getItem('AccountId')) {
+                this.$router.replace({
+                    path: '/login'
+                })
+                return
+            }
+            let AccountId = storage.getItem('AccountId')
+            this.accountId = AccountId
+            this.doctorId = AccountId
+            console.log(`AccountId：${AccountId}`)
+
+            this.getJZMZPatients() //获取减重病人
+            this.getSubDoctor() //获取下属医生
+            this.getPatientGroups() //患者组
+        },
         //加载更多start  tabClick
         async handleChange(id, index) {
             this.isClickTab = true
@@ -271,8 +342,31 @@ export default {
                         useTransition: false,
                         scrollY: true,
                         bindToWrapper: true,
-                        HWCompositing: true
+                        HWCompositing: true,
+                        bounceTime: 700 //回弹时间
                     })
+                    // 滑动过程中事件
+                    this.scroll.on('scroll', pos => {
+                        if (pos.y > 50) {
+                            this.pulldownMsg = '释放立即刷新'
+                        }
+                    })
+                    this.scroll.on('touchEnd', pos => {
+                        //上拉刷新
+                        if (pos.y > 30) {
+                            setTimeout(() => {
+                                //恢复刷新提示文本值
+                                this.pulldownMsg = '下拉刷新'
+                                this.page = 1
+                                this.getJZMZPatients()
+                                //刷新成功后提示
+                                this.refreshalert()
+                                //刷新列表后，重新计算滚动区域高度
+                                this.scroll.refresh()
+                            }, 500)
+                        }
+                    })
+
                     this.scroll.maxScrollY = -300
                     this.scroll.on('scrollEnd', pos => {
                         this.loading = true
@@ -280,7 +374,6 @@ export default {
                             this.scroll.maxScrollY = -300
                         }
                         _this.isClickTab = false
-                        // debugger
                         if (_this.page == _this.totalPage) {
                             if (_this.TotalCount >= 10)
                                 _this.loadingTXT = '---到底了---'
@@ -305,6 +398,13 @@ export default {
             })
         },
         //加载更多end
+        //刷新成功提示
+        refreshalert() {
+            this.alertHook = 'block'
+            setTimeout(() => {
+                this.alertHook = 'none'
+            }, 1000)
+        },
         //删除患者
         deleteItem: function(id) {
             console.log('删除这个患者')
@@ -486,31 +586,38 @@ export default {
             // debugger
             var _this = this
             if (pageIndex && pageIndex == 1) {
-                _this.patientsList = []
-                _this.totalPage = 0
+                this.patientsList = []
+                this.totalPage = 0
+                this.page = pageIndex
             }
             let filterInfo = storage.getObjItem('filterResultsGroup')
             let DoctorId = filterInfo.doctorId
                 ? filterInfo.doctorId
                 : this.doctorId
+            let UpdateTimeDay = filterInfo.timeIndex
+                ? filterInfo.timeIndex
+                : this.timeIndex
+            let GroupId = filterInfo.checkedVal
+                ? filterInfo.checkedVal
+                : this.checkedVal
             let url = this.api.userApi.GetJZMZPatients
             let data = {
                 PageIndex: this.page,
                 PageSize: 10,
                 Keyword: this.searchValue, //搜索关键词
                 DoctorId: DoctorId,
-                UpdateTimeDay: this.timeIndex, //更新时间天数 7,15,30
-                GroupId: this.checkedVal, // 分组
+                UpdateTimeDay: UpdateTimeDay, //更新时间天数 7,15,30
+                GroupId: GroupId, // 分组
                 QueryType: this.queryType //查询类型 0 全部 1今日患者 2明日患者
-						}
-					
-						if (_this.page == 1) {
-								_this.patientsList = []
-						} 
+            }
+
+            if (_this.page == 1) {
+                _this.patientsList = []
+            }
             this.$fetchPost(url, data, 4111).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.Data) {
-										_this.patientsList = _this.patientsList.concat(result.Data)
+                    _this.patientsList = _this.patientsList.concat(result.Data)
                     // debugger
                     _this.totalPage = result.Page.TotalPage
                     _this.TotalCount = result.Page.TotalCount
@@ -555,7 +662,7 @@ export default {
         tabTimeClick(id) {
             this.timeIndex = id
         },
-        // 查看患者详情
+        // 查看患者详情 手释放，如果在500毫秒内就释放，则取消长按事件，此时可以执行onclick应该执行的事件
         lookDetails(val) {
             storage.setItem('queryType', this.queryType)
             this.$router.push({
@@ -612,6 +719,7 @@ export default {
     top: 0;
     left: 0;
     width: 100%;
+    height: 68px;
     .wrapperH {
         display: flex;
         align-items: center;
@@ -674,6 +782,19 @@ export default {
         width: 100vw;
         height: 100vh;
         overflow: hidden;
+    }
+    /* 下拉、上拉提示信息 */
+    .top-tip {
+        position: absolute;
+        top: 80px;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        color: #555;
+        font-size: 14px;
     }
     .listPanel {
         padding: 132px 15px 52px;
@@ -751,5 +872,19 @@ export default {
         height: 100px;
         margin-bottom: 20px;
     }
+}
+/* 全局提示信息 */
+.alert-hook {
+    display: none;
+    position: fixed;
+    top: 25%;
+    left: 38%;
+    z-index: 99;
+    padding: 10px 20px;
+    border-radius: 2px;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.7);
 }
 </style>

@@ -10,10 +10,42 @@
                             @error="imgError()"
                         />
                     </div>
-                    <div>
-                        <p class="pb8">
-                            <strong>{{ patientInfo.Name }}</strong>
+                    <div class="flex1 rel">
+                        <div class="editPBox">
+                            <div @click="moreTap">
+                                <i class="icon iconfont icon-gengduomore10"></i>
+                            </div>
+                            <div class="editPTxt" v-show="stopIconState">
+                                <div class="arrow">
+                                    <i></i>
+                                    <span></span>
+                                </div>
+                                <!-- 0 服务中 10取消服务 -->
+                                <div
+                                    class="px12 py8"
+                                    @click="
+                                        serverStateTap(
+                                            patientInfo.JZServerState
+                                        )
+                                    "
+                                >
+                                    <template
+                                        v-if="patientInfo.JZServerState == 0"
+                                        >终止门诊</template
+                                    >
+                                    <template v-else>取消终止</template>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="pb8 infoBox">
+                            <strong @click="editNameTap(patientInfo.Name)">{{
+                                patientInfo.Name
+                            }}</strong>
                             <span
+                                @click="editNameTap(patientInfo.Name)"
+                                class="iconfont icon-bianji1"
+                            ></span>
+                            <span class="pl5"
                                 >{{ patientInfo.Weight }}kg，{{
                                     patientInfo.Sex == 0 ? '男' : '女'
                                 }}，{{ patientInfo.Age }}</span
@@ -45,17 +77,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="item" v-show="patientInfo.DiagnoseWeight">
+                    <!-- v-show="patientInfo.DiagnoseWeight" -->
+                    <div class="item">
                         <div class="tip">首诊</div>
                         <div class="flex-between">
                             <div>
                                 <p class="num">
-                                    {{ patientInfo.DiagnoseWeight }}
+                                    {{ patientInfo.DiagnoseWeight || '-' }}
                                 </p>
                                 <p>体重（kg）</p>
                             </div>
                             <div>
-                                <p class="num">{{ patientInfo.DiagnoseBMI }}</p>
+                                <p class="num">
+                                    {{ patientInfo.DiagnoseBMI || '-' }}
+                                </p>
                                 <p>BMI指标</p>
                             </div>
                         </div>
@@ -88,6 +123,47 @@
                 </div>
                 <div><i class="icon cubeic-arrow"></i></div>
             </div>
+            <!-- 复诊随访日期设置 -->
+            <div class="patientPanel mb10" v-if="patientInfo.JZServerState == 0">
+                <div class="infoPanel datePanel">
+                    <div class="item currentPanel">
+                        <div class="tip">下次复诊</div>
+                        <div
+                            class="flex-center"
+                            v-if="!nextReVisitingDate"
+                            @click="setTimeTap('FZ')"
+                        >
+                            <span class="setUpBtn">设置</span>
+                        </div>
+                        <div
+                            class="editDateBox"
+                            v-else
+                            @click="setTimeTap('FZ')"
+                        >
+                            <span class="f16">{{ nextReVisitingDate }}</span>
+                            <span class="iconfont icon-bianji1"></span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="tip">下次随访</div>
+                        <div
+                            class="flex-center"
+                            v-if="!nextFollowUpVisitDate"
+                            @click="setTimeTap('SF')"
+                        >
+                            <span class="setUpBtn">设置</span>
+                        </div>
+                        <div
+                            class="editDateBox"
+                            v-else
+                            @click="setTimeTap('SF')"
+                        >
+                            <span class="f16">{{ nextFollowUpVisitDate }}</span>
+                            <span class="iconfont icon-bianji1"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- 体重柱状图 start-->
             <div class="weightChart" v-if="weightData">
                 <div class="infoTit">
@@ -112,7 +188,7 @@
                                 class="list-item"
                                 @click="showTap(index)"
                             >
-																<!-- v-show="index == showTipIndex" -->
+                                <!-- v-show="index == showTipIndex" -->
                                 <div class="tips">
                                     <div class="arrow2">
                                         <i></i>
@@ -363,17 +439,41 @@
                 <div class="f14 c-6d mt10">您已无权查看该患者信息</div>
             </div>
         </div>
+        <selfModal
+            v-model="showModal"
+            type="prompt"
+            title="患者称呼"
+            @cancel="clickCancel()"
+            @confirm="clickConfirm()"
+        >
+            <div class="content">
+                <div class="cu-input">
+                    <input
+                        v-model="nameVal"
+                        type="text"
+                        placeholder="请输入"
+                        class="cube-input-field"
+                    />
+                </div>
+            </div>
+        </selfModal>
     </div>
 </template>
 
 <script>
+import selfModal from '@/components/public/selfModal'
 import { yktoast } from '../common/js/util'
 import storage from '../common/js/storage'
 import { formatDate } from '../common/js/date'
+import qs from 'qs'
 export default {
     name: 'patientList',
+    components: { selfModal },
     data() {
         return {
+            stopIconState: false, //终止门诊框
+            nameVal: '', //患者姓名
+            showModal: false, //模态框
             errorImg0: require('@/assets/tx1.png'),
             errorImg1: require('@/assets/tx2.png'),
             patientInfo: {}, //患者信息
@@ -406,7 +506,10 @@ export default {
             infoList: [], //评估表
             planList: [], //减重方案
             planId: '',
-            assessId: ''
+            assessId: '',
+            nextFollowUpVisitDate: '', //下次随访日期
+            nextReVisitingDate: '', //下次复诊日期
+            followUpVisitPlan: '' // 随诊周期
         }
     },
     filters: {
@@ -426,12 +529,12 @@ export default {
                 return ''
             }
         }
-		},
-		computed: {
-			reverseWeight(){
-				return this.weightData.reverse();            
-			}
-		},
+    },
+    computed: {
+        reverseWeight() {
+            return this.weightData.reverse()
+        }
+    },
     created() {
         let typeIndex = storage.getItem('index')
         if (typeIndex) {
@@ -450,6 +553,7 @@ export default {
         this.getWeightRecordByType()
         this.getRecordedRegistrations()
         this.getWeightLossPlans()
+        this.getWeightLossSchedule()
     },
     computed: {
         options() {
@@ -464,7 +568,167 @@ export default {
             this.rebuildScroll()
         }
     },
+    beforeRouteLeave(to, from, next) {
+        if (from.name == 'patientList') {
+            to.meta.isBack = true
+        }
+        next()
+    },
     methods: {
+        //增加“终止门诊”功能
+        moreTap() {
+            this.stopIconState = !this.stopIconState
+        },
+        // 0 服务中 10取消服务
+        serverStateTap(e) {
+            if (e == 0) this.stopTap(e)
+            else this.cancelStopTap(e)
+        },
+        //设置减重服务状态
+        setJZServerState(e) {
+            var _this = this
+            let url = this.api.userApi.SetJZServerState
+            let patientId = this.$route.query.userId
+            let _value = e == 0 ? 10 : 0
+            let data = {
+                Value: _value
+            }
+            this.$fetchPut(
+                `${url}?patientId=${patientId}`,
+                qs.stringify(data),
+                4115
+            ).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast('设置失败')
+                    return
+                }
+                yktoast('设置成功')
+                _this.getJZMZPatient()
+            })
+        },
+        stopTap(e) {
+            this.moreTap()
+            this.$createDialog({
+                type: 'confirm',
+                title: '确定要终止门诊吗？',
+                content:
+                    '终止后系统将停止对该患者推送复诊、随诊、减重打卡等提醒！',
+                confirmBtn: {
+                    text: '确定',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    console.log('点击确认按钮')
+                    this.setJZServerState(e)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
+        //取消终止
+        cancelStopTap(e) {
+            this.moreTap()
+            this.$createDialog({
+                type: 'confirm',
+                content: '确定要取消终止吗？',
+                confirmBtn: {
+                    text: '确定',
+                    active: true,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                cancelBtn: {
+                    text: '取消',
+                    active: false,
+                    disabled: false,
+                    href: 'javascript:;'
+                },
+                onConfirm: () => {
+                    console.log('点击确认按钮')
+                    this.setJZServerState(e)
+                },
+                onCancel: () => {
+                    console.log('点击取消按钮')
+                }
+            }).show()
+        },
+        clickCancel() {
+            console.log('点击了取消')
+        },
+        clickConfirm() {
+            console.log('点击了confirm')
+            if (!this.nameVal) {
+                this.$createToast({
+                    txt: '姓名不能为空',
+                    type: 'txt'
+                }).show()
+                return
+            }
+            this.updateInfoByDoctor(this.nameVal)
+        },
+        //修改患者姓名弹框
+        editNameTap(val) {
+            this.showModal = true
+            this.nameVal = val
+            return
+            var _this = this
+            this.$createDialog({
+                type: 'prompt',
+                title: '修改患者称呼',
+                prompt: {
+                    value: val,
+                    placeholder: '请输入'
+                },
+                onConfirm: (e, promptValue) => {
+                    console.log(`患者名称：${promptValue}`)
+                    if (!promptValue) {
+                        _this
+                            .$createToast({
+                                txt: '姓名不能为空',
+                                type: 'txt'
+                            })
+                            .show()
+                        return
+                    }
+                    _this.updateInfoByDoctor(promptValue)
+                },
+                onCancel: (e, promptValue) => {
+                    console.log('点击了取消按钮')
+                }
+            }).show()
+        },
+        //修改患者姓名
+        updateInfoByDoctor(name) {
+            var _this = this
+            let url = this.api.userApi.UpdateInfoByDoctor
+            let patientId = this.$route.query.userId
+            let data = {
+                Name: name
+            }
+            this.$fetchPut(
+                `${url}?patientId=${patientId}`,
+                qs.stringify(data),
+                4114
+            ).then(response => {
+                let result = response.data.data //请求返回数据
+                if (!result) {
+                    yktoast('修改失败')
+                    return
+                }
+                yktoast('修改成功')
+                _this.getJZMZPatient()
+            })
+        },
         imgError() {
             let img = event.srcElement
             img.src = this.errorImg0
@@ -528,8 +792,8 @@ export default {
             this.$fetchDelete(url, data, 4112).then(response => {
                 let result = response.data.data //请求返回数据
                 if (result.State != 0) {
-										yktoast(result.Msg)
-										_this.assessId = ''
+                    yktoast(result.Msg)
+                    _this.assessId = ''
                     return
                 }
                 yktoast(result.Msg)
@@ -574,6 +838,48 @@ export default {
             this.$router.push({
                 path: '/draftPlan',
                 query: { userId: this.$route.query.userId, planId: id }
+            })
+        },
+        //获取患者减重计划
+        getWeightLossSchedule() {
+            var _this = this
+            let url = this.api.userApi.GetWeightLossSchedule
+            let data = {
+                patientId: this.$route.query.userId
+            }
+            this.$fetchGet(url, data, 4114).then(response => {
+                let result = response.data.data //请求返回数据
+                //下次随访日期
+                if (!result.NextFollowUpVisitDate)
+                    _this.nextFollowUpVisitDate = ''
+                else
+                    _this.nextFollowUpVisitDate = formatDate(
+                        new Date(result.NextFollowUpVisitDate),
+                        'yyyy-MM-dd'
+                    )
+                _this.followUpVisitPlan = result.FollowUpVisitPlan //随诊周期
+                //下次复诊日期
+                if (!result.NextReVisitingDate) _this.nextReVisitingDate = ''
+                else
+                    _this.nextReVisitingDate = formatDate(
+                        new Date(result.NextReVisitingDate),
+                        'yyyy-MM-dd'
+                    )
+            })
+        },
+        //设置复诊随访时间
+        setTimeTap(type) {
+            let fxdata = {
+                followUpVisitPlan: this.followUpVisitPlan,
+                nextReVisitingDate: this.nextReVisitingDate,
+                userId: this.$route.query.userId
+            }
+            this.$router.push({
+                path: '/setTime',
+                query: {
+                    type: type,
+                    fxdata: JSON.stringify(fxdata)
+                }
             })
         },
         //撤回操作提示框
@@ -786,6 +1092,61 @@ export default {
                 border-radius: 50%;
                 margin-right: 15px;
             }
+            .editPBox {
+                text-align: right;
+                position: absolute;
+                right: 5px;
+                .icon {
+                    font-size: 16px;
+                }
+                .editPTxt {
+										top: 7px;
+										right: -3px;
+                    border: 1px solid #e7e7f1;
+                    box-shadow: 0 2px 6px 0 rgba(120, 122, 167, 0.21);
+                    border-radius: 2px;
+                    background: #fff;
+                    color: #3a3a3a;
+                    font-size: 14px;
+                    position: relative;
+                    .px12 {
+                        padding-left: 12px;
+                        padding-right: 12px;
+                    }
+                    .py8 {
+                        padding-top: 8px;
+                        padding-bottom: 8px;
+                    }
+                    .arrow {
+                        position: absolute;
+                        width: 14px;
+                        height: 14px;
+                        top: -14px;
+                        right: 2px;
+                    }
+                    .arrow i {
+                        display: block;
+                        border-color: transparent transparent #e7e7f1
+                            transparent;
+                        border-width: 6px;
+                        position: absolute;
+                        border-style: dashed dashed solid dashed;
+                        font-size: 0;
+                        line-height: 0;
+                        bottom: 1px;
+                    }
+                    .arrow span {
+                        display: block;
+                        border-color: transparent transparent #fff transparent;
+                        top: 2px;
+                        border-width: 6px;
+                        position: absolute;
+                        border-style: dashed dashed solid dashed;
+                        font-size: 0;
+                        line-height: 0;
+                    }
+                }
+            }
             strong {
                 font-size: 16px;
                 color: #3a3a3a;
@@ -837,6 +1198,39 @@ export default {
                 }
                 &:last-child {
                     margin-right: 0;
+                }
+            }
+        }
+        .datePanel {
+            .item {
+                margin-bottom: 0;
+                padding: 33px 10px 10px;
+                .tip {
+                    width: auto;
+                    padding: 0 6px;
+                }
+                .flex-center {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .setUpBtn {
+                    background: #b4b5d9;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    color: #ffffff;
+                    padding: 5px 10px;
+                }
+                .editDateBox {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .iconfont {
+                        font-size: 18px;
+                        margin-left: 6px;
+                    }
                 }
             }
         }
@@ -1204,6 +1598,8 @@ export default {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
     overflow: hidden;
+		height: 24px;
+		line-height: 24px;
     span {
         position: relative;
         &::after {
@@ -1221,7 +1617,6 @@ export default {
     width: 100%;
     height: 100%;
 }
-
 .noPlan {
     display: table-cell;
     text-align: center;
@@ -1229,9 +1624,21 @@ export default {
     width: 138px;
     height: 127px;
 }
-
 .noPlan .img {
     width: 128px;
     height: 100px;
+}
+.pl5 {
+    padding-left: 5px;
+}
+.infoBox {
+		width: 85%;
+    .iconfont {
+        font-size: 17px;
+        vertical-align: middle;
+    }
+}
+.flex1 {
+    flex: 1;
 }
 </style>

@@ -16,7 +16,7 @@
                 <div v-else>
                     <i class="icon iconfont icon-radioboxblank "></i>
                 </div>
-                <div>全选</div>
+                <div class="f14">全选</div>
             </div>
         </div>
         <ul>

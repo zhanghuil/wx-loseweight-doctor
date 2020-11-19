@@ -10,6 +10,8 @@ export default new Router({
 			name: 'index',
 			component: resolve => require(['@/components/index'], resolve),
 			meta: {
+				keepAlive: true,
+				isBack: false, //用于判断上一个页面是哪个
 				title: '患者',
 				requiresAuth: true  // 添加表示需要验证
 			}
@@ -97,6 +99,15 @@ export default new Router({
 			}
 		},
 		{
+			path: '/demo',
+			name: 'demo',
+			component: resolve => require(['@/components/demo'], resolve),
+			meta: {
+				title: '示例',
+				requiresAuth: true  // 添加表示需要验证
+			}
+		},
+		{
 			path: '/myInfo',
 			name: 'myInfo',
 			component: resolve => require(['@/components/myInfo'], resolve),
@@ -166,6 +177,15 @@ export default new Router({
 			component: resolve => require(['@/components/doctorEvalForm'], resolve),
 			meta: {
 				title: '医生评估表',
+				requiresAuth: true  // 添加表示需要验证
+			}
+		},
+		{
+			path: '/setTime',
+			name: 'setTime',
+			component: resolve => require(['@/components/setTime'], resolve),
+			meta: {
+				title: '复诊',
 				requiresAuth: true  // 添加表示需要验证
 			}
 		},

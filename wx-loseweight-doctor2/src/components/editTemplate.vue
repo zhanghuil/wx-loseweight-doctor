@@ -30,7 +30,22 @@
                     </div>
                     <ol class="mt15">
                         <li v-for="(n, idx) in item.Questions" :key="idx">
-                            <div class="wrap">
+														<!-- 多行文本框 -->
+														<div v-if="n.TypeCode == 'Textarea'">
+																<div class="f14 c-3a">{{ n.Name }}</div>
+																<div class="my-textarea">
+																		<myTextarea
+																				:placeholder="n.Placeholder"
+																				:parentValue="
+																						n.QuestionAnswerInfo.StrValue
+																				"
+																				@parentValue="
+																						n.QuestionAnswerInfo.StrValue = $event
+																				"
+																		></myTextarea>
+																</div>
+														</div>
+                            <div class="wrap" v-else>
                                 <div class="f14 c-3a">{{ n.Name }}</div>
                                 <div class="pr10">
                                     <template v-if="n.TypeCode == 'Num'">
@@ -70,16 +85,10 @@
                                         </template>
                                     </template>
                                     <template v-else-if="n.TypeCode == 'Text'">
-                                        <input
-                                            @input="
-                                                checkInput(
-                                                    index,
-                                                    idx,
-                                                    'StrValue'
-                                                )
-                                            "
+                                        <!-- @input="checkInput(index,idx,'StrValue')" -->
+																				<input
                                             :placeholder="n.Placeholder"
-                                            type="tel"
+                                            type="text"
                                             v-model="
                                                 n.QuestionAnswerInfo.StrValue
                                             "
@@ -129,7 +138,22 @@
                                     v-for="(n, idx) in item.Questions"
                                     :key="idx"
                                 >
-                                    <div class="wrap">
+																    <!-- 多行文本框 -->
+																		<div v-if="n.TypeCode == 'Textarea'">
+																				<div class="f14 c-3a">{{ n.Name }}</div>
+																				<div class="my-textarea">
+																						<myTextarea
+																								:placeholder="n.Placeholder"
+																								:parentValue="
+																										n.QuestionAnswerInfo.StrValue
+																								"
+																								@parentValue="
+																										n.QuestionAnswerInfo.StrValue = $event
+																								"
+																						></myTextarea>
+																				</div>
+																		</div>
+                                    <div class="wrap" v-else>
                                         <div class="f14 c-3a">
                                             {{ n.Name }}
                                         </div>
@@ -181,16 +205,10 @@
                                             <template
                                                 v-else-if="n.TypeCode == 'Text'"
                                             >
+																								<!-- @input="checkInput(index,idx,'StrValue')" -->
                                                 <input
-                                                    @input="
-                                                        checkInput(
-                                                            index,
-                                                            idx,
-                                                            'StrValue'
-                                                        )
-                                                    "
                                                     :placeholder="n.Placeholder"
-                                                    type="tel"
+                                                    type="text"
                                                     v-model="
                                                         n.QuestionAnswerInfo
                                                             .StrValue
@@ -242,7 +260,22 @@
                                     v-for="(n, idx) in item.Questions"
                                     :key="idx"
                                 >
-                                    <div class="wrap">
+																		<!-- 多行文本框 -->
+																		<div v-if="n.TypeCode == 'Textarea'">
+																				<div class="f14 c-3a">{{ n.Name }}</div>
+																				<div class="my-textarea">
+																						<myTextarea
+																								:placeholder="n.Placeholder"
+																								:parentValue="
+																										n.QuestionAnswerInfo.StrValue
+																								"
+																								@parentValue="
+																										n.QuestionAnswerInfo.StrValue = $event
+																								"
+																						></myTextarea>
+																				</div>
+																		</div>
+                                    <div class="wrap" v-else>
                                         <div class="f14 c-3a">
                                             {{ n.Name }}
                                         </div>
@@ -298,18 +331,11 @@
                                             <template
                                                 v-else-if="n.TypeCode == 'Text'"
                                             >
+																								<!-- @input="checkInput(index,idx,'StrValue',1)" -->
                                                 <input
-                                                    @input="
-                                                        checkInput(
-                                                            index,
-                                                            idx,
-                                                            'StrValue',
-                                                            1
-                                                        )
-                                                    "
                                                     :disabled="n.IsFixed"
                                                     :placeholder="n.Placeholder"
-                                                    type="tel"
+                                                    type="text"
                                                     v-model="
                                                         n.QuestionAnswerInfo
                                                             .StrValue
@@ -366,12 +392,13 @@
 
 <script>
 import drawerFoot from '@/components/public/drawerFoot'
+import myTextarea from '@/components/public/myTextarea'
 import qs from 'qs'
 import { yktoast } from '../common/js/util'
 import storage from '../common/js/storage'
 export default {
     name: 'editTemplate',
-    components: { drawerFoot },
+    components: { drawerFoot, myTextarea },
     data() {
         return {
             templateName: '',
@@ -520,7 +547,7 @@ export default {
                             }
                             items.IntValue = element.QuestionAnswerInfo.IntValue
                         }
-                    } else if (element.TypeCode == 'Text') {
+                    } else if (element.TypeCode == 'Text' || element.TypeCode == 'Textarea') {
                         //字符串
                         var items = {
                             StrValue: '',
