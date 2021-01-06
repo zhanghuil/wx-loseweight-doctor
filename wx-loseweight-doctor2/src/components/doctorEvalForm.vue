@@ -255,8 +255,14 @@ export default {
         //评估日期
         showDatePicker() {
             if (!this.datePicker) {
+							  // 当前日期 + 3年
+                var curDate = new Date()
+                curDate.setFullYear(curDate.getFullYear() + 3)
+                curDate.setDate(curDate.getDate() - 1)
+                console.log(curDate)
                 this.datePicker = this.$createDatePicker({
-                    title: '选择评估日期',
+										title: '选择评估日期',
+										max: new Date(curDate),
                     value: new Date(),
                     onSelect: this.selectHandle,
                     onCancel: this.cancelHandle
